@@ -14,16 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      guests: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          invitation_code: string
+          last_name: string
+          notes: string | null
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name: string
+          id?: string
+          invitation_code: string
+          last_name: string
+          notes?: string | null
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          invitation_code?: string
+          last_name?: string
+          notes?: string | null
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wedding_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["wedding_role"]
+          user_id: string
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["wedding_role"]
+          user_id: string
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["wedding_role"]
+          user_id?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wedding_members_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weddings: {
+        Row: {
+          couple_name_one: string
+          couple_name_two: string
+          created_at: string
+          id: string
+          is_public: boolean
+          primary_admin_id: string
+          slug: string
+          updated_at: string
+          wedding_date: string | null
+        }
+        Insert: {
+          couple_name_one: string
+          couple_name_two: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          primary_admin_id: string
+          slug: string
+          updated_at?: string
+          wedding_date?: string | null
+        }
+        Update: {
+          couple_name_one?: string
+          couple_name_two?: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          primary_admin_id?: string
+          slug?: string
+          updated_at?: string
+          wedding_date?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_guest_wedding_id: { Args: never; Returns: string }
+      has_platform_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_wedding_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["wedding_role"]
+          _user_id: string
+          _wedding_id: string
+        }
+        Returns: boolean
+      }
+      is_wedding_admin: {
+        Args: { _user_id: string; _wedding_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "platform_owner"
+      wedding_role: "primary_admin" | "secondary_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +302,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["platform_owner"],
+      wedding_role: ["primary_admin", "secondary_admin"],
+    },
   },
 } as const
