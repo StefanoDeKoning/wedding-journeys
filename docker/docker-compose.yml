@@ -1,0 +1,42 @@
+# OurJourney — local Postgres for development and self-hosting.
+# Run with:  docker compose -f docker/docker-compose.yml up -d
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ourjourney-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ourjourney
+      POSTGRES_PASSWORD: ${OURJOURNEY_DB_PASSWORD:-ourjourney_dev}
+      POSTGRES_DB: ourjourney
+    ports:
+      - "54329:5432"
+    volumes:
+      - ourjourney_pgdata:/var/lib/postgresql/data
+      # Migrations are applied in filename order on first boot.
+      - ../supabase/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ourjourney -d ourjourney"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional: lightweight UI for browsing the DB.
+  # Comment out if you don't want it.
+  studio:
+    image: dpage/pgadmin4:8
+    container_name: ourjourney-studio
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: dev@ourjourney.local
+      PGADMIN_DEFAULT_PASSWORD: ourjourney_dev
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "54323:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  ourjourney_pgdata:
