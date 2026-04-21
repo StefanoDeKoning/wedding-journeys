@@ -13,7 +13,14 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as CreateRouteImport } from './routes/create'
+import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
+import { Route as SlugRsvpRouteImport } from './routes/$slug.rsvp'
+import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
+import { Route as SlugLocationRouteImport } from './routes/$slug.location'
+import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -35,18 +42,60 @@ const CreateRoute = CreateRouteImport.update({
   path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugIndexRoute = SlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugTimelineRoute = SlugTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugRsvpRoute = SlugRsvpRouteImport.update({
+  id: '/rsvp',
+  path: '/rsvp',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugPlaylistRoute = SlugPlaylistRouteImport.update({
+  id: '/playlist',
+  path: '/playlist',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugLocationRoute = SlugLocationRouteImport.update({
+  id: '/location',
+  path: '/location',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugGalleryRoute = SlugGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => SlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
+  '/$slug/gallery': typeof SlugGalleryRoute
+  '/$slug/location': typeof SlugLocationRoute
+  '/$slug/playlist': typeof SlugPlaylistRoute
+  '/$slug/rsvp': typeof SlugRsvpRoute
+  '/$slug/timeline': typeof SlugTimelineRoute
+  '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,25 +103,75 @@ export interface FileRoutesByTo {
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
+  '/$slug/gallery': typeof SlugGalleryRoute
+  '/$slug/location': typeof SlugLocationRoute
+  '/$slug/playlist': typeof SlugPlaylistRoute
+  '/$slug/rsvp': typeof SlugRsvpRoute
+  '/$slug/timeline': typeof SlugTimelineRoute
+  '/$slug': typeof SlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRouteWithChildren
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
+  '/$slug/gallery': typeof SlugGalleryRoute
+  '/$slug/location': typeof SlugLocationRoute
+  '/$slug/playlist': typeof SlugPlaylistRoute
+  '/$slug/rsvp': typeof SlugRsvpRoute
+  '/$slug/timeline': typeof SlugTimelineRoute
+  '/$slug/': typeof SlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/demo' | '/features' | '/login'
+  fullPaths:
+    | '/'
+    | '/$slug'
+    | '/create'
+    | '/demo'
+    | '/features'
+    | '/login'
+    | '/$slug/gallery'
+    | '/$slug/location'
+    | '/$slug/playlist'
+    | '/$slug/rsvp'
+    | '/$slug/timeline'
+    | '/$slug/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/demo' | '/features' | '/login'
-  id: '__root__' | '/' | '/create' | '/demo' | '/features' | '/login'
+  to:
+    | '/'
+    | '/create'
+    | '/demo'
+    | '/features'
+    | '/login'
+    | '/$slug/gallery'
+    | '/$slug/location'
+    | '/$slug/playlist'
+    | '/$slug/rsvp'
+    | '/$slug/timeline'
+    | '/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/$slug'
+    | '/create'
+    | '/demo'
+    | '/features'
+    | '/login'
+    | '/$slug/gallery'
+    | '/$slug/location'
+    | '/$slug/playlist'
+    | '/$slug/rsvp'
+    | '/$slug/timeline'
+    | '/$slug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SlugRoute: typeof SlugRouteWithChildren
   CreateRoute: typeof CreateRoute
   DemoRoute: typeof DemoRoute
   FeaturesRoute: typeof FeaturesRoute
@@ -109,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,11 +222,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug/': {
+      id: '/$slug/'
+      path: '/'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof SlugIndexRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/timeline': {
+      id: '/$slug/timeline'
+      path: '/timeline'
+      fullPath: '/$slug/timeline'
+      preLoaderRoute: typeof SlugTimelineRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/rsvp': {
+      id: '/$slug/rsvp'
+      path: '/rsvp'
+      fullPath: '/$slug/rsvp'
+      preLoaderRoute: typeof SlugRsvpRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/playlist': {
+      id: '/$slug/playlist'
+      path: '/playlist'
+      fullPath: '/$slug/playlist'
+      preLoaderRoute: typeof SlugPlaylistRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/location': {
+      id: '/$slug/location'
+      path: '/location'
+      fullPath: '/$slug/location'
+      preLoaderRoute: typeof SlugLocationRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/gallery': {
+      id: '/$slug/gallery'
+      path: '/gallery'
+      fullPath: '/$slug/gallery'
+      preLoaderRoute: typeof SlugGalleryRouteImport
+      parentRoute: typeof SlugRoute
+    }
   }
 }
 
+interface SlugRouteChildren {
+  SlugGalleryRoute: typeof SlugGalleryRoute
+  SlugLocationRoute: typeof SlugLocationRoute
+  SlugPlaylistRoute: typeof SlugPlaylistRoute
+  SlugRsvpRoute: typeof SlugRsvpRoute
+  SlugTimelineRoute: typeof SlugTimelineRoute
+  SlugIndexRoute: typeof SlugIndexRoute
+}
+
+const SlugRouteChildren: SlugRouteChildren = {
+  SlugGalleryRoute: SlugGalleryRoute,
+  SlugLocationRoute: SlugLocationRoute,
+  SlugPlaylistRoute: SlugPlaylistRoute,
+  SlugRsvpRoute: SlugRsvpRoute,
+  SlugTimelineRoute: SlugTimelineRoute,
+  SlugIndexRoute: SlugIndexRoute,
+}
+
+const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SlugRoute: SlugRouteWithChildren,
   CreateRoute: CreateRoute,
   DemoRoute: DemoRoute,
   FeaturesRoute: FeaturesRoute,

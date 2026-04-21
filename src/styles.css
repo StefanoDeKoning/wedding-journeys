@@ -185,3 +185,136 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fade-up 0.8s var(--transition-base) both; }
+
+/* ============ Wedding Invitation: Envelope, Wax Seal, Parchment ============ */
+
+:root {
+  --parchment-base: oklch(0.93 0.04 80);
+  --parchment-edge: oklch(0.78 0.06 60);
+  --parchment-ink: oklch(0.28 0.04 50);
+  --envelope-paper: oklch(0.86 0.04 70);
+  --envelope-shadow: oklch(0.55 0.04 40);
+  --wax-red: oklch(0.42 0.18 28);
+  --wax-red-dark: oklch(0.32 0.16 28);
+  --wax-gold: oklch(0.78 0.13 75);
+}
+
+/* Vintage parchment texture using layered radial + repeating gradients */
+.parchment {
+  background-color: var(--parchment-base);
+  background-image:
+    radial-gradient(ellipse at 20% 15%, color-mix(in oklab, var(--parchment-edge) 25%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, color-mix(in oklab, var(--parchment-edge) 30%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 60% 30%, color-mix(in oklab, var(--wax-red) 8%, transparent) 0%, transparent 30%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 22px,
+      color-mix(in oklab, var(--parchment-edge) 6%, transparent) 22px,
+      color-mix(in oklab, var(--parchment-edge) 6%, transparent) 23px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 80px,
+      color-mix(in oklab, var(--parchment-edge) 4%, transparent) 80px,
+      color-mix(in oklab, var(--parchment-edge) 4%, transparent) 81px
+    );
+  color: var(--parchment-ink);
+  position: relative;
+  box-shadow:
+    inset 0 0 80px color-mix(in oklab, var(--parchment-edge) 35%, transparent),
+    inset 0 0 12px color-mix(in oklab, var(--parchment-edge) 50%, transparent),
+    0 25px 60px -25px color-mix(in oklab, var(--ink) 50%, transparent),
+    0 8px 20px -8px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+.parchment::before,
+.parchment::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 28px;
+  pointer-events: none;
+  background-repeat: repeat-x;
+  background-size: 40px 28px;
+}
+
+.parchment::before {
+  top: -1px;
+  background-image: radial-gradient(ellipse 22px 14px at 20px 0px, var(--parchment-base) 99%, transparent 100%);
+  filter: drop-shadow(0 -2px 1px color-mix(in oklab, var(--ink) 12%, transparent));
+}
+
+.parchment::after {
+  bottom: -1px;
+  background-image: radial-gradient(ellipse 22px 14px at 20px 28px, var(--parchment-base) 99%, transparent 100%);
+  filter: drop-shadow(0 2px 1px color-mix(in oklab, var(--ink) 12%, transparent));
+}
+
+.font-parchment-script {
+  font-family: var(--font-script);
+  color: var(--parchment-ink);
+}
+
+.font-parchment-display {
+  font-family: var(--font-display);
+  color: var(--parchment-ink);
+}
+
+/* Envelope */
+.envelope-paper {
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--envelope-paper) 100%, transparent) 0%,
+      color-mix(in oklab, var(--envelope-paper) 92%, var(--ink)) 100%);
+  box-shadow:
+    0 30px 70px -20px color-mix(in oklab, var(--ink) 55%, transparent),
+    0 12px 25px -10px color-mix(in oklab, var(--ink) 30%, transparent),
+    inset 0 0 60px color-mix(in oklab, var(--envelope-shadow) 18%, transparent);
+}
+
+.envelope-flap {
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--envelope-paper) 100%, transparent) 0%,
+      color-mix(in oklab, var(--envelope-paper) 88%, var(--ink)) 100%);
+  box-shadow: inset 0 -8px 20px color-mix(in oklab, var(--envelope-shadow) 25%, transparent);
+}
+
+/* Floating animation for the closed envelope */
+@keyframes envelope-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+.envelope-float { animation: envelope-float 4s ease-in-out infinite; }
+
+/* Envelope opening */
+@keyframes flap-open {
+  from { transform: rotateX(0deg); }
+  to { transform: rotateX(180deg); }
+}
+.flap-opening { animation: flap-open 0.9s var(--transition-base) forwards; }
+
+/* Letter slide-out */
+@keyframes letter-rise {
+  0%   { transform: translateY(40px) scale(0.92); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.letter-rise { animation: letter-rise 1.2s 0.4s var(--transition-base) both; }
+
+/* Wax seal pulse */
+@keyframes wax-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--wax-red-dark) 45%, transparent)); }
+  50% { transform: scale(1.04); filter: drop-shadow(0 12px 22px color-mix(in oklab, var(--wax-red-dark) 60%, transparent)); }
+}
+.wax-pulse { animation: wax-pulse 2.6s ease-in-out infinite; }
+
+/* Wax shatter on click */
+@keyframes wax-break {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1.6) rotate(20deg); opacity: 0; }
+}
+.wax-break { animation: wax-break 0.5s ease-out forwards; }
