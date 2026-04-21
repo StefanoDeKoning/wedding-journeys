@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as CreateRouteImport } from './routes/create'
+import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 
 const LoginRoute = LoginRouteImport.update({
@@ -35,6 +36,11 @@ const CreateRoute = CreateRouteImport.update({
   path: '/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlugRoute = SlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRoute
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRoute
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$slug': typeof SlugRoute
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
@@ -65,14 +74,15 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/demo' | '/features' | '/login'
+  fullPaths: '/' | '/$slug' | '/create' | '/demo' | '/features' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/demo' | '/features' | '/login'
-  id: '__root__' | '/' | '/create' | '/demo' | '/features' | '/login'
+  to: '/' | '/$slug' | '/create' | '/demo' | '/features' | '/login'
+  id: '__root__' | '/' | '/$slug' | '/create' | '/demo' | '/features' | '/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SlugRoute: typeof SlugRoute
   CreateRoute: typeof CreateRoute
   DemoRoute: typeof DemoRoute
   FeaturesRoute: typeof FeaturesRoute
@@ -109,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$slug': {
+      id: '/$slug'
+      path: '/$slug'
+      fullPath: '/$slug'
+      preLoaderRoute: typeof SlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -121,6 +138,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SlugRoute: SlugRoute,
   CreateRoute: CreateRoute,
   DemoRoute: DemoRoute,
   FeaturesRoute: FeaturesRoute,
