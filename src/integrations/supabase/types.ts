@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           email: string | null
           first_name: string
+          guest_type: Database["public"]["Enums"]["guest_type"]
           id: string
           invitation_code: string
           last_name: string
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name: string
+          guest_type?: Database["public"]["Enums"]["guest_type"]
           id?: string
           invitation_code: string
           last_name: string
@@ -41,6 +43,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string
+          guest_type?: Database["public"]["Enums"]["guest_type"]
           id?: string
           invitation_code?: string
           last_name?: string
@@ -114,16 +117,19 @@ export type Database = {
       weddings: {
         Row: {
           bride_name: string | null
+          ceremony_at: string | null
           couple_name_one: string | null
           couple_name_two: string | null
           created_at: string
           groom_name: string | null
           id: string
+          invitation_message: string | null
           is_public: boolean
           location_address: string | null
           location_name: string | null
           maps_url: string | null
           primary_admin_id: string
+          reception_at: string | null
           rsvp_deadline: string | null
           slug: string
           status: Database["public"]["Enums"]["wedding_status"]
@@ -133,16 +139,19 @@ export type Database = {
         }
         Insert: {
           bride_name?: string | null
+          ceremony_at?: string | null
           couple_name_one?: string | null
           couple_name_two?: string | null
           created_at?: string
           groom_name?: string | null
           id?: string
+          invitation_message?: string | null
           is_public?: boolean
           location_address?: string | null
           location_name?: string | null
           maps_url?: string | null
           primary_admin_id: string
+          reception_at?: string | null
           rsvp_deadline?: string | null
           slug: string
           status?: Database["public"]["Enums"]["wedding_status"]
@@ -152,16 +161,19 @@ export type Database = {
         }
         Update: {
           bride_name?: string | null
+          ceremony_at?: string | null
           couple_name_one?: string | null
           couple_name_two?: string | null
           created_at?: string
           groom_name?: string | null
           id?: string
+          invitation_message?: string | null
           is_public?: boolean
           location_address?: string | null
           location_name?: string | null
           maps_url?: string | null
           primary_admin_id?: string
+          reception_at?: string | null
           rsvp_deadline?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["wedding_status"]
@@ -200,6 +212,7 @@ export type Database = {
     }
     Enums: {
       app_role: "platform_owner"
+      guest_type: "day" | "evening"
       wedding_role: "primary_admin" | "secondary_admin"
       wedding_status: "draft" | "published"
     }
@@ -330,6 +343,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["platform_owner"],
+      guest_type: ["day", "evening"],
       wedding_role: ["primary_admin", "secondary_admin"],
       wedding_status: ["draft", "published"],
     },
