@@ -113,37 +113,61 @@ export type Database = {
       }
       weddings: {
         Row: {
-          couple_name_one: string
-          couple_name_two: string
+          bride_name: string | null
+          couple_name_one: string | null
+          couple_name_two: string | null
           created_at: string
+          groom_name: string | null
           id: string
           is_public: boolean
+          location_address: string | null
+          location_name: string | null
+          maps_url: string | null
           primary_admin_id: string
+          rsvp_deadline: string | null
           slug: string
+          status: Database["public"]["Enums"]["wedding_status"]
           updated_at: string
           wedding_date: string | null
+          wedding_name: string | null
         }
         Insert: {
-          couple_name_one: string
-          couple_name_two: string
+          bride_name?: string | null
+          couple_name_one?: string | null
+          couple_name_two?: string | null
           created_at?: string
+          groom_name?: string | null
           id?: string
           is_public?: boolean
+          location_address?: string | null
+          location_name?: string | null
+          maps_url?: string | null
           primary_admin_id: string
+          rsvp_deadline?: string | null
           slug: string
+          status?: Database["public"]["Enums"]["wedding_status"]
           updated_at?: string
           wedding_date?: string | null
+          wedding_name?: string | null
         }
         Update: {
-          couple_name_one?: string
-          couple_name_two?: string
+          bride_name?: string | null
+          couple_name_one?: string | null
+          couple_name_two?: string | null
           created_at?: string
+          groom_name?: string | null
           id?: string
           is_public?: boolean
+          location_address?: string | null
+          location_name?: string | null
+          maps_url?: string | null
           primary_admin_id?: string
+          rsvp_deadline?: string | null
           slug?: string
+          status?: Database["public"]["Enums"]["wedding_status"]
           updated_at?: string
           wedding_date?: string | null
+          wedding_name?: string | null
         }
         Relationships: []
       }
@@ -168,6 +192,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_slug_available: { Args: { _slug: string }; Returns: boolean }
       is_wedding_admin: {
         Args: { _user_id: string; _wedding_id: string }
         Returns: boolean
@@ -176,6 +201,7 @@ export type Database = {
     Enums: {
       app_role: "platform_owner"
       wedding_role: "primary_admin" | "secondary_admin"
+      wedding_status: "draft" | "published"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -305,6 +331,7 @@ export const Constants = {
     Enums: {
       app_role: ["platform_owner"],
       wedding_role: ["primary_admin", "secondary_admin"],
+      wedding_status: ["draft", "published"],
     },
   },
 } as const
