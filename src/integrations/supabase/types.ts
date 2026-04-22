@@ -61,6 +61,171 @@ export type Database = {
           },
         ]
       }
+      photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          guest_id: string | null
+          id: string
+          size_bytes: number
+          status: Database["public"]["Enums"]["photo_status"]
+          storage_path: string
+          updated_at: string
+          uploader_name: string
+          wedding_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          size_bytes?: number
+          status?: Database["public"]["Enums"]["photo_status"]
+          storage_path: string
+          updated_at?: string
+          uploader_name: string
+          wedding_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          size_bytes?: number
+          status?: Database["public"]["Enums"]["photo_status"]
+          storage_path?: string
+          updated_at?: string
+          uploader_name?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photos_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlist_songs: {
+        Row: {
+          artist: string
+          created_at: string
+          guest_id: string | null
+          id: string
+          spotify_url: string | null
+          submitted_by_name: string
+          title: string
+          updated_at: string
+          vote_count: number
+          wedding_id: string
+        }
+        Insert: {
+          artist: string
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          spotify_url?: string | null
+          submitted_by_name: string
+          title: string
+          updated_at?: string
+          vote_count?: number
+          wedding_id: string
+        }
+        Update: {
+          artist?: string
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          spotify_url?: string | null
+          submitted_by_name?: string
+          title?: string
+          updated_at?: string
+          vote_count?: number
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_songs_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_songs_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rsvp_responses: {
+        Row: {
+          comments: string | null
+          created_at: string
+          dietary_other: string | null
+          dietary_tags: string[]
+          edited_by_admin: boolean
+          guest_id: string
+          id: string
+          plus_one_name: string | null
+          status: Database["public"]["Enums"]["rsvp_status"]
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string
+          dietary_other?: string | null
+          dietary_tags?: string[]
+          edited_by_admin?: boolean
+          guest_id: string
+          id?: string
+          plus_one_name?: string | null
+          status: Database["public"]["Enums"]["rsvp_status"]
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string
+          dietary_other?: string | null
+          dietary_tags?: string[]
+          edited_by_admin?: boolean
+          guest_id?: string
+          id?: string
+          plus_one_name?: string | null
+          status?: Database["public"]["Enums"]["rsvp_status"]
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rsvp_responses_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: true
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rsvp_responses_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -213,6 +378,8 @@ export type Database = {
     Enums: {
       app_role: "platform_owner"
       guest_type: "day" | "evening"
+      photo_status: "pending" | "approved" | "hidden"
+      rsvp_status: "yes" | "no" | "maybe"
       wedding_role: "primary_admin" | "secondary_admin"
       wedding_status: "draft" | "published"
     }
@@ -344,6 +511,8 @@ export const Constants = {
     Enums: {
       app_role: ["platform_owner"],
       guest_type: ["day", "evening"],
+      photo_status: ["pending", "approved", "hidden"],
+      rsvp_status: ["yes", "no", "maybe"],
       wedding_role: ["primary_admin", "secondary_admin"],
       wedding_status: ["draft", "published"],
     },
