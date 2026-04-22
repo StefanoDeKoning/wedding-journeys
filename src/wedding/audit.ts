@@ -54,8 +54,8 @@ export async function logAudit(input: LogAuditInput): Promise<void> {
       action: input.action,
       target_type: input.targetType ?? null,
       target_id: input.targetId ?? null,
-      details: input.details ?? {},
-    });
+      details: (input.details ?? {}) as Json,
+    } as never);
     if (error) console.warn("[audit] insert failed:", error.message);
   } catch (err) {
     console.warn("[audit] unexpected:", err);
