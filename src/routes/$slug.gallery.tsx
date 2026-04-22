@@ -215,14 +215,10 @@ function GalleryPage() {
     void load();
   };
 
-  const visiblePhotos = useMemo(() => {
-    if (!isAdmin) return photos.filter((p) => p.status === "approved" || p.guest_id === guest?.id);
-    if (adminFilter === "pending") return photos.filter((p) => p.status === "pending");
-    if (adminFilter === "hidden") return photos.filter((p) => p.status === "hidden");
-    return photos;
-  }, [photos, isAdmin, adminFilter, guest?.id]);
-
   const uploadUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/${slug}/gallery`
+      : `/${slug}/gallery`;
     typeof window !== "undefined"
       ? `${window.location.origin}/${slug}/gallery`
       : `/${slug}/gallery`;
