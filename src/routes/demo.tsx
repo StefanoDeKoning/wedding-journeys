@@ -30,7 +30,7 @@ function DemoPage() {
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 px-8">
-              <Link to="/demo">Enter demo wedding</Link>
+              <Link to="/$slug" params={{ slug: "jan-sophie" }}>Enter demo wedding</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 px-8">
               <Link to="/features">See all features</Link>
