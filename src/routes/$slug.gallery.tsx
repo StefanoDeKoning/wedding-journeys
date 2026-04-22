@@ -108,6 +108,13 @@ function GalleryPage() {
     return { open: true, label: "Uploads are open right now — share away! ✨" };
   }, [wedding]);
 
+  const visiblePhotos = useMemo(() => {
+    if (!isAdmin) return photos.filter((p) => p.status === "approved" || p.guest_id === guest?.id);
+    if (adminFilter === "pending") return photos.filter((p) => p.status === "pending");
+    if (adminFilter === "hidden") return photos.filter((p) => p.status === "hidden");
+    return photos;
+  }, [photos, isAdmin, adminFilter, guest?.id]);
+
   if (!wedding) return null;
 
   const handleFiles = async (files: FileList | null) => {
