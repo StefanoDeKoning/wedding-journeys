@@ -219,9 +219,6 @@ function GalleryPage() {
     typeof window !== "undefined"
       ? `${window.location.origin}/${slug}/gallery`
       : `/${slug}/gallery`;
-    typeof window !== "undefined"
-      ? `${window.location.origin}/${slug}/gallery`
-      : `/${slug}/gallery`;
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
