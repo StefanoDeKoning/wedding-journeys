@@ -21,6 +21,7 @@ import { Route as SlugRsvpRouteImport } from './routes/$slug.rsvp'
 import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
 import { Route as SlugLocationRouteImport } from './routes/$slug.location'
 import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
+import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -82,6 +83,11 @@ const SlugGalleryRoute = SlugGalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugGalleryMeRoute = SlugGalleryMeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => SlugGalleryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,12 +96,13 @@ export interface FileRoutesByFullPath {
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
-  '/$slug/gallery': typeof SlugGalleryRoute
+  '/$slug/gallery': typeof SlugGalleryRouteWithChildren
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/$slug/': typeof SlugIndexRoute
+  '/$slug/gallery/me': typeof SlugGalleryMeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -103,12 +110,13 @@ export interface FileRoutesByTo {
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
-  '/$slug/gallery': typeof SlugGalleryRoute
+  '/$slug/gallery': typeof SlugGalleryRouteWithChildren
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/$slug': typeof SlugIndexRoute
+  '/$slug/gallery/me': typeof SlugGalleryMeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -118,12 +126,13 @@ export interface FileRoutesById {
   '/demo': typeof DemoRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
-  '/$slug/gallery': typeof SlugGalleryRoute
+  '/$slug/gallery': typeof SlugGalleryRouteWithChildren
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/$slug/': typeof SlugIndexRoute
+  '/$slug/gallery/me': typeof SlugGalleryMeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/$slug/rsvp'
     | '/$slug/timeline'
     | '/$slug/'
+    | '/$slug/gallery/me'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/$slug/rsvp'
     | '/$slug/timeline'
     | '/$slug'
+    | '/$slug/gallery/me'
   id:
     | '__root__'
     | '/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/$slug/rsvp'
     | '/$slug/timeline'
     | '/$slug/'
+    | '/$slug/gallery/me'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,11 +276,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugGalleryRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/gallery/me': {
+      id: '/$slug/gallery/me'
+      path: '/me'
+      fullPath: '/$slug/gallery/me'
+      preLoaderRoute: typeof SlugGalleryMeRouteImport
+      parentRoute: typeof SlugGalleryRoute
+    }
   }
 }
 
+interface SlugGalleryRouteChildren {
+  SlugGalleryMeRoute: typeof SlugGalleryMeRoute
+}
+
+const SlugGalleryRouteChildren: SlugGalleryRouteChildren = {
+  SlugGalleryMeRoute: SlugGalleryMeRoute,
+}
+
+const SlugGalleryRouteWithChildren = SlugGalleryRoute._addFileChildren(
+  SlugGalleryRouteChildren,
+)
+
 interface SlugRouteChildren {
-  SlugGalleryRoute: typeof SlugGalleryRoute
+  SlugGalleryRoute: typeof SlugGalleryRouteWithChildren
   SlugLocationRoute: typeof SlugLocationRoute
   SlugPlaylistRoute: typeof SlugPlaylistRoute
   SlugRsvpRoute: typeof SlugRsvpRoute
@@ -277,7 +308,7 @@ interface SlugRouteChildren {
 }
 
 const SlugRouteChildren: SlugRouteChildren = {
-  SlugGalleryRoute: SlugGalleryRoute,
+  SlugGalleryRoute: SlugGalleryRouteWithChildren,
   SlugLocationRoute: SlugLocationRoute,
   SlugPlaylistRoute: SlugPlaylistRoute,
   SlugRsvpRoute: SlugRsvpRoute,
