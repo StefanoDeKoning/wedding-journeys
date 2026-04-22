@@ -14,11 +14,94 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          actor_label: string | null
+          actor_user_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          target_id: string | null
+          target_type: string | null
+          wedding_id: string
+        }
+        Insert: {
+          action: string
+          actor_label?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+          wedding_id: string
+        }
+        Update: {
+          action?: string
+          actor_label?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_groups: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          position: number
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_groups_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests: {
         Row: {
           created_at: string
           email: string | null
           first_name: string
+          guest_group_id: string | null
           guest_type: Database["public"]["Enums"]["guest_type"]
           id: string
           invitation_code: string
@@ -31,6 +114,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name: string
+          guest_group_id?: string | null
           guest_type?: Database["public"]["Enums"]["guest_type"]
           id?: string
           invitation_code: string
@@ -43,6 +127,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string
+          guest_group_id?: string | null
           guest_type?: Database["public"]["Enums"]["guest_type"]
           id?: string
           invitation_code?: string
@@ -52,6 +137,13 @@ export type Database = {
           wedding_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "guests_guest_group_id_fkey"
+            columns: ["guest_group_id"]
+            isOneToOne: false
+            referencedRelation: "guest_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "guests_wedding_id_fkey"
             columns: ["wedding_id"]
@@ -226,6 +318,137 @@ export type Database = {
           },
         ]
       }
+      seat_assignments: {
+        Row: {
+          created_at: string
+          guest_id: string
+          id: string
+          seat_index: number
+          table_id: string
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          guest_id: string
+          id?: string
+          seat_index: number
+          table_id: string
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          guest_id?: string
+          id?: string
+          seat_index?: number
+          table_id?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seat_assignments_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: true
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seat_assignments_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "seating_tables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seat_assignments_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seating_tables: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          position: number
+          seat_count: number
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          seat_count: number
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          seat_count?: number
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seating_tables_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      timeline_events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_time: string
+          id: string
+          position: number
+          title: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["timeline_visibility"]
+          wedding_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_time: string
+          id?: string
+          position?: number
+          title: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["timeline_visibility"]
+          wedding_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_time?: string
+          id?: string
+          position?: number
+          title?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["timeline_visibility"]
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timeline_events_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -298,6 +521,7 @@ export type Database = {
           rsvp_deadline: string | null
           slug: string
           status: Database["public"]["Enums"]["wedding_status"]
+          storage_limit_bytes: number
           updated_at: string
           wedding_date: string | null
           wedding_name: string | null
@@ -320,6 +544,7 @@ export type Database = {
           rsvp_deadline?: string | null
           slug: string
           status?: Database["public"]["Enums"]["wedding_status"]
+          storage_limit_bytes?: number
           updated_at?: string
           wedding_date?: string | null
           wedding_name?: string | null
@@ -342,6 +567,7 @@ export type Database = {
           rsvp_deadline?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["wedding_status"]
+          storage_limit_bytes?: number
           updated_at?: string
           wedding_date?: string | null
           wedding_name?: string | null
@@ -353,6 +579,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_guest_data_retention: { Args: never; Returns: undefined }
       current_guest_wedding_id: { Args: never; Returns: string }
       has_platform_role: {
         Args: {
@@ -374,12 +601,14 @@ export type Database = {
         Args: { _user_id: string; _wedding_id: string }
         Returns: boolean
       }
+      wedding_storage_used: { Args: { _wedding_id: string }; Returns: number }
     }
     Enums: {
       app_role: "platform_owner"
       guest_type: "day" | "evening"
       photo_status: "pending" | "approved" | "hidden"
       rsvp_status: "yes" | "no" | "maybe"
+      timeline_visibility: "all" | "day" | "evening"
       wedding_role: "primary_admin" | "secondary_admin"
       wedding_status: "draft" | "published"
     }
@@ -513,6 +742,7 @@ export const Constants = {
       guest_type: ["day", "evening"],
       photo_status: ["pending", "approved", "hidden"],
       rsvp_status: ["yes", "no", "maybe"],
+      timeline_visibility: ["all", "day", "evening"],
       wedding_role: ["primary_admin", "secondary_admin"],
       wedding_status: ["draft", "published"],
     },
