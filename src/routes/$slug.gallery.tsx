@@ -56,16 +56,13 @@ function publicUrl(path: string): string {
 
 function GalleryPage() {
   const { slug } = Route.useParams();
-  const { wedding, guest, isAdmin } = useWedding(slug);
+  const { wedding, guest } = useWedding(slug);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const [qrOpen, setQrOpen] = useState(false);
-  const [adminFilter, setAdminFilter] = useState<"all" | "pending" | "hidden">(
-    "all",
-  );
 
   const load = async () => {
     if (!wedding) return;
@@ -109,11 +106,8 @@ function GalleryPage() {
   }, [wedding]);
 
   const visiblePhotos = useMemo(() => {
-    if (!isAdmin) return photos.filter((p) => p.status === "approved" || p.guest_id === guest?.id);
-    if (adminFilter === "pending") return photos.filter((p) => p.status === "pending");
-    if (adminFilter === "hidden") return photos.filter((p) => p.status === "hidden");
-    return photos;
-  }, [photos, isAdmin, adminFilter, guest?.id]);
+    return photos.filter((p) => p.status === "approved" || p.guest_id === guest?.id);
+  }, [photos, guest?.id]);
 
   if (!wedding) return null;
 
