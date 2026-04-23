@@ -7,7 +7,6 @@ import {
   AlertTriangle,
   Loader2,
   Pencil,
-  Users,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Button } from "@/components/ui/button";
@@ -40,14 +39,6 @@ interface RsvpRow {
   dietary_other: string | null;
   comments: string | null;
   edited_by_admin: boolean;
-}
-
-interface AdminGuestRow {
-  id: string;
-  first_name: string;
-  last_name: string;
-  guest_type: "day" | "evening";
-  rsvp: RsvpRow | null;
 }
 
 function RsvpPage() {
