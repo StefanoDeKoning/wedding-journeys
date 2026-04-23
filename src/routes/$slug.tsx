@@ -91,6 +91,7 @@ function WeddingLayout() {
       slug={slug}
       title={wedding.wedding_name ?? slug}
       guestFirstName={guest?.first_name}
+      isAdmin={isAdmin}
     >
       <Outlet />
     </WeddingShell>

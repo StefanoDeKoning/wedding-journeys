@@ -7,7 +7,6 @@ import {
   AlertTriangle,
   Loader2,
   Pencil,
-  Users,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Button } from "@/components/ui/button";
@@ -42,17 +41,9 @@ interface RsvpRow {
   edited_by_admin: boolean;
 }
 
-interface AdminGuestRow {
-  id: string;
-  first_name: string;
-  last_name: string;
-  guest_type: "day" | "evening";
-  rsvp: RsvpRow | null;
-}
-
 function RsvpPage() {
   const { slug } = Route.useParams();
-  const { wedding, guest, isAdmin } = useWedding(slug);
+  const { wedding, guest } = useWedding(slug);
 
   if (!wedding) return null;
 
@@ -76,17 +67,17 @@ function RsvpPage() {
         )}
       </header>
 
-      {guest && (
+      {guest ? (
         <GuestRsvpForm
           weddingId={wedding.id}
           guestId={guest.id}
           guestFirstName={guest.first_name}
           rsvpDeadline={wedding.rsvp_deadline}
         />
-      )}
-
-      {isAdmin && (
-        <AdminRsvpManager weddingId={wedding.id} hasGuestForm={!!guest} />
+      ) : (
+        <p className="text-center text-sm text-muted-foreground">
+          Sign in with your invitation code to reply.
+        </p>
       )}
     </section>
   );
@@ -361,297 +352,7 @@ function GuestRsvpForm({
   );
 }
 
-// ─────────────────────────── Admin manager ───────────────────────────
-
-function AdminRsvpManager({
-  weddingId,
-  hasGuestForm,
-}: {
-  weddingId: string;
-  hasGuestForm: boolean;
-}) {
-  const [loading, setLoading] = useState(true);
-  const [rows, setRows] = useState<AdminGuestRow[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    const [guestsRes, rsvpsRes] = await Promise.all([
-      supabase
-        .from("guests")
-        .select("id, first_name, last_name, guest_type")
-        .eq("wedding_id", weddingId)
-        .order("last_name"),
-      supabase
-        .from("rsvp_responses")
-        .select(
-          "id, guest_id, status, plus_one_name, dietary_tags, dietary_other, comments, edited_by_admin",
-        )
-        .eq("wedding_id", weddingId),
-    ]);
-    const rsvpByGuest = new Map<string, RsvpRow>();
-    for (const r of (rsvpsRes.data ?? []) as RsvpRow[]) {
-      rsvpByGuest.set(r.guest_id, r);
-    }
-    setRows(
-      ((guestsRes.data ?? []) as Omit<AdminGuestRow, "rsvp">[]).map((g) => ({
-        ...g,
-        rsvp: rsvpByGuest.get(g.id) ?? null,
-      })),
-    );
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    void load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weddingId]);
-
-  const stats = useMemo(() => {
-    const s = { yes: 0, no: 0, maybe: 0, none: 0 };
-    for (const r of rows) {
-      if (!r.rsvp) s.none++;
-      else s[r.rsvp.status]++;
-    }
-    return s;
-  }, [rows]);
-
-  return (
-    <div className={hasGuestForm ? "mt-12" : ""}>
-      <div className="divider-script">
-        <span className="font-script text-2xl">admin · all replies</span>
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6">
-        <StatCard label="Yes" value={stats.yes} tone="primary" />
-        <StatCard label="Maybe" value={stats.maybe} tone="muted" />
-        <StatCard label="No" value={stats.no} tone="muted" />
-        <StatCard label="No reply" value={stats.none} tone="muted" />
-      </div>
-
-      {loading ? (
-        <div className="text-center py-8 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-        </div>
-      ) : rows.length === 0 ? (
-        <div className="text-center py-8 text-sm text-muted-foreground">
-          <Users className="w-6 h-6 mx-auto mb-2 opacity-50" />
-          No guests yet.
-        </div>
-      ) : (
-        <ul className="space-y-2">
-          {rows.map((row) => (
-            <AdminRsvpRow
-              key={row.id}
-              weddingId={weddingId}
-              row={row}
-              expanded={editingId === row.id}
-              onToggle={() =>
-                setEditingId((cur) => (cur === row.id ? null : row.id))
-              }
-              onSaved={() => {
-                setEditingId(null);
-                void load();
-              }}
-            />
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "primary" | "muted";
-}) {
-  return (
-    <div
-      className={`rounded-xl border p-3 text-center ${
-        tone === "primary"
-          ? "border-primary/30 bg-primary/5"
-          : "border-border bg-card"
-      }`}
-    >
-      <p className="text-2xl font-display">{value}</p>
-      <p className="text-[11px] uppercase tracking-wider text-muted-foreground mt-1">
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function AdminRsvpRow({
-  weddingId,
-  row,
-  expanded,
-  onToggle,
-  onSaved,
-}: {
-  weddingId: string;
-  row: AdminGuestRow;
-  expanded: boolean;
-  onToggle: () => void;
-  onSaved: () => void;
-}) {
-  const r = row.rsvp;
-  return (
-    <li className="rounded-xl border border-border bg-card overflow-hidden">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="w-full flex items-center gap-3 p-3 text-left hover:bg-muted/40 transition-colors"
-      >
-        <StatusDot status={r?.status ?? null} />
-        <div className="flex-1 min-w-0">
-          <p className="font-medium truncate">
-            {row.first_name} {row.last_name}
-          </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {answerLabel(r?.status ?? null)}
-            {r?.plus_one_name && ` · +1: ${r.plus_one_name}`}
-            {r && r.dietary_tags.length > 0 && ` · ${r.dietary_tags.length} dietary`}
-          </p>
-        </div>
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {row.guest_type}
-        </span>
-      </button>
-      {expanded && (
-        <AdminEditForm
-          weddingId={weddingId}
-          guestId={row.id}
-          existing={r}
-          onSaved={onSaved}
-        />
-      )}
-    </li>
-  );
-}
-
-function AdminEditForm({
-  weddingId,
-  guestId,
-  existing,
-  onSaved,
-}: {
-  weddingId: string;
-  guestId: string;
-  existing: RsvpRow | null;
-  onSaved: () => void;
-}) {
-  const [answer, setAnswer] = useState<Answer>(existing?.status ?? "yes");
-  const [plusOne, setPlusOne] = useState(existing?.plus_one_name ?? "");
-  const [tags, setTags] = useState<DietaryValue[]>(
-    (existing?.dietary_tags ?? []) as DietaryValue[],
-  );
-  const [dietaryOther, setDietaryOther] = useState(existing?.dietary_other ?? "");
-  const [comments, setComments] = useState(existing?.comments ?? "");
-  const [saving, setSaving] = useState(false);
-
-  const save = async () => {
-    setSaving(true);
-    const { error } = await supabase.from("rsvp_responses").upsert(
-      {
-        wedding_id: weddingId,
-        guest_id: guestId,
-        status: answer,
-        plus_one_name: plusOne.trim() || null,
-        dietary_tags: tags,
-        dietary_other: dietaryOther.trim() || null,
-        comments: comments.trim() || null,
-        edited_by_admin: true,
-      },
-      { onConflict: "guest_id" },
-    );
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Reply updated.");
-    onSaved();
-  };
-
-  return (
-    <div className="border-t border-border bg-muted/20 p-4 space-y-4">
-      <div className="grid grid-cols-3 gap-2">
-        {(["yes", "maybe", "no"] as const).map((v) => (
-          <button
-            key={v}
-            type="button"
-            onClick={() => setAnswer(v)}
-            className={`text-xs rounded-lg border px-2 py-2 transition-colors ${
-              answer === v
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border bg-background hover:border-primary/40"
-            }`}
-          >
-            {answerLabel(v)}
-          </button>
-        ))}
-      </div>
-      <Input
-        value={plusOne}
-        onChange={(e) => setPlusOne(e.target.value)}
-        placeholder="Plus-one"
-        maxLength={120}
-      />
-      <div className="flex flex-wrap gap-1.5">
-        {DIETARY_OPTIONS.map((opt) => {
-          const checked = tags.includes(opt.value);
-          return (
-            <button
-              type="button"
-              key={opt.value}
-              onClick={() =>
-                setTags((prev) =>
-                  prev.includes(opt.value)
-                    ? prev.filter((t) => t !== opt.value)
-                    : [...prev, opt.value],
-                )
-              }
-              className={`text-[11px] rounded-full px-2.5 py-1 border transition-colors ${
-                checked
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-background hover:border-primary/40"
-              }`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
-      <Input
-        value={dietaryOther}
-        onChange={(e) => setDietaryOther(e.target.value)}
-        placeholder="Other dietary notes"
-        maxLength={200}
-      />
-      <Textarea
-        value={comments}
-        onChange={(e) => setComments(e.target.value)}
-        placeholder="Comments"
-        rows={2}
-        maxLength={1000}
-      />
-      <Button
-        type="button"
-        size="sm"
-        onClick={save}
-        disabled={saving}
-        className="rounded-full"
-      >
-        {saving ? "Saving…" : "Save changes"}
-      </Button>
-    </div>
-  );
-}
+// Admin RSVP management has moved to /$slug/admin/guests
 
 function StatusDot({ status }: { status: Answer | null }) {
   const cls =
