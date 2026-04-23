@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, ListChecks, CalendarHeart, Image as ImageIcon, Music, MapPin, LogOut } from "lucide-react";
+import { Mail, ListChecks, CalendarHeart, Image as ImageIcon, Music, MapPin, LogOut, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -17,10 +17,12 @@ export function WeddingHeader({
   slug,
   title,
   guestFirstName,
+  isAdmin = false,
 }: {
   slug: string;
   title: string;
   guestFirstName?: string;
+  isAdmin?: boolean;
 }) {
   const { signOut } = useAuth();
 
@@ -36,6 +38,14 @@ export function WeddingHeader({
               <span className="hidden sm:inline text-xs text-muted-foreground">
                 Hi, <span className="text-foreground font-medium">{guestFirstName}</span>
               </span>
+            )}
+            {isAdmin && (
+              <Button asChild variant="outline" size="sm" className="rounded-full">
+                <Link to="/$slug/admin" params={{ slug }}>
+                  <Settings className="w-3.5 h-3.5 mr-1.5" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+              </Button>
             )}
             <Button
               variant="ghost"
@@ -83,16 +93,18 @@ export function WeddingShell({
   slug,
   title,
   guestFirstName,
+  isAdmin = false,
   children,
 }: {
   slug: string;
   title: string;
   guestFirstName?: string;
+  isAdmin?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-soft">
-      <WeddingHeader slug={slug} title={title} guestFirstName={guestFirstName} />
+      <WeddingHeader slug={slug} title={title} guestFirstName={guestFirstName} isAdmin={isAdmin} />
       <main className="flex-1">{children}</main>
       <footer className="text-center text-xs text-muted-foreground py-8">
         Made with love on{" "}

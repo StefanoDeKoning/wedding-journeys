@@ -52,7 +52,7 @@ interface AdminGuestRow {
 
 function RsvpPage() {
   const { slug } = Route.useParams();
-  const { wedding, guest, isAdmin } = useWedding(slug);
+  const { wedding, guest } = useWedding(slug);
 
   if (!wedding) return null;
 
@@ -76,17 +76,17 @@ function RsvpPage() {
         )}
       </header>
 
-      {guest && (
+      {guest ? (
         <GuestRsvpForm
           weddingId={wedding.id}
           guestId={guest.id}
           guestFirstName={guest.first_name}
           rsvpDeadline={wedding.rsvp_deadline}
         />
-      )}
-
-      {isAdmin && (
-        <AdminRsvpManager weddingId={wedding.id} hasGuestForm={!!guest} />
+      ) : (
+        <p className="text-center text-sm text-muted-foreground">
+          Sign in with your invitation code to reply.
+        </p>
       )}
     </section>
   );
