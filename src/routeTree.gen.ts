@@ -26,6 +26,7 @@ import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
 import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
 import { Route as SlugAdminStorageRouteImport } from './routes/$slug.admin.storage'
+import { Route as SlugAdminSeatingRouteImport } from './routes/$slug.admin.seating'
 import { Route as SlugAdminPhotosRouteImport } from './routes/$slug.admin.photos'
 import { Route as SlugAdminGuestsRouteImport } from './routes/$slug.admin.guests'
 import { Route as SlugAdminGroupsRouteImport } from './routes/$slug.admin.groups'
@@ -116,6 +117,11 @@ const SlugAdminStorageRoute = SlugAdminStorageRouteImport.update({
   path: '/storage',
   getParentRoute: () => SlugAdminRoute,
 } as any)
+const SlugAdminSeatingRoute = SlugAdminSeatingRouteImport.update({
+  id: '/seating',
+  path: '/seating',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
 const SlugAdminPhotosRoute = SlugAdminPhotosRouteImport.update({
   id: '/photos',
   path: '/photos',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
   '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
+  '/$slug/admin/seating': typeof SlugAdminSeatingRoute
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
   '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
+  '/$slug/admin/seating': typeof SlugAdminSeatingRoute
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
   '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
+  '/$slug/admin/seating': typeof SlugAdminSeatingRoute
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/groups'
     | '/$slug/admin/guests'
     | '/$slug/admin/photos'
+    | '/$slug/admin/seating'
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/gallery/me'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/groups'
     | '/$slug/admin/guests'
     | '/$slug/admin/photos'
+    | '/$slug/admin/seating'
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/gallery/me'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/groups'
     | '/$slug/admin/guests'
     | '/$slug/admin/photos'
+    | '/$slug/admin/seating'
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/gallery/me'
@@ -405,6 +417,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminStorageRouteImport
       parentRoute: typeof SlugAdminRoute
     }
+    '/$slug/admin/seating': {
+      id: '/$slug/admin/seating'
+      path: '/seating'
+      fullPath: '/$slug/admin/seating'
+      preLoaderRoute: typeof SlugAdminSeatingRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
     '/$slug/admin/photos': {
       id: '/$slug/admin/photos'
       path: '/photos'
@@ -441,6 +460,7 @@ interface SlugAdminRouteChildren {
   SlugAdminGroupsRoute: typeof SlugAdminGroupsRoute
   SlugAdminGuestsRoute: typeof SlugAdminGuestsRoute
   SlugAdminPhotosRoute: typeof SlugAdminPhotosRoute
+  SlugAdminSeatingRoute: typeof SlugAdminSeatingRoute
   SlugAdminStorageRoute: typeof SlugAdminStorageRoute
   SlugAdminTimelineRoute: typeof SlugAdminTimelineRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
@@ -451,6 +471,7 @@ const SlugAdminRouteChildren: SlugAdminRouteChildren = {
   SlugAdminGroupsRoute: SlugAdminGroupsRoute,
   SlugAdminGuestsRoute: SlugAdminGuestsRoute,
   SlugAdminPhotosRoute: SlugAdminPhotosRoute,
+  SlugAdminSeatingRoute: SlugAdminSeatingRoute,
   SlugAdminStorageRoute: SlugAdminStorageRoute,
   SlugAdminTimelineRoute: SlugAdminTimelineRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,

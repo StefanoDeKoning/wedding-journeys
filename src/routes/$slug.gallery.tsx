@@ -5,10 +5,8 @@ import {
   Upload,
   Loader2,
   QrCode,
-  Eye,
   EyeOff,
   Trash2,
-  CheckCircle2,
   Clock,
   User,
   ExternalLink,
@@ -292,27 +290,6 @@ function GalleryPage() {
         )}
       </div>
 
-      {/* Admin filter bar */}
-      {isAdmin && (
-        <div className="flex items-center gap-2 mb-4 text-xs">
-          <span className="text-muted-foreground">Admin view:</span>
-          {(["all", "pending", "hidden"] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setAdminFilter(f)}
-              className={`px-2.5 py-1 rounded-full border transition-colors ${
-                adminFilter === f
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-background hover:border-primary/40"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-      )}
-
       {loading ? (
         <div className="text-center py-12 text-muted-foreground">
           <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -334,10 +311,7 @@ function GalleryPage() {
             <PhotoTile
               key={p.id}
               photo={p}
-              isAdmin={isAdmin}
               isMine={!!(guest && p.guest_id === guest.id)}
-              onApprove={() => moderate(p.id, "approved")}
-              onHide={() => moderate(p.id, "hidden")}
               onDelete={() => remove(p.id, p.storage_path)}
             />
           ))}
@@ -376,17 +350,11 @@ function GalleryPage() {
 
 function PhotoTile({
   photo,
-  isAdmin,
   isMine,
-  onApprove,
-  onHide,
   onDelete,
 }: {
   photo: Photo;
-  isAdmin: boolean;
   isMine: boolean;
-  onApprove: () => void;
-  onHide: () => void;
   onDelete: () => void;
 }) {
   const url = publicUrl(photo.storage_path);
@@ -402,7 +370,6 @@ function PhotoTile({
         loading="lazy"
         className="w-full h-full object-cover transition-transform group-hover:scale-105"
       />
-      {/* Status badge */}
       {photo.status !== "approved" && (
         <div className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-background/90 backdrop-blur text-foreground border border-border flex items-center gap-1">
           {photo.status === "pending" ? (
@@ -413,48 +380,22 @@ function PhotoTile({
           {photo.status}
         </div>
       )}
-      {/* Caption */}
       <figcaption className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/70 to-transparent text-white text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
         <p className="truncate">
           {photo.caption ?? `By ${photo.uploader_name}`}
         </p>
       </figcaption>
-      {/* Admin / owner controls */}
-      {(isAdmin || isMine) && (
+      {isMine && (
         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {isAdmin && photo.status !== "approved" && (
-            <button
-              type="button"
-              onClick={onApprove}
-              className="p-1.5 rounded-full bg-background/95 hover:bg-primary hover:text-primary-foreground"
-              aria-label="Approve"
-              title="Approve"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {isAdmin && photo.status !== "hidden" && (
-            <button
-              type="button"
-              onClick={onHide}
-              className="p-1.5 rounded-full bg-background/95 hover:bg-foreground hover:text-background"
-              aria-label="Hide"
-              title="Hide"
-            >
-              <Eye className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {(isAdmin || isMine) && (
-            <button
-              type="button"
-              onClick={onDelete}
-              className="p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground"
-              aria-label="Delete"
-              title="Delete"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onDelete}
+            className="p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground"
+            aria-label="Delete"
+            title="Delete"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
     </figure>

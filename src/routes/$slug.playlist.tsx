@@ -6,7 +6,6 @@ import {
   Trash2,
   ExternalLink,
   Loader2,
-  Download,
   Trophy,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
@@ -15,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadCsv, toCsv } from "@/wedding/csv";
 
 export const Route = createFileRoute("/$slug/playlist")({
   head: () => ({
@@ -41,6 +39,7 @@ interface Song {
 function PlaylistPage() {
   const { slug } = Route.useParams();
   const { wedding, guest, isAdmin } = useWedding(slug);
+  void isAdmin;
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
@@ -134,17 +133,6 @@ function PlaylistPage() {
     void load();
   };
 
-  const exportCsv = () => {
-    const rows = songs.map((s) => ({
-      title: s.title,
-      artist: s.artist,
-      spotify_url: s.spotify_url ?? "",
-      submitted_by: s.submitted_by_name,
-      votes: s.vote_count,
-      submitted_at: new Date(s.created_at).toISOString(),
-    }));
-    downloadCsv(`${wedding.slug}-playlist.csv`, toCsv(rows));
-  };
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
@@ -247,20 +235,6 @@ function PlaylistPage() {
         </form>
       )}
 
-      {/* Admin export */}
-      {isAdmin && songs.length > 0 && (
-        <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={exportCsv}
-            className="rounded-full"
-          >
-            <Download className="w-3.5 h-3.5 mr-1.5" />
-            Export CSV ({songs.length})
-          </Button>
-        </div>
-      )}
 
       {/* All songs */}
       <div>
