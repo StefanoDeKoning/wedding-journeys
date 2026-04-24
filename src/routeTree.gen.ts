@@ -16,6 +16,7 @@ import { Route as CreateRouteImport } from './routes/create'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
 import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
 import { Route as SlugRsvpRouteImport } from './routes/$slug.rsvp'
 import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
@@ -66,6 +67,11 @@ const SlugIndexRoute = SlugIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SlugRoute,
+} as any)
+const AdminPlatformRoute = AdminPlatformRouteImport.update({
+  id: '/admin/platform',
+  path: '/admin/platform',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SlugTimelineRoute = SlugTimelineRouteImport.update({
   id: '/timeline',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
+  '/admin/platform': typeof AdminPlatformRoute
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
+  '/admin/platform': typeof AdminPlatformRoute
   '/$slug': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
+  '/admin/platform': typeof AdminPlatformRoute
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
+    | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
+    | '/admin/platform'
     | '/$slug'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
+    | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -294,6 +306,7 @@ export interface RootRouteChildren {
   DemoRoute: typeof DemoRoute
   FeaturesRoute: typeof FeaturesRoute
   LoginRoute: typeof LoginRoute
+  AdminPlatformRoute: typeof AdminPlatformRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -346,6 +359,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$slug/'
       preLoaderRoute: typeof SlugIndexRouteImport
       parentRoute: typeof SlugRoute
+    }
+    '/admin/platform': {
+      id: '/admin/platform'
+      path: '/admin/platform'
+      fullPath: '/admin/platform'
+      preLoaderRoute: typeof AdminPlatformRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$slug/timeline': {
       id: '/$slug/timeline'
@@ -522,6 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoRoute: DemoRoute,
   FeaturesRoute: FeaturesRoute,
   LoginRoute: LoginRoute,
+  AdminPlatformRoute: AdminPlatformRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
