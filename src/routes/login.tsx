@@ -210,7 +210,11 @@ function LoginPage() {
                 {submitting ? "Signing in…" : "Sign in"}
               </Button>
               <p className="text-center text-xs text-muted-foreground">
-                Platform Owners sign in here too — access is granted manually.
+                Platform Owner setup?{" "}
+                <Link to="/admin/platform/claim" className="text-primary hover:underline">
+                  Bootstrap the first owner
+                </Link>
+                .
               </p>
             </form>
           ) : (

@@ -16,6 +16,7 @@ import { Route as CreateRouteImport } from './routes/create'
 import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
+import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
 import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
 import { Route as SlugRsvpRouteImport } from './routes/$slug.rsvp'
 import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
@@ -23,6 +24,7 @@ import { Route as SlugLocationRouteImport } from './routes/$slug.location'
 import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugAdminRouteImport } from './routes/$slug.admin'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
+import { Route as AdminPlatformClaimRouteImport } from './routes/admin.platform.claim'
 import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
 import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
 import { Route as SlugAdminStorageRouteImport } from './routes/$slug.admin.storage'
@@ -67,6 +69,11 @@ const SlugIndexRoute = SlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SlugRoute,
 } as any)
+const AdminPlatformRoute = AdminPlatformRouteImport.update({
+  id: '/admin/platform',
+  path: '/admin/platform',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlugTimelineRoute = SlugTimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
@@ -101,6 +108,11 @@ const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SlugAdminRoute,
+} as any)
+const AdminPlatformClaimRoute = AdminPlatformClaimRouteImport.update({
+  id: '/claim',
+  path: '/claim',
+  getParentRoute: () => AdminPlatformRoute,
 } as any)
 const SlugGalleryMeRoute = SlugGalleryMeRouteImport.update({
   id: '/me',
@@ -156,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
+  '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -165,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
+  '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -178,6 +192,7 @@ export interface FileRoutesByTo {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
+  '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -187,6 +202,7 @@ export interface FileRoutesByTo {
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
+  '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/$slug/admin': typeof SlugAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -203,6 +219,7 @@ export interface FileRoutesById {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
+  '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -212,6 +229,7 @@ export interface FileRoutesById {
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
+  '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -229,6 +247,7 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
+    | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -238,6 +257,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/gallery/me'
+    | '/admin/platform/claim'
     | '/$slug/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -251,6 +271,7 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
+    | '/admin/platform'
     | '/$slug'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -260,6 +281,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/gallery/me'
+    | '/admin/platform/claim'
     | '/$slug/admin'
   id:
     | '__root__'
@@ -275,6 +297,7 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
+    | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -284,6 +307,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/gallery/me'
+    | '/admin/platform/claim'
     | '/$slug/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -294,6 +318,7 @@ export interface RootRouteChildren {
   DemoRoute: typeof DemoRoute
   FeaturesRoute: typeof FeaturesRoute
   LoginRoute: typeof LoginRoute
+  AdminPlatformRoute: typeof AdminPlatformRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -347,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugIndexRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/admin/platform': {
+      id: '/admin/platform'
+      path: '/admin/platform'
+      fullPath: '/admin/platform'
+      preLoaderRoute: typeof AdminPlatformRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$slug/timeline': {
       id: '/$slug/timeline'
       path: '/timeline'
@@ -395,6 +427,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$slug/admin/'
       preLoaderRoute: typeof SlugAdminIndexRouteImport
       parentRoute: typeof SlugAdminRoute
+    }
+    '/admin/platform/claim': {
+      id: '/admin/platform/claim'
+      path: '/claim'
+      fullPath: '/admin/platform/claim'
+      preLoaderRoute: typeof AdminPlatformClaimRouteImport
+      parentRoute: typeof AdminPlatformRoute
     }
     '/$slug/gallery/me': {
       id: '/$slug/gallery/me'
@@ -515,6 +554,18 @@ const SlugRouteChildren: SlugRouteChildren = {
 
 const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
 
+interface AdminPlatformRouteChildren {
+  AdminPlatformClaimRoute: typeof AdminPlatformClaimRoute
+}
+
+const AdminPlatformRouteChildren: AdminPlatformRouteChildren = {
+  AdminPlatformClaimRoute: AdminPlatformClaimRoute,
+}
+
+const AdminPlatformRouteWithChildren = AdminPlatformRoute._addFileChildren(
+  AdminPlatformRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SlugRoute: SlugRouteWithChildren,
@@ -522,6 +573,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoRoute: DemoRoute,
   FeaturesRoute: FeaturesRoute,
   LoginRoute: LoginRoute,
+  AdminPlatformRoute: AdminPlatformRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

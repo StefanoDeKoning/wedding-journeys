@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { Crown } from "lucide-react";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/auth/AuthProvider";
 
 const nav = [
   { to: "/" as const, label: "Home" },
@@ -10,6 +12,8 @@ const nav = [
 ];
 
 export function SiteHeader() {
+  const { isPlatformOwner } = useAuth();
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/75 border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 h-20 flex items-center justify-between">
@@ -26,6 +30,15 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
+          {isPlatformOwner && (
+            <Link
+              to="/admin/platform"
+              className="text-sm tracking-wide text-foreground/75 hover:text-primary transition-colors flex items-center gap-1"
+              activeProps={{ className: "text-primary" }}
+            >
+              <Crown className="w-3.5 h-3.5" /> Platform
+            </Link>
+          )}
         </nav>
         <div className="flex items-center gap-3">
           <Link to="/login" className="text-sm text-foreground/75 hover:text-primary transition-colors">
@@ -39,3 +52,4 @@ export function SiteHeader() {
     </header>
   );
 }
+
