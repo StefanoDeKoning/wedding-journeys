@@ -6,7 +6,6 @@ import {
   Trash2,
   ExternalLink,
   Loader2,
-  Download,
   Trophy,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
@@ -15,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadCsv, toCsv } from "@/wedding/csv";
 
 export const Route = createFileRoute("/$slug/playlist")({
   head: () => ({
@@ -41,6 +39,7 @@ interface Song {
 function PlaylistPage() {
   const { slug } = Route.useParams();
   const { wedding, guest, isAdmin } = useWedding(slug);
+  void isAdmin;
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
