@@ -179,7 +179,7 @@ function AdminSeating() {
       }
       void logAudit({
         weddingId: wedding.id,
-        action: "seating.table_updated",
+        action: "table.updated",
         targetType: "seating_table",
         targetId: tableDialog.editing.id,
         details: { name, seat_count: tableDialog.seats },
@@ -198,7 +198,7 @@ function AdminSeating() {
       }
       void logAudit({
         weddingId: wedding.id,
-        action: "seating.table_created",
+        action: "table.created",
         targetType: "seating_table",
         targetId: data?.id,
         details: { name, seat_count: tableDialog.seats },
@@ -218,7 +218,7 @@ function AdminSeating() {
     }
     void logAudit({
       weddingId: wedding.id,
-      action: "seating.table_deleted",
+      action: "table.removed",
       targetType: "seating_table",
       targetId: t.id,
       details: { name: t.name },
@@ -261,7 +261,7 @@ function AdminSeating() {
     }
     void logAudit({
       weddingId: wedding.id,
-      action: "seating.guest_assigned",
+      action: "seat.assigned",
       targetType: "guest",
       targetId: guestId,
       details: { table_id: tableId },
@@ -279,7 +279,7 @@ function AdminSeating() {
     }
     void logAudit({
       weddingId: wedding.id,
-      action: "seating.guest_unassigned",
+      action: "seat.unassigned",
       targetType: "guest",
       targetId: guestId,
       details: {},
