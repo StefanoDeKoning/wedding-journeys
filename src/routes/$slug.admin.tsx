@@ -8,6 +8,7 @@ import {
   Image as ImageIcon,
   HardDrive,
   ScrollText,
+  Mail,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Loader2 } from "lucide-react";
@@ -28,6 +29,7 @@ const tabs = [
   { to: "/$slug/admin/groups" as const, label: "Groups", icon: Tags, exact: false },
   { to: "/$slug/admin/seating" as const, label: "Seating", icon: Armchair, exact: false },
   { to: "/$slug/admin/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false },
+  { to: "/$slug/admin/invitation" as const, label: "Invitation", icon: Mail, exact: false },
   { to: "/$slug/admin/photos" as const, label: "Photos", icon: ImageIcon, exact: false },
   { to: "/$slug/admin/storage" as const, label: "Storage", icon: HardDrive, exact: false },
   { to: "/$slug/admin/audit" as const, label: "Audit", icon: ScrollText, exact: false },
