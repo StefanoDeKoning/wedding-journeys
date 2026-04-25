@@ -245,12 +245,18 @@ export const createWeddingWithAccount = createServerFn({ method: "POST" })
     if (mErr) {
       console.error("[createWeddingWithAccount] member insert failed", mErr);
       // Rollback: delete wedding, then user.
-      await admin.from("weddings").delete().eq("id", wedding.id).catch((e) => {
-        console.error("[createWeddingWithAccount] rollback delete wedding failed", e);
-      });
-      await admin.auth.admin.deleteUser(userId).catch((e) => {
-        console.error("[createWeddingWithAccount] rollback deleteUser failed", e);
-      });
+      try {
+        const { error: delWErr } = await admin.from("weddings").delete().eq("id", wedding.id);
+        if (delWErr) console.error("[createWeddingWithAccount] rollback delete wedding failed", delWErr);
+      } catch (e) {
+        console.error("[createWeddingWithAccount] rollback delete wedding threw", e);
+      }
+      try {
+        const { error: delUErr } = await admin.auth.admin.deleteUser(userId);
+        if (delUErr) console.error("[createWeddingWithAccount] rollback deleteUser failed", delUErr);
+      } catch (e) {
+        console.error("[createWeddingWithAccount] rollback deleteUser threw", e);
+      }
       return { ok: false, error: "Could not assign you as primary admin." };
     }
 
