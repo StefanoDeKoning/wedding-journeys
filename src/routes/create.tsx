@@ -180,73 +180,40 @@ function CreatePage() {
 
     setSubmitting(true);
     try {
-      // 1. Make sure we have an authenticated session BEFORE we touch the wedding.
-      if (!user) {
-        const sParsed = signupSchema.safeParse({ email, password });
-        if (!sParsed.success) {
-          const fe: Record<string, string> = {};
-          for (const issue of sParsed.error.issues) fe[issue.path[0] as string] = issue.message;
-          setErrors(fe);
-          setSubmitting(false);
-          return;
-        }
-
-        // Try sign-in first — if the email already exists with this password,
-        // we just resume the account instead of creating a duplicate.
-        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-          email: sParsed.data.email,
-          password: sParsed.data.password,
-        });
-
-        if (signInErr || !signInData.session) {
-          // No existing account (or wrong password). Try to sign up.
-          const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-            email: sParsed.data.email,
-            password: sParsed.data.password,
-            options: { emailRedirectTo: `${window.location.origin}/` },
-          });
-
-          if (signUpErr) {
-            // "User already registered" → wrong password above. Be explicit.
-            const msg = /already (registered|exists)/i.test(signUpErr.message)
-              ? "An account with this email already exists. Use your existing password or sign in first."
-              : signUpErr.message;
-            setErrors({ email: msg });
-            toast.error(msg);
-            setSubmitting(false);
-            return;
-          }
-
-          if (!signUpData.session) {
-            // Email confirmation is required — we cannot create the wedding now,
-            // because there is no auth session to authorise the server function.
-            toast.message("Confirm your email", {
-              description:
-                "We sent you a verification email. Confirm it, then sign in and finish creating your wedding.",
-            });
-            setSubmitting(false);
-            return;
-          }
-        }
-
-        await refresh();
-      }
-
-      // 2. Confirm we now have an access token before calling the server fn.
-      const { data: sess } = await supabase.auth.getSession();
-      if (!sess.session?.access_token) {
-        toast.error("Your sign-in did not complete. Please try again.");
+      // If the visitor is already signed in, they should use the dashboard
+      // to create another wedding (future feature). For now, the atomic flow
+      // requires fresh credentials so we always go through the same backend op.
+      if (user) {
+        toast.error(
+          "You're already signed in. Sign out first to create a new wedding from a fresh account.",
+        );
         setSubmitting(false);
         return;
       }
 
-      // 3. Create the wedding. Surface real errors instead of swallowing them.
+      const sParsed = signupSchema.safeParse({ email, password });
+      if (!sParsed.success) {
+        const fe: Record<string, string> = {};
+        for (const issue of sParsed.error.issues) fe[issue.path[0] as string] = issue.message;
+        setErrors(fe);
+        setSubmitting(false);
+        return;
+      }
+
+      // ATOMIC: backend creates user + wedding + admin membership in one call,
+      // and rolls back any partial state on failure.
       let result;
       try {
-        result = await createWedding({ data: parsed.data });
+        result = await createWeddingWithAccount({
+          data: {
+            ...parsed.data,
+            email: sParsed.data.email,
+            password: sParsed.data.password,
+          },
+        });
       } catch (callErr) {
         const message = callErr instanceof Error ? callErr.message : "Server error";
-        console.error("[create] createWedding threw:", callErr);
+        console.error("[create] createWeddingWithAccount threw:", callErr);
         toast.error(`Could not create your wedding: ${message}`);
         setSubmitting(false);
         return;
@@ -254,12 +221,25 @@ function CreatePage() {
 
       if (!result.ok || !result.wedding) {
         const message = result.error ?? "Could not create your wedding.";
-        console.error("[create] createWedding failed:", result);
-        if (/url|slug/i.test(message)) {
-          setErrors({ slug: message });
+        console.error("[create] createWeddingWithAccount failed:", result);
+        if (result.errorField) {
+          setErrors({ [result.errorField]: message });
         }
         toast.error(message);
         setSubmitting(false);
+        return;
+      }
+
+      // Sign the user in with the credentials we just provisioned.
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: sParsed.data.email,
+        password: sParsed.data.password,
+      });
+      if (signInErr) {
+        toast.message("Wedding created. Please sign in to continue.", {
+          description: signInErr.message,
+        });
+        void navigate({ to: "/login" });
         return;
       }
 
