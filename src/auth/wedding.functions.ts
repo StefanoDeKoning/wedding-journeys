@@ -74,7 +74,7 @@ export const suggestSlugs = createServerFn({ method: "POST" })
 
 // ---------- Create wedding ----------
 
-const CreateWeddingInput = z.object({
+const WeddingFieldsInput = z.object({
   weddingName: z.string().trim().min(2).max(120),
   brideName: z.string().trim().min(1).max(80),
   groomName: z.string().trim().min(1).max(80),
