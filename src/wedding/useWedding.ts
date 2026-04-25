@@ -52,7 +52,7 @@ export function useWedding(slug: string): WeddingState {
       const { data } = await supabase
         .from("weddings")
         .select(
-          "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, rsvp_deadline, status",
+          "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, invitation_text, rsvp_deadline, status",
         )
         .eq("slug", slug)
         .maybeSingle();

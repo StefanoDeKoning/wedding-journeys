@@ -30,9 +30,21 @@ export interface PublicWedding {
   location_address: string | null;
   maps_url: string | null;
   invitation_message: string | null;
+  invitation_text: string;
   rsvp_deadline: string | null;
   status: "draft" | "published";
 }
+
+export const DEFAULT_INVITATION_TEXT = `Dear {FirstName} {LastName},
+
+You are warmly invited to the most magical celebration of the year.
+
+The location and all details can be found on the reverse side of this letter.
+
+Please return this letter with any dietary wishes or special requests.
+
+With love,
+The happy couple.`;
 
 /**
  * Returns the wedding by slug if it is published, OR if the caller is its admin/guest.
@@ -49,7 +61,7 @@ export const getPublishedWedding = createServerFn({ method: "POST" })
     const { data: row, error } = await admin
       .from("weddings")
       .select(
-        "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, rsvp_deadline, status",
+        "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, invitation_text, rsvp_deadline, status",
       )
       .eq("slug", data.slug)
       .eq("status", "published")
