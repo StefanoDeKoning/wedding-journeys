@@ -97,7 +97,7 @@ function InvitationPage() {
         <EnvelopeLetter
           recipientFirstName={recipientFirst}
           recipientLastName={recipientLast}
-          invitationMessage={wedding.invitation_message}
+          invitationTemplate={wedding.invitation_text ?? null}
           coupleSignature={coupleSignature}
         />
       </section>

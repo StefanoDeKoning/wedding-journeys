@@ -512,6 +512,7 @@ export type Database = {
           groom_name: string | null
           id: string
           invitation_message: string | null
+          invitation_text: string
           is_public: boolean
           location_address: string | null
           location_name: string | null
@@ -535,6 +536,7 @@ export type Database = {
           groom_name?: string | null
           id?: string
           invitation_message?: string | null
+          invitation_text?: string
           is_public?: boolean
           location_address?: string | null
           location_name?: string | null
@@ -558,6 +560,7 @@ export type Database = {
           groom_name?: string | null
           id?: string
           invitation_message?: string | null
+          invitation_text?: string
           is_public?: boolean
           location_address?: string | null
           location_name?: string | null
