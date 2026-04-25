@@ -64,9 +64,10 @@ function AdminInvitation() {
     toast.success("Invitation letter updated.");
     void logAudit({
       weddingId: wedding.id,
-      action: "invitation_text.update",
+      action: "wedding.updated",
       targetType: "wedding",
       targetId: wedding.id,
+      details: { field: "invitation_text" },
     });
     void refresh();
   };
