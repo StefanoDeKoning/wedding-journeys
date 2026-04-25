@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { WaxSeal } from "./WaxSeal";
+import { renderInvitationText } from "./invitationTemplate";
 
 interface EnvelopeLetterProps {
   recipientFirstName: string;
   recipientLastName: string;
-  invitationMessage?: string | null;
+  invitationTemplate: string | null;
   coupleSignature: string;
 }
 
@@ -15,10 +16,15 @@ interface EnvelopeLetterProps {
 export function EnvelopeLetter({
   recipientFirstName,
   recipientLastName,
-  invitationMessage,
+  invitationTemplate,
   coupleSignature,
 }: EnvelopeLetterProps) {
   const [opened, setOpened] = useState(false);
+  const letterBody = renderInvitationText(
+    invitationTemplate,
+    recipientFirstName,
+    recipientLastName,
+  );
 
   return (
     <div className="relative w-full">
@@ -111,30 +117,14 @@ export function EnvelopeLetter({
               </div>
             </header>
 
-            <div className="space-y-5 font-body text-base md:text-lg leading-relaxed">
-              <p className="font-parchment-display text-xl md:text-2xl">
-                Dear {recipientFirstName} {recipientLastName},
-              </p>
-              <p>
-                You are warmly invited to the most magical celebration of the year.
-              </p>
-              {invitationMessage && (
-                <p className="italic opacity-90">{invitationMessage}</p>
-              )}
-              <p>
-                The location and all details can be found on the reverse side of this
-                letter.
-              </p>
-              <p>
-                Please return this letter with any dietary wishes or special requests.
-              </p>
+            <div className="space-y-5 font-body text-base md:text-lg leading-relaxed whitespace-pre-line">
+              {letterBody}
+            </div>
 
-              <div className="pt-4">
-                <p>With love,</p>
-                <p className="font-parchment-script text-3xl md:text-4xl mt-2">
-                  {coupleSignature}
-                </p>
-              </div>
+            <div className="pt-6 text-center">
+              <p className="font-parchment-script text-3xl md:text-4xl mt-2">
+                {coupleSignature}
+              </p>
             </div>
 
             {/* Tiny re-seal */}
