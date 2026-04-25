@@ -12,7 +12,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import {
   checkSlugAvailability,
-  createWedding,
+  createWeddingWithAccount,
   suggestSlugs,
 } from "@/auth/wedding.functions";
 
