@@ -74,7 +74,7 @@ export const suggestSlugs = createServerFn({ method: "POST" })
 
 // ---------- Create wedding ----------
 
-const CreateWeddingInput = z.object({
+const WeddingFieldsInput = z.object({
   weddingName: z.string().trim().min(2).max(120),
   brideName: z.string().trim().min(1).max(80),
   groomName: z.string().trim().min(1).max(80),
@@ -105,29 +105,103 @@ const CreateWeddingInput = z.object({
 export interface CreateWeddingResult {
   ok: boolean;
   error?: string;
+  errorField?: "email" | "password" | "slug" | "weddingName" | "form";
   wedding?: {
     id: string;
     slug: string;
     adminUrl: string;
     publicUrl: string;
   };
+  /** Returned by createWeddingWithAccount so the client can sign in with the new credentials. */
+  signIn?: {
+    email: string;
+  };
 }
 
-export const createWedding = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => CreateWeddingInput.parse(input))
-  .handler(async ({ data, context }): Promise<CreateWeddingResult> => {
-    const userId = context.userId;
+const SignupCredentials = z.object({
+  email: z.string().trim().toLowerCase().email("Enter a valid email").max(255),
+  password: z.string().min(8, "At least 8 characters").max(100),
+});
+
+const CreateWeddingWithAccountInput = WeddingFieldsInput.merge(SignupCredentials);
+
+/**
+ * Atomic backend operation:
+ *   1. Verify slug is free.
+ *   2. Verify email is not already registered.
+ *   3. Create the auth user (admin API).
+ *   4. Create the wedding row.
+ *   5. Insert the wedding_members row (primary_admin).
+ *   6. On ANY failure, roll back everything that was already created.
+ *
+ * Returns ok:true ONLY when all steps committed.
+ */
+export const createWeddingWithAccount = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => CreateWeddingWithAccountInput.parse(input))
+  .handler(async ({ data }): Promise<CreateWeddingResult> => {
     const admin = adminClient();
 
-    // Re-check slug atomically.
-    const { data: free, error: rpcErr } = await admin.rpc("is_slug_available", {
+    // 1. Slug must be free.
+    const { data: slugFree, error: slugErr } = await admin.rpc("is_slug_available", {
       _slug: data.slug,
     });
-    if (rpcErr) return { ok: false, error: "Could not verify slug." };
-    if (!free) return { ok: false, error: "That URL was just taken. Pick another." };
+    if (slugErr) {
+      console.error("[createWeddingWithAccount] slug check failed", slugErr);
+      return { ok: false, error: "Could not verify the URL. Try again." };
+    }
+    if (!slugFree) {
+      return {
+        ok: false,
+        errorField: "slug",
+        error: "That URL was just taken. Pick another.",
+      };
+    }
 
-    // Insert wedding (status defaults to 'draft').
+    // 2. Email must not be registered.
+    //    listUsers does not support a server-side email filter, but we can ask for
+    //    a small page and filter — for our scale this is acceptable. For larger
+    //    deployments swap to admin.getUserByEmail when available.
+    try {
+      const { data: existing, error: listErr } = await admin.auth.admin.listUsers({
+        page: 1,
+        perPage: 200,
+      });
+      if (listErr) {
+        console.error("[createWeddingWithAccount] listUsers failed", listErr);
+        return { ok: false, error: "Could not verify your email. Try again." };
+      }
+      const lower = data.email.toLowerCase();
+      if (existing.users.some((u) => (u.email ?? "").toLowerCase() === lower)) {
+        return {
+          ok: false,
+          errorField: "email",
+          error:
+            "An account with this email already exists. Sign in first, then create your wedding.",
+        };
+      }
+    } catch (e) {
+      console.error("[createWeddingWithAccount] email pre-check threw", e);
+      return { ok: false, error: "Could not verify your email. Try again." };
+    }
+
+    // 3. Create the auth user (auto-confirmed so they can sign in immediately).
+    const { data: created, error: userErr } = await admin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true,
+    });
+    if (userErr || !created.user) {
+      console.error("[createWeddingWithAccount] createUser failed", userErr);
+      const msg = userErr?.message ?? "Could not create your account.";
+      return {
+        ok: false,
+        errorField: /email/i.test(msg) ? "email" : "form",
+        error: msg,
+      };
+    }
+    const userId = created.user.id;
+
+    // 4. Create the wedding row.
     const { data: wedding, error: wErr } = await admin
       .from("weddings")
       .insert({
@@ -149,21 +223,40 @@ export const createWedding = createServerFn({ method: "POST" })
       .single();
 
     if (wErr || !wedding) {
-      return { ok: false, error: wErr?.message ?? "Could not create the wedding." };
+      console.error("[createWeddingWithAccount] wedding insert failed", wErr);
+      // Rollback: delete the user.
+      await admin.auth.admin.deleteUser(userId).catch((e) => {
+        console.error("[createWeddingWithAccount] rollback deleteUser failed", e);
+      });
+      return {
+        ok: false,
+        errorField: /slug|url/i.test(wErr?.message ?? "") ? "slug" : "form",
+        error: wErr?.message ?? "Could not create your wedding.",
+      };
     }
 
-    // Add primary_admin membership.
-    const { error: mErr } = await admin
-      .from("wedding_members")
-      .insert({
-        wedding_id: wedding.id,
-        user_id: userId,
-        role: "primary_admin",
-      });
+    // 5. Insert primary_admin membership.
+    const { error: mErr } = await admin.from("wedding_members").insert({
+      wedding_id: wedding.id,
+      user_id: userId,
+      role: "primary_admin",
+    });
 
     if (mErr) {
-      // Best effort cleanup
-      await admin.from("weddings").delete().eq("id", wedding.id);
+      console.error("[createWeddingWithAccount] member insert failed", mErr);
+      // Rollback: delete wedding, then user.
+      try {
+        const { error: delWErr } = await admin.from("weddings").delete().eq("id", wedding.id);
+        if (delWErr) console.error("[createWeddingWithAccount] rollback delete wedding failed", delWErr);
+      } catch (e) {
+        console.error("[createWeddingWithAccount] rollback delete wedding threw", e);
+      }
+      try {
+        const { error: delUErr } = await admin.auth.admin.deleteUser(userId);
+        if (delUErr) console.error("[createWeddingWithAccount] rollback deleteUser failed", delUErr);
+      } catch (e) {
+        console.error("[createWeddingWithAccount] rollback deleteUser threw", e);
+      }
       return { ok: false, error: "Could not assign you as primary admin." };
     }
 
@@ -175,6 +268,7 @@ export const createWedding = createServerFn({ method: "POST" })
         adminUrl: `/${wedding.slug}/admin`,
         publicUrl: `/${wedding.slug}`,
       },
+      signIn: { email: data.email },
     };
   });
 
