@@ -180,7 +180,7 @@ function CreatePage() {
 
     setSubmitting(true);
     try {
-      // If not signed in, sign up first.
+      // 1. Make sure we have an authenticated session BEFORE we touch the wedding.
       if (!user) {
         const sParsed = signupSchema.safeParse({ email, password });
         if (!sParsed.success) {
@@ -190,44 +190,84 @@ function CreatePage() {
           setSubmitting(false);
           return;
         }
-        const { error: signErr } = await supabase.auth.signUp({
+
+        // Try sign-in first — if the email already exists with this password,
+        // we just resume the account instead of creating a duplicate.
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
           email: sParsed.data.email,
           password: sParsed.data.password,
-          options: { emailRedirectTo: `${window.location.origin}/` },
         });
-        if (signErr) {
-          toast.error(signErr.message);
-          setSubmitting(false);
-          return;
-        }
-        // If email confirmation is required there will be no session — sign in instead.
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (!sessionData.session) {
-          const { error: siErr } = await supabase.auth.signInWithPassword({
+
+        if (signInErr || !signInData.session) {
+          // No existing account (or wrong password). Try to sign up.
+          const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
             email: sParsed.data.email,
             password: sParsed.data.password,
+            options: { emailRedirectTo: `${window.location.origin}/` },
           });
-          if (siErr) {
-            toast.message("Check your inbox", {
-              description: "Confirm your email to finish setting up your wedding.",
+
+          if (signUpErr) {
+            // "User already registered" → wrong password above. Be explicit.
+            const msg = /already (registered|exists)/i.test(signUpErr.message)
+              ? "An account with this email already exists. Use your existing password or sign in first."
+              : signUpErr.message;
+            setErrors({ email: msg });
+            toast.error(msg);
+            setSubmitting(false);
+            return;
+          }
+
+          if (!signUpData.session) {
+            // Email confirmation is required — we cannot create the wedding now,
+            // because there is no auth session to authorise the server function.
+            toast.message("Confirm your email", {
+              description:
+                "We sent you a verification email. Confirm it, then sign in and finish creating your wedding.",
             });
             setSubmitting(false);
             return;
           }
         }
+
         await refresh();
       }
 
-      const result = await createWedding({ data: parsed.data });
-      if (!result.ok || !result.wedding) {
-        toast.error(result.error ?? "Could not create your wedding.");
+      // 2. Confirm we now have an access token before calling the server fn.
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session?.access_token) {
+        toast.error("Your sign-in did not complete. Please try again.");
         setSubmitting(false);
         return;
       }
+
+      // 3. Create the wedding. Surface real errors instead of swallowing them.
+      let result;
+      try {
+        result = await createWedding({ data: parsed.data });
+      } catch (callErr) {
+        const message = callErr instanceof Error ? callErr.message : "Server error";
+        console.error("[create] createWedding threw:", callErr);
+        toast.error(`Could not create your wedding: ${message}`);
+        setSubmitting(false);
+        return;
+      }
+
+      if (!result.ok || !result.wedding) {
+        const message = result.error ?? "Could not create your wedding.";
+        console.error("[create] createWedding failed:", result);
+        if (/url|slug/i.test(message)) {
+          setErrors({ slug: message });
+        }
+        toast.error(message);
+        setSubmitting(false);
+        return;
+      }
+
       toast.success("Your wedding home is ready.");
       await refresh();
       void navigate({ to: result.wedding.adminUrl });
     } catch (err) {
+      console.error("[create] unexpected:", err);
       toast.error(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSubmitting(false);
