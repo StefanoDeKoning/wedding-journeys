@@ -274,16 +274,44 @@ function GuestRsvpForm({
         </div>
       </fieldset>
 
-      <fieldset disabled={deadlinePassed} className="space-y-2">
-        <Label htmlFor="plusOne">Plus-one (optional)</Label>
-        <Input
-          id="plusOne"
-          value={plusOne}
-          onChange={(e) => setPlusOne(e.target.value)}
-          placeholder="Name of your guest"
-          maxLength={120}
-        />
-      </fieldset>
+      {plusOneAllowed && answer === "yes" && (
+        <fieldset disabled={deadlinePassed} className="space-y-3">
+          <Label>Will you bring a guest?</Label>
+          <div className="grid grid-cols-2 gap-3">
+            {(
+              [
+                { v: true, label: "Yes, +1" },
+                { v: false, label: "No, just me" },
+              ] as const
+            ).map(({ v, label }) => {
+              const active = bringingGuest === v;
+              return (
+                <button
+                  key={String(v)}
+                  type="button"
+                  onClick={() => setBringingGuest(v)}
+                  className={`rounded-2xl border p-3 text-center transition-all text-sm ${
+                    active
+                      ? "border-primary bg-primary/10 text-primary shadow-warm"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {bringingGuest && (
+            <Input
+              id="plusOne"
+              value={plusOne}
+              onChange={(e) => setPlusOne(e.target.value)}
+              placeholder="Name of your guest (optional)"
+              maxLength={120}
+            />
+          )}
+        </fieldset>
+      )}
 
       <fieldset disabled={deadlinePassed} className="space-y-3">
         <Label>Dietary restrictions</Label>
