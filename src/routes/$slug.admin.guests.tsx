@@ -77,7 +77,7 @@ function AdminGuests() {
     const [g, gg, rs] = await Promise.all([
       supabase
         .from("guests")
-        .select("id, first_name, last_name, email, invitation_code, guest_type, guest_group_id, notes")
+        .select("id, first_name, last_name, email, invitation_code, guest_type, guest_group_id, notes, plus_one_allowed")
         .eq("wedding_id", wedding.id)
         .order("last_name"),
       supabase.from("guest_groups").select("id, name, color").eq("wedding_id", wedding.id).order("position"),
