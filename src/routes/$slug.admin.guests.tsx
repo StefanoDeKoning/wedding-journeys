@@ -395,6 +395,7 @@ function GuestDialog({
           guest_type: guestType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
+          plus_one_allowed: plusOneAllowed,
         })
         .select("id")
         .single();
@@ -422,6 +423,7 @@ function GuestDialog({
           guest_type: guestType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
+          plus_one_allowed: plusOneAllowed,
         })
         .eq("id", guest.id);
       if (error) {
