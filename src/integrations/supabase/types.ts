@@ -107,6 +107,7 @@ export type Database = {
           invitation_code: string
           last_name: string
           notes: string | null
+          plus_one_allowed: boolean
           updated_at: string
           wedding_id: string
         }
@@ -120,6 +121,7 @@ export type Database = {
           invitation_code: string
           last_name: string
           notes?: string | null
+          plus_one_allowed?: boolean
           updated_at?: string
           wedding_id: string
         }
@@ -133,6 +135,7 @@ export type Database = {
           invitation_code?: string
           last_name?: string
           notes?: string | null
+          plus_one_allowed?: boolean
           updated_at?: string
           wedding_id?: string
         }

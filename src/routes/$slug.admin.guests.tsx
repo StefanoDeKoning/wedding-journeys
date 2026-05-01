@@ -41,6 +41,7 @@ interface Guest {
   guest_type: "day" | "evening";
   guest_group_id: string | null;
   notes: string | null;
+  plus_one_allowed: boolean;
 }
 
 interface Group {
@@ -76,7 +77,7 @@ function AdminGuests() {
     const [g, gg, rs] = await Promise.all([
       supabase
         .from("guests")
-        .select("id, first_name, last_name, email, invitation_code, guest_type, guest_group_id, notes")
+        .select("id, first_name, last_name, email, invitation_code, guest_type, guest_group_id, notes, plus_one_allowed")
         .eq("wedding_id", wedding.id)
         .order("last_name"),
       supabase.from("guest_groups").select("id, name, color").eq("wedding_id", wedding.id).order("position"),
@@ -146,7 +147,9 @@ function AdminGuests() {
         guest_type: g.guest_type,
         group: groupName,
         rsvp_status: r?.status ?? "",
-        plus_one: r?.plus_one_name ?? "",
+        plus_one_allowed: g.plus_one_allowed ? "yes" : "no",
+        plus_one_name: r?.plus_one_name ?? "",
+        attendees: r?.status === "yes" ? (g.plus_one_allowed && r?.plus_one_name ? 2 : 1) : 0,
         dietary_tags: r?.dietary_tags?.join("; ") ?? "",
         dietary_other: r?.dietary_other ?? "",
         comments: r?.comments ?? "",
@@ -267,8 +270,13 @@ function GuestRow({
     <li className="flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors">
       <StatusDot status={rsvp?.status ?? null} />
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">
+        <p className="font-medium truncate flex items-center gap-2">
           {guest.first_name} {guest.last_name}
+          {guest.plus_one_allowed && (
+            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              +1 ok
+            </span>
+          )}
         </p>
         <p className="text-xs text-muted-foreground truncate">
           {answerLabel(rsvp?.status ?? null)}
@@ -350,6 +358,7 @@ function GuestDialog({
   const [guestType, setGuestType] = useState<"day" | "evening">(guest?.guest_type ?? "day");
   const [groupId, setGroupId] = useState<string>(guest?.guest_group_id ?? "none");
   const [notes, setNotes] = useState(guest?.notes ?? "");
+  const [plusOneAllowed, setPlusOneAllowed] = useState<boolean>(guest?.plus_one_allowed ?? false);
 
   const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | "maybe" | "none">(
     rsvp?.status ?? "none",
@@ -386,6 +395,7 @@ function GuestDialog({
           guest_type: guestType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
+          plus_one_allowed: plusOneAllowed,
         })
         .select("id")
         .single();
@@ -413,6 +423,7 @@ function GuestDialog({
           guest_type: guestType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
+          plus_one_allowed: plusOneAllowed,
         })
         .eq("id", guest.id);
       if (error) {
@@ -543,6 +554,27 @@ function GuestDialog({
             <Textarea id="nt" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} maxLength={500} />
           </div>
 
+          <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer">
+            <Checkbox
+              checked={plusOneAllowed}
+              onCheckedChange={(c) => setPlusOneAllowed(c === true)}
+              className="mt-0.5"
+            />
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium">Allow plus-one</p>
+              <p className="text-xs text-muted-foreground">
+                If enabled, this guest can bring a companion when they RSVP.
+              </p>
+            </div>
+          </label>
+
+          {rsvpStatus !== "none" && plusOne && !plusOneAllowed && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              A plus-one name is set but this guest isn't allowed to bring one. Either enable
+              "Allow plus-one" above or clear the plus-one field below.
+            </p>
+          )}
+
           <div className="border-t border-border pt-4 space-y-3">
             <h4 className="font-display text-sm">RSVP</h4>
             <div className="grid grid-cols-4 gap-2">
@@ -563,12 +595,14 @@ function GuestDialog({
             </div>
             {rsvpStatus !== "none" && (
               <>
-                <Input
-                  value={plusOne}
-                  onChange={(e) => setPlusOne(e.target.value)}
-                  placeholder="Plus-one name (optional)"
-                  maxLength={120}
-                />
+                {plusOneAllowed && (
+                  <Input
+                    value={plusOne}
+                    onChange={(e) => setPlusOne(e.target.value)}
+                    placeholder="Plus-one name (optional)"
+                    maxLength={120}
+                  />
+                )}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                   {DIETARY_OPTIONS.map((opt) => {
                     const checked = tags.includes(opt.value);
