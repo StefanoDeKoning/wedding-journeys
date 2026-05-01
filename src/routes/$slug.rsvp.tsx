@@ -158,7 +158,8 @@ function GuestRsvpForm({
       wedding_id: weddingId,
       guest_id: guestId,
       status: answer,
-      plus_one_name: plusOne.trim() || null,
+      plus_one_name:
+        plusOneAllowed && answer === "yes" && bringingGuest ? plusOne.trim() || null : null,
       dietary_tags: tags,
       dietary_other: dietaryOther.trim() || null,
       comments: comments.trim() || null,
