@@ -103,6 +103,7 @@ function GuestRsvpForm({
   const [existing, setExisting] = useState<RsvpRow | null>(null);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [plusOne, setPlusOne] = useState("");
+  const [bringingGuest, setBringingGuest] = useState<boolean>(false);
   const [tags, setTags] = useState<DietaryValue[]>([]);
   const [dietaryOther, setDietaryOther] = useState("");
   const [comments, setComments] = useState("");
