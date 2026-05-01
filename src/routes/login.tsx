@@ -75,16 +75,65 @@ function LoginPage() {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(parsed.data);
-    setSubmitting(false);
+    const { data: signInData, error } = await supabase.auth.signInWithPassword(parsed.data);
 
     if (error) {
+      setSubmitting(false);
       toast.error(error.message);
       return;
     }
+
+    const userId = signInData.user?.id;
+    let destination: { to: string; params?: Record<string, string> } = { to: "/" };
+
+    if (userId) {
+      try {
+        // Check platform owner first.
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId)
+          .eq("role", "platform_owner")
+          .maybeSingle();
+
+        if (roleRow) {
+          destination = { to: "/admin/platform" };
+        } else {
+          const { data: memberships } = await supabase
+            .from("wedding_members")
+            .select("wedding_id, role, weddings!inner(slug)")
+            .eq("user_id", userId);
+
+          type Row = { wedding_id: string; role: string; weddings: { slug: string } | { slug: string }[] };
+          const rows = (memberships ?? []) as Row[];
+          const slugs = rows
+            .map((r) => (Array.isArray(r.weddings) ? r.weddings[0]?.slug : r.weddings?.slug))
+            .filter((s): s is string => !!s);
+
+          if (slugs.length === 1) {
+            destination = { to: "/$slug/admin", params: { slug: slugs[0] } };
+          } else if (slugs.length > 1) {
+            // Prefer last-used slug from localStorage if it matches one of the memberships.
+            const last = typeof window !== "undefined" ? window.localStorage.getItem("ourjourney:lastWeddingSlug") : null;
+            const chosen = last && slugs.includes(last) ? last : slugs[0];
+            destination = { to: "/$slug/admin", params: { slug: chosen } };
+          }
+        }
+      } catch (err) {
+        console.error("Post-login redirect lookup failed", err);
+      }
+    }
+
+    setSubmitting(false);
     toast.success("Welcome back");
     await refresh();
-    void navigate({ to: "/" });
+    if (destination.params) {
+      try {
+        window.localStorage.setItem("ourjourney:lastWeddingSlug", destination.params.slug);
+      } catch { /* ignore */ }
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    void navigate(destination as any);
   };
 
   const handleGuest = async (e: React.FormEvent<HTMLFormElement>) => {
