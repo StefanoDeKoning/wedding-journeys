@@ -90,7 +90,7 @@ export function useWedding(slug: string): WeddingState {
     if (guestId && guestWeddingId === w.id) {
       const { data: g } = await supabase
         .from("guests")
-        .select("id, first_name, last_name, guest_type, email")
+        .select("id, first_name, last_name, guest_type, email, plus_one_allowed")
         .eq("id", guestId)
         .maybeSingle();
       if (g) setGuest(g as CurrentGuest);
