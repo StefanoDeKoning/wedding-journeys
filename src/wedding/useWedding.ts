@@ -8,6 +8,7 @@ export interface CurrentGuest {
   last_name: string;
   guest_type: "day" | "evening";
   email: string | null;
+  plus_one_allowed: boolean;
 }
 
 export interface WeddingState {
