@@ -72,6 +72,7 @@ function RsvpPage() {
           weddingId={wedding.id}
           guestId={guest.id}
           guestFirstName={guest.first_name}
+          plusOneAllowed={guest.plus_one_allowed}
           rsvpDeadline={wedding.rsvp_deadline}
         />
       ) : (
@@ -89,11 +90,13 @@ function GuestRsvpForm({
   weddingId,
   guestId,
   guestFirstName,
+  plusOneAllowed,
   rsvpDeadline,
 }: {
   weddingId: string;
   guestId: string;
   guestFirstName: string;
+  plusOneAllowed: boolean;
   rsvpDeadline: string | null;
 }) {
   const [loading, setLoading] = useState(true);
