@@ -554,6 +554,27 @@ function GuestDialog({
             <Textarea id="nt" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} maxLength={500} />
           </div>
 
+          <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 cursor-pointer">
+            <Checkbox
+              checked={plusOneAllowed}
+              onCheckedChange={(c) => setPlusOneAllowed(c === true)}
+              className="mt-0.5"
+            />
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium">Allow plus-one</p>
+              <p className="text-xs text-muted-foreground">
+                If enabled, this guest can bring a companion when they RSVP.
+              </p>
+            </div>
+          </label>
+
+          {rsvpStatus !== "none" && plusOne && !plusOneAllowed && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              A plus-one name is set but this guest isn't allowed to bring one. Either enable
+              "Allow plus-one" above or clear the plus-one field below.
+            </p>
+          )}
+
           <div className="border-t border-border pt-4 space-y-3">
             <h4 className="font-display text-sm">RSVP</h4>
             <div className="grid grid-cols-4 gap-2">
