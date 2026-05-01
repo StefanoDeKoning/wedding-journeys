@@ -131,6 +131,7 @@ function GuestRsvpForm({
         setExisting(row);
         setAnswer(row.status);
         setPlusOne(row.plus_one_name ?? "");
+        setBringingGuest(!!row.plus_one_name);
         setTags((row.dietary_tags ?? []) as DietaryValue[]);
         setDietaryOther(row.dietary_other ?? "");
         setComments(row.comments ?? "");
@@ -336,6 +337,7 @@ function GuestRsvpForm({
               setEditing(false);
               setAnswer(existing.status);
               setPlusOne(existing.plus_one_name ?? "");
+              setBringingGuest(!!existing.plus_one_name);
               setTags((existing.dietary_tags ?? []) as DietaryValue[]);
               setDietaryOther(existing.dietary_other ?? "");
               setComments(existing.comments ?? "");
