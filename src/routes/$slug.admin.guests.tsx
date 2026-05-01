@@ -270,8 +270,13 @@ function GuestRow({
     <li className="flex items-center gap-3 p-3 hover:bg-muted/30 transition-colors">
       <StatusDot status={rsvp?.status ?? null} />
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate">
+        <p className="font-medium truncate flex items-center gap-2">
           {guest.first_name} {guest.last_name}
+          {guest.plus_one_allowed && (
+            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              +1 ok
+            </span>
+          )}
         </p>
         <p className="text-xs text-muted-foreground truncate">
           {answerLabel(rsvp?.status ?? null)}
