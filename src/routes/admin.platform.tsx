@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Crown, Users, Image as ImageIcon, HardDrive, CalendarHeart, ScrollText, ArrowRight } from "lucide-react";
 import { useAuth } from "@/auth/AuthProvider";
@@ -25,16 +25,19 @@ function formatBytes(bytes: number): string {
 
 function PlatformDashboard() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState<PlatformOverview | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (auth.loading) return;
     if (!auth.user) {
-      throw redirect({ to: "/login" });
+      void navigate({ to: "/login" });
+      return;
     }
     if (!auth.isPlatformOwner) {
-      throw redirect({ to: "/" });
+      void navigate({ to: "/" });
+      return;
     }
     let cancelled = false;
     setLoading(true);
@@ -43,7 +46,8 @@ function PlatformDashboard() {
         if (!cancelled) setData(res);
       })
       .catch((err: Error) => {
-        toast.error(err.message);
+        console.error("getPlatformOverview failed", err);
+        toast.error(err?.message ?? "Could not load platform overview.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -51,7 +55,7 @@ function PlatformDashboard() {
     return () => {
       cancelled = true;
     };
-  }, [auth.loading, auth.user, auth.isPlatformOwner]);
+  }, [auth.loading, auth.user, auth.isPlatformOwner, navigate]);
 
   if (auth.loading || loading) {
     return (
