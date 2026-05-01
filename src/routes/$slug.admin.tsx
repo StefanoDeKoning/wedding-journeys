@@ -9,6 +9,7 @@ import {
   HardDrive,
   ScrollText,
   Mail,
+  ClipboardCheck,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Loader2 } from "lucide-react";
