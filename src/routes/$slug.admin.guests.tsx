@@ -41,6 +41,7 @@ interface Guest {
   guest_type: "day" | "evening";
   guest_group_id: string | null;
   notes: string | null;
+  plus_one_allowed: boolean;
 }
 
 interface Group {
