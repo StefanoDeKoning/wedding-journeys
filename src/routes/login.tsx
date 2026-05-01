@@ -174,7 +174,8 @@ function LoginPage() {
       }
       toast.success(`Welcome, ${result.guest?.first_name}!`);
       await refresh();
-      void navigate({ to: "/" });
+      const slug = result.guest?.wedding_slug ?? parsed.data.weddingSlug;
+      void navigate({ to: "/$slug", params: { slug } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not sign you in.");
     } finally {
