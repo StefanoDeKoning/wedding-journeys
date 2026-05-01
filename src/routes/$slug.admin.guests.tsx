@@ -595,12 +595,14 @@ function GuestDialog({
             </div>
             {rsvpStatus !== "none" && (
               <>
-                <Input
-                  value={plusOne}
-                  onChange={(e) => setPlusOne(e.target.value)}
-                  placeholder="Plus-one name (optional)"
-                  maxLength={120}
-                />
+                {plusOneAllowed && (
+                  <Input
+                    value={plusOne}
+                    onChange={(e) => setPlusOne(e.target.value)}
+                    placeholder="Plus-one name (optional)"
+                    maxLength={120}
+                  />
+                )}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                   {DIETARY_OPTIONS.map((opt) => {
                     const checked = tags.includes(opt.value);
