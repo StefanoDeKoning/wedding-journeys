@@ -358,6 +358,7 @@ function GuestDialog({
   const [guestType, setGuestType] = useState<"day" | "evening">(guest?.guest_type ?? "day");
   const [groupId, setGroupId] = useState<string>(guest?.guest_group_id ?? "none");
   const [notes, setNotes] = useState(guest?.notes ?? "");
+  const [plusOneAllowed, setPlusOneAllowed] = useState<boolean>(guest?.plus_one_allowed ?? false);
 
   const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | "maybe" | "none">(
     rsvp?.status ?? "none",
