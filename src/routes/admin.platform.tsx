@@ -77,14 +77,22 @@ function PlatformDashboard() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-10">
-      <header className="mb-8">
-        <p className="font-script text-2xl text-primary flex items-center gap-2">
-          <Crown className="w-5 h-5" /> platform owner
-        </p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">OurJourney overview</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Cross-wedding stats, storage, and audit history.
-        </p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-script text-2xl text-primary flex items-center gap-2">
+            <Crown className="w-5 h-5" /> platform owner
+          </p>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl">OurJourney overview</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Cross-wedding stats, storage, and audit history.
+          </p>
+        </div>
+        <Link
+          to="/admin/platform/todo-templates"
+          className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted/60 transition-colors"
+        >
+          ToDo templates <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
