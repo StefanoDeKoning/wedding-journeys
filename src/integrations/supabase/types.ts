@@ -452,6 +452,90 @@ export type Database = {
           },
         ]
       }
+      todo_tasks: {
+        Row: {
+          category: string
+          created_at: string
+          created_from_template: boolean
+          deadline: string | null
+          description: string | null
+          id: string
+          position: number
+          priority: Database["public"]["Enums"]["todo_priority"]
+          status: Database["public"]["Enums"]["todo_status"]
+          template_id: string | null
+          title: string
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_from_template?: boolean
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["todo_priority"]
+          status?: Database["public"]["Enums"]["todo_status"]
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_from_template?: boolean
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["todo_priority"]
+          status?: Database["public"]["Enums"]["todo_status"]
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: []
+      }
+      todo_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          position: number
+          priority: Database["public"]["Enums"]["todo_priority"]
+          relative_days_before: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["todo_priority"]
+          relative_days_before?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["todo_priority"]
+          relative_days_before?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -607,6 +691,10 @@ export type Database = {
         Args: { _user_id: string; _wedding_id: string }
         Returns: boolean
       }
+      seed_todo_tasks_for_wedding: {
+        Args: { _wedding_id: string }
+        Returns: number
+      }
       wedding_storage_used: { Args: { _wedding_id: string }; Returns: number }
     }
     Enums: {
@@ -615,6 +703,8 @@ export type Database = {
       photo_status: "pending" | "approved" | "hidden"
       rsvp_status: "yes" | "no" | "maybe"
       timeline_visibility: "all" | "day" | "evening"
+      todo_priority: "low" | "medium" | "high"
+      todo_status: "todo" | "in_progress" | "done"
       wedding_role: "primary_admin" | "secondary_admin"
       wedding_status: "draft" | "published"
     }
@@ -749,6 +839,8 @@ export const Constants = {
       photo_status: ["pending", "approved", "hidden"],
       rsvp_status: ["yes", "no", "maybe"],
       timeline_visibility: ["all", "day", "evening"],
+      todo_priority: ["low", "medium", "high"],
+      todo_status: ["todo", "in_progress", "done"],
       wedding_role: ["primary_admin", "secondary_admin"],
       wedding_status: ["draft", "published"],
     },
