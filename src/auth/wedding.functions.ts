@@ -260,6 +260,39 @@ export const createWeddingWithAccount = createServerFn({ method: "POST" })
       return { ok: false, error: "Could not assign you as primary admin." };
     }
 
+    // 6. Seed default todo tasks from templates (best-effort, non-blocking).
+    try {
+      const weddingDate = data.weddingDate ? new Date(data.weddingDate) : null;
+      const { data: templates } = await admin
+        .from("todo_templates")
+        .select("id, title, description, category, relative_days_before, priority, position");
+      if (templates && templates.length > 0) {
+        const rows = templates.map((t) => {
+          let deadline: string | null = null;
+          if (weddingDate && t.relative_days_before != null) {
+            const d = new Date(weddingDate);
+            d.setDate(d.getDate() - t.relative_days_before);
+            deadline = d.toISOString().slice(0, 10);
+          }
+          return {
+            wedding_id: wedding.id,
+            title: t.title,
+            description: t.description,
+            category: t.category,
+            deadline,
+            priority: t.priority,
+            created_from_template: true,
+            template_id: t.id,
+            position: t.position,
+          };
+        });
+        const { error: seedErr } = await admin.from("todo_tasks").insert(rows);
+        if (seedErr) console.error("[createWeddingWithAccount] seed todos failed", seedErr);
+      }
+    } catch (e) {
+      console.error("[createWeddingWithAccount] seed todos threw", e);
+    }
+
     return {
       ok: true,
       wedding: {
