@@ -36,7 +36,7 @@ function PlatformDashboard() {
       return;
     }
     if (!auth.isPlatformOwner) {
-      void navigate({ to: "/" });
+      void navigate({ to: "/admin/platform/claim" });
       return;
     }
     let cancelled = false;
