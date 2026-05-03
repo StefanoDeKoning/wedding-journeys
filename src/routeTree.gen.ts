@@ -23,6 +23,7 @@ import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
 import { Route as SlugLocationRouteImport } from './routes/$slug.location'
 import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugAdminRouteImport } from './routes/$slug.admin'
+import { Route as AdminPlatformIndexRouteImport } from './routes/admin.platform.index'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as AdminPlatformTodoTemplatesRouteImport } from './routes/admin.platform.todo-templates'
 import { Route as AdminPlatformClaimRouteImport } from './routes/admin.platform.claim'
@@ -107,6 +108,11 @@ const SlugAdminRoute = SlugAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => SlugRoute,
+} as any)
+const AdminPlatformIndexRoute = AdminPlatformIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminPlatformRoute,
 } as any)
 const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
   id: '/',
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
+  '/admin/platform/': typeof AdminPlatformIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -221,7 +228,6 @@ export interface FileRoutesByTo {
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/timeline': typeof SlugTimelineRoute
-  '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
@@ -237,6 +243,7 @@ export interface FileRoutesByTo {
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
   '/$slug/admin': typeof SlugAdminIndexRoute
+  '/admin/platform': typeof AdminPlatformIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -268,6 +275,7 @@ export interface FileRoutesById {
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
+  '/admin/platform/': typeof AdminPlatformIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -300,6 +308,7 @@ export interface FileRouteTypes {
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
     | '/$slug/admin/'
+    | '/admin/platform/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -312,7 +321,6 @@ export interface FileRouteTypes {
     | '/$slug/playlist'
     | '/$slug/rsvp'
     | '/$slug/timeline'
-    | '/admin/platform'
     | '/$slug'
     | '/$slug/admin/audit'
     | '/$slug/admin/groups'
@@ -328,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
     | '/$slug/admin'
+    | '/admin/platform'
   id:
     | '__root__'
     | '/'
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
     | '/$slug/admin/'
+    | '/admin/platform/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -469,6 +479,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$slug/admin'
       preLoaderRoute: typeof SlugAdminRouteImport
       parentRoute: typeof SlugRoute
+    }
+    '/admin/platform/': {
+      id: '/admin/platform/'
+      path: '/'
+      fullPath: '/admin/platform/'
+      preLoaderRoute: typeof AdminPlatformIndexRouteImport
+      parentRoute: typeof AdminPlatformRoute
     }
     '/$slug/admin/': {
       id: '/$slug/admin/'
@@ -640,11 +657,13 @@ const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)
 interface AdminPlatformRouteChildren {
   AdminPlatformClaimRoute: typeof AdminPlatformClaimRoute
   AdminPlatformTodoTemplatesRoute: typeof AdminPlatformTodoTemplatesRoute
+  AdminPlatformIndexRoute: typeof AdminPlatformIndexRoute
 }
 
 const AdminPlatformRouteChildren: AdminPlatformRouteChildren = {
   AdminPlatformClaimRoute: AdminPlatformClaimRoute,
   AdminPlatformTodoTemplatesRoute: AdminPlatformTodoTemplatesRoute,
+  AdminPlatformIndexRoute: AdminPlatformIndexRoute,
 }
 
 const AdminPlatformRouteWithChildren = AdminPlatformRoute._addFileChildren(

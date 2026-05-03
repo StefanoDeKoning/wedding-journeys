@@ -132,8 +132,11 @@ function LoginPage() {
         window.localStorage.setItem("ourjourney:lastWeddingSlug", destination.params.slug);
       } catch { /* ignore */ }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    void navigate(destination as any);
+    // Defer navigation to next tick so AuthProvider state has settled.
+    setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      void navigate(destination as any);
+    }, 0);
   };
 
   const handleGuest = async (e: React.FormEvent<HTMLFormElement>) => {
