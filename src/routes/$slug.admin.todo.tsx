@@ -344,45 +344,8 @@ function AdminTodo() {
             value={overdue}
             tone={overdue > 0 ? "danger" : "muted"}
           />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Select
-                value={draft.vendor_id || "__none__"}
-                onValueChange={(v) =>
-                  setDraft({ ...draft, vendor_id: v === "__none__" ? "" : v })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="No vendor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">No vendor</SelectItem>
-                  {vendors.map((v) => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={draft.budget_item_id || "__none__"}
-                onValueChange={(v) =>
-                  setDraft({ ...draft, budget_item_id: v === "__none__" ? "" : v })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="No budget item" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">No budget item</SelectItem>
-                  {budgets.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>
-                      {b.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        </div>
+      </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
