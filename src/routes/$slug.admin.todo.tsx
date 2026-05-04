@@ -240,6 +240,8 @@ function AdminTodo() {
       deadline: draft.deadline || null,
       priority: draft.priority,
       status: draft.status,
+      vendor_id: draft.vendor_id || null,
+      budget_item_id: draft.budget_item_id || null,
     };
     if (editing) {
       const { error } = await supabase
