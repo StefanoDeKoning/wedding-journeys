@@ -182,6 +182,7 @@ function BudgetPage() {
       estimated_cost: est,
       actual_cost: act,
       notes: form.notes.trim() || null,
+      vendor_id: form.vendor_id || null,
     };
     let error;
     if (form.id) {
