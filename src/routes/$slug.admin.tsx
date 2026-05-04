@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   ListTodo,
   Wallet,
+  Briefcase,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Loader2 } from "lucide-react";
@@ -31,6 +32,7 @@ const tabs = [
   { to: "/$slug/admin/rsvp" as const, label: "RSVP", icon: ClipboardCheck, exact: false },
   { to: "/$slug/admin/todo" as const, label: "ToDo", icon: ListTodo, exact: false },
   { to: "/$slug/admin/budget" as const, label: "Budget", icon: Wallet, exact: false },
+  { to: "/$slug/admin/vendors" as const, label: "Vendors", icon: Briefcase, exact: false },
   { to: "/$slug/admin/guests" as const, label: "Guests", icon: Users, exact: false },
   { to: "/$slug/admin/groups" as const, label: "Groups", icon: Tags, exact: false },
   { to: "/$slug/admin/seating" as const, label: "Seating", icon: Armchair, exact: false },

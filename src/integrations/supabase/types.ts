@@ -68,6 +68,7 @@ export type Database = {
           notes: string | null
           position: number
           updated_at: string
+          vendor_id: string | null
           wedding_id: string
         }
         Insert: {
@@ -79,6 +80,7 @@ export type Database = {
           notes?: string | null
           position?: number
           updated_at?: string
+          vendor_id?: string | null
           wedding_id: string
         }
         Update: {
@@ -90,9 +92,18 @@ export type Database = {
           notes?: string | null
           position?: number
           updated_at?: string
+          vendor_id?: string | null
           wedding_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "budget_items_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       guest_groups: {
         Row: {
@@ -490,6 +501,7 @@ export type Database = {
       }
       todo_tasks: {
         Row: {
+          budget_item_id: string | null
           category: string
           created_at: string
           created_from_template: boolean
@@ -502,9 +514,11 @@ export type Database = {
           template_id: string | null
           title: string
           updated_at: string
+          vendor_id: string | null
           wedding_id: string
         }
         Insert: {
+          budget_item_id?: string | null
           category?: string
           created_at?: string
           created_from_template?: boolean
@@ -517,9 +531,11 @@ export type Database = {
           template_id?: string | null
           title: string
           updated_at?: string
+          vendor_id?: string | null
           wedding_id: string
         }
         Update: {
+          budget_item_id?: string | null
           category?: string
           created_at?: string
           created_from_template?: boolean
@@ -532,9 +548,25 @@ export type Database = {
           template_id?: string | null
           title?: string
           updated_at?: string
+          vendor_id?: string | null
           wedding_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "todo_tasks_budget_item_id_fkey"
+            columns: ["budget_item_id"]
+            isOneToOne: false
+            referencedRelation: "budget_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "todo_tasks_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       todo_templates: {
         Row: {
@@ -590,6 +622,51 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          category: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          position: number
+          updated_at: string
+          website: string | null
+          wedding_id: string
+        }
+        Insert: {
+          category?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          position?: number
+          updated_at?: string
+          website?: string | null
+          wedding_id: string
+        }
+        Update: {
+          category?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          position?: number
+          updated_at?: string
+          website?: string | null
+          wedding_id?: string
         }
         Relationships: []
       }

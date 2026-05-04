@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Pencil, Trash2, Wallet, TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Wallet, TrendingUp, TrendingDown, PiggyBank, Briefcase, ListTodo } from "lucide-react";
 import { toast } from "sonner";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -36,7 +43,19 @@ interface BudgetItem {
   estimated_cost: number;
   actual_cost: number | null;
   notes: string | null;
+  vendor_id: string | null;
   created_at: string;
+}
+
+interface VendorLite {
+  id: string;
+  name: string;
+}
+
+interface TodoLite {
+  id: string;
+  title: string;
+  budget_item_id: string | null;
 }
 
 interface FormState {
@@ -45,6 +64,7 @@ interface FormState {
   estimated_cost: string;
   actual_cost: string;
   notes: string;
+  vendor_id: string;
 }
 
 const emptyForm: FormState = {
@@ -52,6 +72,7 @@ const emptyForm: FormState = {
   estimated_cost: "",
   actual_cost: "",
   notes: "",
+  vendor_id: "",
 };
 
 function formatCurrency(n: number): string {
@@ -66,27 +87,43 @@ function BudgetPage() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [items, setItems] = useState<BudgetItem[] | null>(null);
+  const [vendors, setVendors] = useState<VendorLite[]>([]);
+  const [todos, setTodos] = useState<TodoLite[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!wedding) return;
-    void loadItems(wedding.id);
+    void loadAll(wedding.id);
   }, [wedding]);
 
-  const loadItems = async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from("budget_items" as never)
-      .select("*")
-      .eq("wedding_id", weddingId)
-      .order("created_at", { ascending: true });
-    if (error) {
-      toast.error(error.message);
+  const loadAll = async (weddingId: string) => {
+    const [i, v, t] = await Promise.all([
+      supabase
+        .from("budget_items" as never)
+        .select("*")
+        .eq("wedding_id", weddingId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("vendors" as never)
+        .select("id,name")
+        .eq("wedding_id", weddingId)
+        .order("name", { ascending: true }),
+      supabase
+        .from("todo_tasks")
+        .select("id,title,budget_item_id")
+        .eq("wedding_id", weddingId),
+    ]);
+    if (i.error) {
+      toast.error(i.error.message);
       return;
     }
-    setItems((data ?? []) as unknown as BudgetItem[]);
+    setItems(((i.data ?? []) as unknown) as BudgetItem[]);
+    setVendors(((v.data ?? []) as unknown) as VendorLite[]);
+    setTodos(((t.data ?? []) as unknown) as TodoLite[]);
   };
+  const loadItems = (weddingId: string) => loadAll(weddingId);
 
   const totals = useMemo(() => {
     const list = items ?? [];
@@ -116,6 +153,7 @@ function BudgetPage() {
       estimated_cost: String(item.estimated_cost ?? ""),
       actual_cost: item.actual_cost == null ? "" : String(item.actual_cost),
       notes: item.notes ?? "",
+      vendor_id: item.vendor_id ?? "",
     });
     setOpen(true);
   };
@@ -144,6 +182,7 @@ function BudgetPage() {
       estimated_cost: est,
       actual_cost: act,
       notes: form.notes.trim() || null,
+      vendor_id: form.vendor_id || null,
     };
     let error;
     if (form.id) {
@@ -290,6 +329,27 @@ function BudgetPage() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
+                  <Label>Linked vendor (optional)</Label>
+                  <Select
+                    value={form.vendor_id || "__none__"}
+                    onValueChange={(v) =>
+                      setForm({ ...form, vendor_id: v === "__none__" ? "" : v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="No vendor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">No vendor</SelectItem>
+                      {vendors.map((v) => (
+                        <SelectItem key={v.id} value={v.id}>
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
                   <Label htmlFor="notes">Notes</Label>
                   <Textarea
                     id="notes"
@@ -346,6 +406,28 @@ function BudgetPage() {
                             {item.notes}
                           </div>
                         )}
+                        {(() => {
+                          const vendor = vendors.find((v) => v.id === item.vendor_id);
+                          const linkedTodos = todos.filter((t) => t.budget_item_id === item.id);
+                          if (!vendor && linkedTodos.length === 0) return null;
+                          return (
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              {vendor && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Briefcase className="w-3 h-3" /> {vendor.name}
+                                </span>
+                              )}
+                              {linkedTodos.map((t) => (
+                                <span
+                                  key={t.id}
+                                  className="inline-flex items-center gap-1"
+                                >
+                                  <ListTodo className="w-3 h-3" /> {t.title}
+                                </span>
+                              ))}
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {formatCurrency(est)}

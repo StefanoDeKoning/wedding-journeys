@@ -8,6 +8,8 @@ import {
   Sparkles,
   AlertTriangle,
   CalendarDays,
+  Briefcase,
+  Wallet,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,6 +54,18 @@ interface Task {
   priority: Priority;
   created_from_template: boolean;
   position: number;
+  vendor_id: string | null;
+  budget_item_id: string | null;
+}
+
+interface VendorLite {
+  id: string;
+  name: string;
+}
+
+interface BudgetLite {
+  id: string;
+  name: string;
 }
 
 interface Draft {
@@ -61,6 +75,8 @@ interface Draft {
   deadline: string;
   priority: Priority;
   status: Status;
+  vendor_id: string;
+  budget_item_id: string;
 }
 
 const emptyDraft = (): Draft => ({
@@ -70,12 +86,16 @@ const emptyDraft = (): Draft => ({
   deadline: "",
   priority: "medium",
   status: "todo",
+  vendor_id: "",
+  budget_item_id: "",
 });
 
 function AdminTodo() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [vendors, setVendors] = useState<VendorLite[]>([]);
+  const [budgets, setBudgets] = useState<BudgetLite[]>([]);
   const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"deadline" | "priority">("deadline");
@@ -87,16 +107,30 @@ function AdminTodo() {
 
   const load = async () => {
     if (!wedding) return;
-    const { data, error } = await supabase
-      .from("todo_tasks")
-      .select("*")
-      .eq("wedding_id", wedding.id)
-      .order("position", { ascending: true });
-    if (error) {
-      toast.error(error.message);
+    const [t, v, b] = await Promise.all([
+      supabase
+        .from("todo_tasks")
+        .select("*")
+        .eq("wedding_id", wedding.id)
+        .order("position", { ascending: true }),
+      supabase
+        .from("vendors" as never)
+        .select("id,name")
+        .eq("wedding_id", wedding.id)
+        .order("name", { ascending: true }),
+      supabase
+        .from("budget_items" as never)
+        .select("id,name")
+        .eq("wedding_id", wedding.id)
+        .order("name", { ascending: true }),
+    ]);
+    if (t.error) {
+      toast.error(t.error.message);
       return;
     }
-    setTasks((data ?? []) as Task[]);
+    setTasks((t.data ?? []) as Task[]);
+    setVendors(((v.data ?? []) as unknown) as VendorLite[]);
+    setBudgets(((b.data ?? []) as unknown) as BudgetLite[]);
   };
 
   useEffect(() => {
@@ -180,6 +214,8 @@ function AdminTodo() {
       deadline: t.deadline ?? "",
       priority: t.priority,
       status: t.status,
+      vendor_id: t.vendor_id ?? "",
+      budget_item_id: t.budget_item_id ?? "",
     });
     setEditing(t);
     setCreating(false);
@@ -204,6 +240,8 @@ function AdminTodo() {
       deadline: draft.deadline || null,
       priority: draft.priority,
       status: draft.status,
+      vendor_id: draft.vendor_id || null,
+      budget_item_id: draft.budget_item_id || null,
     };
     if (editing) {
       const { error } = await supabase
@@ -361,6 +399,8 @@ function AdminTodo() {
                   <TaskRow
                     key={t.id}
                     task={t}
+                    vendor={vendors.find((v) => v.id === t.vendor_id) ?? null}
+                    budget={budgets.find((b) => b.id === t.budget_item_id) ?? null}
                     onToggle={() => toggleDone(t)}
                     onEdit={() => openEdit(t)}
                     onDelete={() => remove(t)}
@@ -432,6 +472,44 @@ function AdminTodo() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Select
+                value={draft.vendor_id || "__none__"}
+                onValueChange={(v) =>
+                  setDraft({ ...draft, vendor_id: v === "__none__" ? "" : v })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="No vendor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">No vendor</SelectItem>
+                  {vendors.map((v) => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={draft.budget_item_id || "__none__"}
+                onValueChange={(v) =>
+                  setDraft({ ...draft, budget_item_id: v === "__none__" ? "" : v })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="No budget item" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">No budget item</SelectItem>
+                  {budgets.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>
@@ -473,11 +551,15 @@ function Stat({
 
 function TaskRow({
   task,
+  vendor,
+  budget,
   onToggle,
   onEdit,
   onDelete,
 }: {
   task: Task;
+  vendor: VendorLite | null;
+  budget: BudgetLite | null;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -525,7 +607,7 @@ function TaskRow({
         {task.description && (
           <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
         )}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5 flex-wrap">
           {task.deadline ? (
             <span
               className={`inline-flex items-center gap-1 ${
@@ -541,6 +623,16 @@ function TaskRow({
             </span>
           ) : (
             <span>No deadline</span>
+          )}
+          {vendor && (
+            <span className="inline-flex items-center gap-1">
+              <Briefcase className="w-3 h-3" /> {vendor.name}
+            </span>
+          )}
+          {budget && (
+            <span className="inline-flex items-center gap-1">
+              <Wallet className="w-3 h-3" /> {budget.name}
+            </span>
           )}
         </div>
       </div>
