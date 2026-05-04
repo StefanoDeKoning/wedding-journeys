@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   ListTodo,
   Wallet,
+  Briefcase,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Loader2 } from "lucide-react";
