@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Pencil, Trash2, Wallet, TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Wallet, TrendingUp, TrendingDown, PiggyBank, Briefcase, ListTodo } from "lucide-react";
 import { toast } from "sonner";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
