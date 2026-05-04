@@ -153,6 +153,7 @@ function BudgetPage() {
       estimated_cost: String(item.estimated_cost ?? ""),
       actual_cost: item.actual_cost == null ? "" : String(item.actual_cost),
       notes: item.notes ?? "",
+      vendor_id: item.vendor_id ?? "",
     });
     setOpen(true);
   };
