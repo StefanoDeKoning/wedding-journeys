@@ -43,7 +43,19 @@ interface BudgetItem {
   estimated_cost: number;
   actual_cost: number | null;
   notes: string | null;
+  vendor_id: string | null;
   created_at: string;
+}
+
+interface VendorLite {
+  id: string;
+  name: string;
+}
+
+interface TodoLite {
+  id: string;
+  title: string;
+  budget_item_id: string | null;
 }
 
 interface FormState {
@@ -52,6 +64,7 @@ interface FormState {
   estimated_cost: string;
   actual_cost: string;
   notes: string;
+  vendor_id: string;
 }
 
 const emptyForm: FormState = {
@@ -59,6 +72,7 @@ const emptyForm: FormState = {
   estimated_cost: "",
   actual_cost: "",
   notes: "",
+  vendor_id: "",
 };
 
 function formatCurrency(n: number): string {
