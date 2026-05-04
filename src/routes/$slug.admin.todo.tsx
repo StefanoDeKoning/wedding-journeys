@@ -551,11 +551,15 @@ function Stat({
 
 function TaskRow({
   task,
+  vendor,
+  budget,
   onToggle,
   onEdit,
   onDelete,
 }: {
   task: Task;
+  vendor: VendorLite | null;
+  budget: BudgetLite | null;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
