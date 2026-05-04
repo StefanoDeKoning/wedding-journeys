@@ -94,6 +94,8 @@ function AdminTodo() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [vendors, setVendors] = useState<VendorLite[]>([]);
+  const [budgets, setBudgets] = useState<BudgetLite[]>([]);
   const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"deadline" | "priority">("deadline");
@@ -105,16 +107,30 @@ function AdminTodo() {
 
   const load = async () => {
     if (!wedding) return;
-    const { data, error } = await supabase
-      .from("todo_tasks")
-      .select("*")
-      .eq("wedding_id", wedding.id)
-      .order("position", { ascending: true });
-    if (error) {
-      toast.error(error.message);
+    const [t, v, b] = await Promise.all([
+      supabase
+        .from("todo_tasks")
+        .select("*")
+        .eq("wedding_id", wedding.id)
+        .order("position", { ascending: true }),
+      supabase
+        .from("vendors" as never)
+        .select("id,name")
+        .eq("wedding_id", wedding.id)
+        .order("name", { ascending: true }),
+      supabase
+        .from("budget_items" as never)
+        .select("id,name")
+        .eq("wedding_id", wedding.id)
+        .order("name", { ascending: true }),
+    ]);
+    if (t.error) {
+      toast.error(t.error.message);
       return;
     }
-    setTasks((data ?? []) as Task[]);
+    setTasks((t.data ?? []) as Task[]);
+    setVendors(((v.data ?? []) as unknown) as VendorLite[]);
+    setBudgets(((b.data ?? []) as unknown) as BudgetLite[]);
   };
 
   useEffect(() => {
