@@ -58,6 +58,42 @@ export type Database = {
           },
         ]
       }
+      budget_items: {
+        Row: {
+          actual_cost: number | null
+          created_at: string
+          estimated_cost: number
+          id: string
+          name: string
+          notes: string | null
+          position: number
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          actual_cost?: number | null
+          created_at?: string
+          estimated_cost?: number
+          id?: string
+          name: string
+          notes?: string | null
+          position?: number
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          actual_cost?: number | null
+          created_at?: string
+          estimated_cost?: number
+          id?: string
+          name?: string
+          notes?: string | null
+          position?: number
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: []
+      }
       guest_groups: {
         Row: {
           color: string | null
