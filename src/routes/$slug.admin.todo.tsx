@@ -399,6 +399,8 @@ function AdminTodo() {
                   <TaskRow
                     key={t.id}
                     task={t}
+                    vendor={vendors.find((v) => v.id === t.vendor_id) ?? null}
+                    budget={budgets.find((b) => b.id === t.budget_item_id) ?? null}
                     onToggle={() => toggleDone(t)}
                     onEdit={() => openEdit(t)}
                     onDelete={() => remove(t)}
