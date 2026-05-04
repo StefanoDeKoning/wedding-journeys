@@ -37,6 +37,7 @@ import { Route as SlugAdminPhotosRouteImport } from './routes/$slug.admin.photos
 import { Route as SlugAdminInvitationRouteImport } from './routes/$slug.admin.invitation'
 import { Route as SlugAdminGuestsRouteImport } from './routes/$slug.admin.guests'
 import { Route as SlugAdminGroupsRouteImport } from './routes/$slug.admin.groups'
+import { Route as SlugAdminBudgetRouteImport } from './routes/$slug.admin.budget'
 import { Route as SlugAdminAuditRouteImport } from './routes/$slug.admin.audit'
 
 const LoginRoute = LoginRouteImport.update({
@@ -180,6 +181,11 @@ const SlugAdminGroupsRoute = SlugAdminGroupsRouteImport.update({
   path: '/groups',
   getParentRoute: () => SlugAdminRoute,
 } as any)
+const SlugAdminBudgetRoute = SlugAdminBudgetRouteImport.update({
+  id: '/budget',
+  path: '/budget',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
 const SlugAdminAuditRoute = SlugAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
+  '/$slug/admin/budget': typeof SlugAdminBudgetRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
   '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/$slug/timeline': typeof SlugTimelineRoute
   '/$slug': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
+  '/$slug/admin/budget': typeof SlugAdminBudgetRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
   '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
+  '/$slug/admin/budget': typeof SlugAdminBudgetRoute
   '/$slug/admin/groups': typeof SlugAdminGroupsRoute
   '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/audit'
+    | '/$slug/admin/budget'
     | '/$slug/admin/groups'
     | '/$slug/admin/guests'
     | '/$slug/admin/invitation'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/$slug/timeline'
     | '/$slug'
     | '/$slug/admin/audit'
+    | '/$slug/admin/budget'
     | '/$slug/admin/groups'
     | '/$slug/admin/guests'
     | '/$slug/admin/invitation'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/audit'
+    | '/$slug/admin/budget'
     | '/$slug/admin/groups'
     | '/$slug/admin/guests'
     | '/$slug/admin/invitation'
@@ -578,6 +590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminGroupsRouteImport
       parentRoute: typeof SlugAdminRoute
     }
+    '/$slug/admin/budget': {
+      id: '/$slug/admin/budget'
+      path: '/budget'
+      fullPath: '/$slug/admin/budget'
+      preLoaderRoute: typeof SlugAdminBudgetRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
     '/$slug/admin/audit': {
       id: '/$slug/admin/audit'
       path: '/audit'
@@ -590,6 +609,7 @@ declare module '@tanstack/react-router' {
 
 interface SlugAdminRouteChildren {
   SlugAdminAuditRoute: typeof SlugAdminAuditRoute
+  SlugAdminBudgetRoute: typeof SlugAdminBudgetRoute
   SlugAdminGroupsRoute: typeof SlugAdminGroupsRoute
   SlugAdminGuestsRoute: typeof SlugAdminGuestsRoute
   SlugAdminInvitationRoute: typeof SlugAdminInvitationRoute
@@ -604,6 +624,7 @@ interface SlugAdminRouteChildren {
 
 const SlugAdminRouteChildren: SlugAdminRouteChildren = {
   SlugAdminAuditRoute: SlugAdminAuditRoute,
+  SlugAdminBudgetRoute: SlugAdminBudgetRoute,
   SlugAdminGroupsRoute: SlugAdminGroupsRoute,
   SlugAdminGuestsRoute: SlugAdminGuestsRoute,
   SlugAdminInvitationRoute: SlugAdminInvitationRoute,
