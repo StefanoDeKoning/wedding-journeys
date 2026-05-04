@@ -8,6 +8,8 @@ import {
   Sparkles,
   AlertTriangle,
   CalendarDays,
+  Briefcase,
+  Wallet,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
