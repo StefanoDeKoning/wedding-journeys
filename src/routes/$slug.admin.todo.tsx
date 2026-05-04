@@ -214,6 +214,8 @@ function AdminTodo() {
       deadline: t.deadline ?? "",
       priority: t.priority,
       status: t.status,
+      vendor_id: t.vendor_id ?? "",
+      budget_item_id: t.budget_item_id ?? "",
     });
     setEditing(t);
     setCreating(false);
