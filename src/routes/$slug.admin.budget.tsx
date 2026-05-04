@@ -406,6 +406,28 @@ function BudgetPage() {
                             {item.notes}
                           </div>
                         )}
+                        {(() => {
+                          const vendor = vendors.find((v) => v.id === item.vendor_id);
+                          const linkedTodos = todos.filter((t) => t.budget_item_id === item.id);
+                          if (!vendor && linkedTodos.length === 0) return null;
+                          return (
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                              {vendor && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Briefcase className="w-3 h-3" /> {vendor.name}
+                                </span>
+                              )}
+                              {linkedTodos.map((t) => (
+                                <span
+                                  key={t.id}
+                                  className="inline-flex items-center gap-1"
+                                >
+                                  <ListTodo className="w-3 h-3" /> {t.title}
+                                </span>
+                              ))}
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {formatCurrency(est)}
