@@ -607,7 +607,7 @@ function TaskRow({
         {task.description && (
           <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
         )}
-        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5 flex-wrap">
           {task.deadline ? (
             <span
               className={`inline-flex items-center gap-1 ${
@@ -623,6 +623,16 @@ function TaskRow({
             </span>
           ) : (
             <span>No deadline</span>
+          )}
+          {vendor && (
+            <span className="inline-flex items-center gap-1">
+              <Briefcase className="w-3 h-3" /> {vendor.name}
+            </span>
+          )}
+          {budget && (
+            <span className="inline-flex items-center gap-1">
+              <Wallet className="w-3 h-3" /> {budget.name}
+            </span>
           )}
         </div>
       </div>
