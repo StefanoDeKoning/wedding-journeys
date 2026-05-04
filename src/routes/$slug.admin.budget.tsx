@@ -329,6 +329,27 @@ function BudgetPage() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
+                  <Label>Linked vendor (optional)</Label>
+                  <Select
+                    value={form.vendor_id || "__none__"}
+                    onValueChange={(v) =>
+                      setForm({ ...form, vendor_id: v === "__none__" ? "" : v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="No vendor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">No vendor</SelectItem>
+                      {vendors.map((v) => (
+                        <SelectItem key={v.id} value={v.id}>
+                          {v.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
                   <Label htmlFor="notes">Notes</Label>
                   <Textarea
                     id="notes"
