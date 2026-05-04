@@ -87,27 +87,43 @@ function BudgetPage() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [items, setItems] = useState<BudgetItem[] | null>(null);
+  const [vendors, setVendors] = useState<VendorLite[]>([]);
+  const [todos, setTodos] = useState<TodoLite[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!wedding) return;
-    void loadItems(wedding.id);
+    void loadAll(wedding.id);
   }, [wedding]);
 
-  const loadItems = async (weddingId: string) => {
-    const { data, error } = await supabase
-      .from("budget_items" as never)
-      .select("*")
-      .eq("wedding_id", weddingId)
-      .order("created_at", { ascending: true });
-    if (error) {
-      toast.error(error.message);
+  const loadAll = async (weddingId: string) => {
+    const [i, v, t] = await Promise.all([
+      supabase
+        .from("budget_items" as never)
+        .select("*")
+        .eq("wedding_id", weddingId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("vendors" as never)
+        .select("id,name")
+        .eq("wedding_id", weddingId)
+        .order("name", { ascending: true }),
+      supabase
+        .from("todo_tasks")
+        .select("id,title,budget_item_id")
+        .eq("wedding_id", weddingId),
+    ]);
+    if (i.error) {
+      toast.error(i.error.message);
       return;
     }
-    setItems((data ?? []) as unknown as BudgetItem[]);
+    setItems(((i.data ?? []) as unknown) as BudgetItem[]);
+    setVendors(((v.data ?? []) as unknown) as VendorLite[]);
+    setTodos(((t.data ?? []) as unknown) as TodoLite[]);
   };
+  const loadItems = (weddingId: string) => loadAll(weddingId);
 
   const totals = useMemo(() => {
     const list = items ?? [];
