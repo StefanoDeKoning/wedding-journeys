@@ -54,6 +54,18 @@ interface Task {
   priority: Priority;
   created_from_template: boolean;
   position: number;
+  vendor_id: string | null;
+  budget_item_id: string | null;
+}
+
+interface VendorLite {
+  id: string;
+  name: string;
+}
+
+interface BudgetLite {
+  id: string;
+  name: string;
 }
 
 interface Draft {
@@ -63,6 +75,8 @@ interface Draft {
   deadline: string;
   priority: Priority;
   status: Status;
+  vendor_id: string;
+  budget_item_id: string;
 }
 
 const emptyDraft = (): Draft => ({
@@ -72,6 +86,8 @@ const emptyDraft = (): Draft => ({
   deadline: "",
   priority: "medium",
   status: "todo",
+  vendor_id: "",
+  budget_item_id: "",
 });
 
 function AdminTodo() {
