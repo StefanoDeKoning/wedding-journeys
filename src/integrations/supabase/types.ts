@@ -711,8 +711,12 @@ export type Database = {
           created_at: string
           groom_name: string | null
           id: string
+          invitation_content: string | null
           invitation_message: string | null
+          invitation_template: string
           invitation_text: string
+          invitation_title: string | null
+          invitation_visible: boolean
           is_public: boolean
           location_address: string | null
           location_name: string | null
@@ -735,8 +739,12 @@ export type Database = {
           created_at?: string
           groom_name?: string | null
           id?: string
+          invitation_content?: string | null
           invitation_message?: string | null
+          invitation_template?: string
           invitation_text?: string
+          invitation_title?: string | null
+          invitation_visible?: boolean
           is_public?: boolean
           location_address?: string | null
           location_name?: string | null
@@ -759,8 +767,12 @@ export type Database = {
           created_at?: string
           groom_name?: string | null
           id?: string
+          invitation_content?: string | null
           invitation_message?: string | null
+          invitation_template?: string
           invitation_text?: string
+          invitation_title?: string | null
+          invitation_visible?: boolean
           is_public?: boolean
           location_address?: string | null
           location_name?: string | null

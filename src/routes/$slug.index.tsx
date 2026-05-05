@@ -4,6 +4,7 @@ import { useWedding } from "@/wedding/useWedding";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
 import { Button } from "@/components/ui/button";
+import { renderInvitationHtml, getTemplate } from "@/wedding/invitationTemplates";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
@@ -91,6 +92,32 @@ function InvitationPage() {
           )}
         </div>
       </section>
+
+      {/* Custom invitation block (admin-edited) */}
+      {wedding.invitation_visible && (wedding.invitation_content || wedding.invitation_title) && (
+        <section className="mx-auto max-w-3xl px-6 pt-16">
+          <article className="rounded-2xl border border-border bg-card p-8 sm:p-10 shadow-soft">
+            {(wedding.invitation_title || getTemplate(wedding.invitation_template).title) && (
+              <h2 className="font-display text-3xl sm:text-4xl text-center text-balance">
+                {wedding.invitation_title ?? getTemplate(wedding.invitation_template).title}
+              </h2>
+            )}
+            <div className="divider-script my-6">
+              <span className="font-script text-xl">with love</span>
+            </div>
+            <div
+              className="max-w-none text-foreground [&_h2]:font-display [&_h2]:text-2xl [&_h2]:my-3 [&_p]:my-2 [&_a]:text-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5"
+              dangerouslySetInnerHTML={{
+                __html: renderInvitationHtml(
+                  wedding.invitation_content ?? getTemplate(wedding.invitation_template).content,
+                  `${recipientFirst} ${recipientLast}`.trim() || "Friend",
+                  guest?.plus_one_allowed ? "your plus one" : "",
+                ),
+              }}
+            />
+          </article>
+        </section>
+      )}
 
       {/* Envelope + Parchment */}
       <section className="mx-auto max-w-3xl px-6 py-20">
