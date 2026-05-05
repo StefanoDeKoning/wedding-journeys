@@ -457,10 +457,13 @@ export type Database = {
       }
       timeline_events: {
         Row: {
+          category: string
           created_at: string
           description: string | null
           event_time: string
           id: string
+          is_visible: boolean
+          location: string | null
           position: number
           title: string
           updated_at: string
@@ -468,10 +471,13 @@ export type Database = {
           wedding_id: string
         }
         Insert: {
+          category?: string
           created_at?: string
           description?: string | null
           event_time: string
           id?: string
+          is_visible?: boolean
+          location?: string | null
           position?: number
           title: string
           updated_at?: string
@@ -479,10 +485,13 @@ export type Database = {
           wedding_id: string
         }
         Update: {
+          category?: string
           created_at?: string
           description?: string | null
           event_time?: string
           id?: string
+          is_visible?: boolean
+          location?: string | null
           position?: number
           title?: string
           updated_at?: string
