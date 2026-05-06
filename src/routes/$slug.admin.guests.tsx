@@ -38,7 +38,8 @@ interface Guest {
   last_name: string;
   email: string | null;
   invitation_code: string;
-  guest_type: "day" | "evening";
+  guest_type: "day" | "evening" | "full_day";
+  age_type: "adult" | "child";
   guest_group_id: string | null;
   notes: string | null;
   plus_one_allowed: boolean;
@@ -52,7 +53,8 @@ interface Group {
 
 interface RsvpRow {
   guest_id: string;
-  status: "yes" | "no" | "maybe";
+  status: "yes" | "no";
+  attendance: "day" | "evening" | "both" | null;
   plus_one_name: string | null;
   dietary_tags: string[];
   dietary_other: string | null;
@@ -77,13 +79,13 @@ function AdminGuests() {
     const [g, gg, rs] = await Promise.all([
       supabase
         .from("guests")
-        .select("id, first_name, last_name, email, invitation_code, guest_type, guest_group_id, notes, plus_one_allowed")
+        .select("id, first_name, last_name, email, invitation_code, guest_type, age_type, guest_group_id, notes, plus_one_allowed")
         .eq("wedding_id", wedding.id)
         .order("last_name"),
       supabase.from("guest_groups").select("id, name, color").eq("wedding_id", wedding.id).order("position"),
       supabase
         .from("rsvp_responses")
-        .select("guest_id, status, plus_one_name, dietary_tags, dietary_other, comments")
+        .select("guest_id, status, attendance, plus_one_name, dietary_tags, dietary_other, comments")
         .eq("wedding_id", wedding.id),
     ]);
     setGuests((g.data ?? []) as Guest[]);
@@ -282,7 +284,7 @@ function GuestRow({
           {answerLabel(rsvp?.status ?? null)}
           {rsvp?.plus_one_name && ` · +1 ${rsvp.plus_one_name}`}
           {group && ` · ${group.name}`}
-          <span className="ml-1 opacity-70">· {guest.guest_type}</span>
+          <span className="ml-1 opacity-70">· {guestTypeLabel(guest.guest_type)}{guest.age_type === "child" ? " · child" : ""}</span>
         </p>
       </div>
       <button
@@ -309,23 +311,25 @@ function GuestRow({
   );
 }
 
-function StatusDot({ status }: { status: "yes" | "no" | "maybe" | null }) {
+function StatusDot({ status }: { status: "yes" | "no" | null }) {
   const cls =
     status === "yes"
       ? "bg-primary"
-      : status === "maybe"
-        ? "bg-amber-500"
-        : status === "no"
-          ? "bg-muted-foreground/60"
-          : "bg-border";
+      : status === "no"
+        ? "bg-muted-foreground/60"
+        : "bg-border";
   return <span className={`inline-block w-2.5 h-2.5 rounded-full shrink-0 ${cls}`} />;
 }
 
-function answerLabel(a: "yes" | "no" | "maybe" | null): string {
+function answerLabel(a: "yes" | "no" | null): string {
   if (a === "yes") return "Joyfully yes";
   if (a === "no") return "Sadly no";
-  if (a === "maybe") return "Maybe";
   return "Awaiting reply";
+}
+
+function guestTypeLabel(t: "day" | "evening" | "full_day"): string {
+  if (t === "full_day") return "full day";
+  return t;
 }
 
 function generateCode(): string {
