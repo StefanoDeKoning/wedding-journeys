@@ -332,6 +332,22 @@ function guestTypeLabel(t: "day" | "evening" | "full_day"): string {
   return t;
 }
 
+interface AttendanceOption {
+  value: "day" | "evening" | "both";
+  label: string;
+}
+export function attendanceOptionsFor(
+  gt: "day" | "evening" | "full_day",
+): AttendanceOption[] {
+  if (gt === "day") return [{ value: "day", label: "Day only" }];
+  if (gt === "evening") return [{ value: "evening", label: "Evening only" }];
+  return [
+    { value: "day", label: "Day" },
+    { value: "evening", label: "Evening" },
+    { value: "both", label: "Both" },
+  ];
+}
+
 function generateCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let s = "";
