@@ -537,27 +537,39 @@ function GuestDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Type</Label>
-              <Select value={guestType} onValueChange={(v) => setGuestType(v as "day" | "evening")}>
+              <Label>Guest type</Label>
+              <Select value={guestType} onValueChange={(v) => setGuestType(v as "day" | "evening" | "full_day")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="day">Day guest</SelectItem>
-                  <SelectItem value="evening">Evening guest</SelectItem>
+                  <SelectItem value="day">Day only</SelectItem>
+                  <SelectItem value="evening">Evening only</SelectItem>
+                  <SelectItem value="full_day">Full day (both)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Group</Label>
-              <Select value={groupId} onValueChange={setGroupId}>
+              <Label>Age</Label>
+              <Select value={ageType} onValueChange={(v) => setAgeType(v as "adult" | "child")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No group</SelectItem>
-                  {groups.map((g) => (
-                    <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
-                  ))}
+                  <SelectItem value="adult">Adult</SelectItem>
+                  <SelectItem value="child">Child</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Group</Label>
+            <Select value={groupId} onValueChange={setGroupId}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No group</SelectItem>
+                {groups.map((g) => (
+                  <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
@@ -588,8 +600,8 @@ function GuestDialog({
 
           <div className="border-t border-border pt-4 space-y-3">
             <h4 className="font-display text-sm">RSVP</h4>
-            <div className="grid grid-cols-4 gap-2">
-              {(["none", "yes", "maybe", "no"] as const).map((v) => (
+            <div className="grid grid-cols-3 gap-2">
+              {(["none", "yes", "no"] as const).map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -604,6 +616,30 @@ function GuestDialog({
                 </button>
               ))}
             </div>
+            {rsvpStatus === "yes" && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Attending</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {attendanceOptionsFor(guestType).map((opt) => {
+                    const active = attendance === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setAttendance(opt.value)}
+                        className={`text-xs rounded-lg border px-2 py-2 transition-colors ${
+                          active
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background hover:border-primary/40"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {rsvpStatus !== "none" && (
               <>
                 {plusOneAllowed && (
