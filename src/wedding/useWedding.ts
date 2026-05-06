@@ -6,7 +6,8 @@ export interface CurrentGuest {
   id: string;
   first_name: string;
   last_name: string;
-  guest_type: "day" | "evening";
+  guest_type: "day" | "evening" | "full_day";
+  age_type: "adult" | "child";
   email: string | null;
   plus_one_allowed: boolean;
 }
@@ -90,7 +91,7 @@ export function useWedding(slug: string): WeddingState {
     if (guestId && guestWeddingId === w.id) {
       const { data: g } = await supabase
         .from("guests")
-        .select("id, first_name, last_name, guest_type, email, plus_one_allowed")
+        .select("id, first_name, last_name, guest_type, age_type, email, plus_one_allowed")
         .eq("id", guestId)
         .maybeSingle();
       if (g) setGuest(g as CurrentGuest);

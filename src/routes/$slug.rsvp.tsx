@@ -28,17 +28,29 @@ export const Route = createFileRoute("/$slug/rsvp")({
   component: RsvpPage,
 });
 
-type Answer = "yes" | "no" | "maybe";
+type Answer = "yes" | "no";
+type Attendance = "day" | "evening" | "both";
 
 interface RsvpRow {
   id: string;
   guest_id: string;
   status: Answer;
+  attendance: Attendance | null;
   plus_one_name: string | null;
   dietary_tags: string[];
   dietary_other: string | null;
   comments: string | null;
   edited_by_admin: boolean;
+}
+
+function attendanceOptionsFor(gt: "day" | "evening" | "full_day"): { value: Attendance; label: string }[] {
+  if (gt === "day") return [{ value: "day", label: "Day only" }];
+  if (gt === "evening") return [{ value: "evening", label: "Evening only" }];
+  return [
+    { value: "day", label: "Day only" },
+    { value: "evening", label: "Evening only" },
+    { value: "both", label: "Both" },
+  ];
 }
 
 function RsvpPage() {
@@ -102,6 +114,7 @@ function GuestRsvpForm({
   const [loading, setLoading] = useState(true);
   const [existing, setExisting] = useState<RsvpRow | null>(null);
   const [answer, setAnswer] = useState<Answer | null>(null);
+  const [attendance, setAttendance] = useState<Attendance | null>(null);
   const [plusOne, setPlusOne] = useState("");
   const [bringingGuest, setBringingGuest] = useState<boolean>(false);
   const [tags, setTags] = useState<DietaryValue[]>([]);
@@ -115,13 +128,22 @@ function GuestRsvpForm({
     return new Date(rsvpDeadline).getTime() < Date.now();
   }, [rsvpDeadline]);
 
+  const attendanceOptions = useMemo(() => attendanceOptionsFor(guestType), [guestType]);
+
+  // Auto-pick attendance if guest has only one possible value (day or evening only)
+  useEffect(() => {
+    if (answer === "yes" && !attendance && attendanceOptions.length === 1) {
+      setAttendance(attendanceOptions[0].value);
+    }
+  }, [answer, attendance, attendanceOptions]);
+
   useEffect(() => {
     let mounted = true;
     void (async () => {
       const { data } = await supabase
         .from("rsvp_responses")
         .select(
-          "id, guest_id, status, plus_one_name, dietary_tags, dietary_other, comments, edited_by_admin",
+          "id, guest_id, status, attendance, plus_one_name, dietary_tags, dietary_other, comments, edited_by_admin",
         )
         .eq("guest_id", guestId)
         .maybeSingle();
@@ -130,6 +152,7 @@ function GuestRsvpForm({
         const row = data as RsvpRow;
         setExisting(row);
         setAnswer(row.status);
+        setAttendance(row.attendance);
         setPlusOne(row.plus_one_name ?? "");
         setBringingGuest(!!row.plus_one_name);
         setTags((row.dietary_tags ?? []) as DietaryValue[]);
@@ -149,8 +172,16 @@ function GuestRsvpForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (deadlinePassed) {
+      toast.error("RSVP is closed.");
+      return;
+    }
     if (!answer) {
-      toast.error("Please choose Yes, No, or Maybe.");
+      toast.error("Please choose Yes or No.");
+      return;
+    }
+    if (answer === "yes" && !attendance) {
+      toast.error("Please choose which part of the day you'll attend.");
       return;
     }
     setSubmitting(true);
@@ -158,6 +189,7 @@ function GuestRsvpForm({
       wedding_id: weddingId,
       guest_id: guestId,
       status: answer,
+      attendance: answer === "yes" ? attendance : null,
       plus_one_name:
         plusOneAllowed && answer === "yes" && bringingGuest ? plusOne.trim() || null : null,
       dietary_tags: tags,
@@ -169,7 +201,7 @@ function GuestRsvpForm({
       .from("rsvp_responses")
       .upsert(payload, { onConflict: "guest_id" })
       .select(
-        "id, guest_id, status, plus_one_name, dietary_tags, dietary_other, comments, edited_by_admin",
+        "id, guest_id, status, attendance, plus_one_name, dietary_tags, dietary_other, comments, edited_by_admin",
       )
       .single();
     setSubmitting(false);

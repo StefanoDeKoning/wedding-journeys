@@ -4,12 +4,16 @@ import {
   Loader2,
   CheckCircle2,
   XCircle,
-  HelpCircle,
   CircleDashed,
   Users,
   UserPlus,
   ArrowRight,
+  Calendar,
+  Save,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
@@ -43,7 +47,8 @@ interface GuestLite {
 
 interface RsvpLite {
   guest_id: string;
-  status: "yes" | "no" | "maybe";
+  status: "yes" | "no";
+  attendance: "day" | "evening" | "both" | null;
   plus_one_name: string | null;
   dietary_tags: string[];
   dietary_other: string | null;
@@ -67,7 +72,7 @@ function AdminRsvpOverview() {
         .order("last_name"),
       supabase
         .from("rsvp_responses")
-        .select("guest_id, status, plus_one_name, dietary_tags, dietary_other")
+        .select("guest_id, status, attendance, plus_one_name, dietary_tags, dietary_other")
         .eq("wedding_id", wedding.id),
     ]);
     setGuests((g.data ?? []) as GuestLite[]);
@@ -108,14 +113,12 @@ function AdminRsvpOverview() {
     const total = guests.length;
     let yes = 0;
     let no = 0;
-    let maybe = 0;
     let plusOnes = 0;
     for (const g of guests) {
       const r = rsvps.get(g.id);
       if (!r) continue;
       if (r.status === "yes") yes++;
       else if (r.status === "no") no++;
-      else if (r.status === "maybe") maybe++;
       if (
         g.plus_one_allowed &&
         r.status === "yes" &&
@@ -125,10 +128,10 @@ function AdminRsvpOverview() {
         plusOnes++;
       }
     }
-    const responded = yes + no + maybe;
+    const responded = yes + no;
     const noResponse = total - responded;
     const pct = total === 0 ? 0 : Math.round((responded / total) * 100);
-    return { total, yes, no, maybe, noResponse, responded, pct, plusOnes };
+    return { total, yes, no, noResponse, responded, pct, plusOnes };
   }, [guests, rsvps]);
 
   if (!wedding) return null;
@@ -163,11 +166,13 @@ function AdminRsvpOverview() {
         </p>
       </section>
 
+      {/* Deadline */}
+      <DeadlineCard weddingId={wedding.id} initialDeadline={wedding.rsvp_deadline} />
+
       {/* Stats cards */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-3">
         <StatCard icon={CheckCircle2} label="Attending" value={stats.yes} tone="primary" />
         <StatCard icon={XCircle} label="Declined" value={stats.no} tone="muted" />
-        <StatCard icon={HelpCircle} label="Maybe" value={stats.maybe} tone="amber" />
         <StatCard icon={CircleDashed} label="No response" value={stats.noResponse} tone="muted" />
       </section>
 
@@ -316,7 +321,7 @@ function StatCard({
   );
 }
 
-function RsvpBadge({ status }: { status: "yes" | "no" | "maybe" | null }) {
+function RsvpBadge({ status }: { status: "yes" | "no" | null }) {
   if (status === "yes")
     return (
       <Badge className="bg-primary/15 text-primary border-0 hover:bg-primary/20">
@@ -329,15 +334,73 @@ function RsvpBadge({ status }: { status: "yes" | "no" | "maybe" | null }) {
         <XCircle className="w-3 h-3 mr-1" /> Declined
       </Badge>
     );
-  if (status === "maybe")
-    return (
-      <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-0 hover:bg-amber-500/20">
-        <HelpCircle className="w-3 h-3 mr-1" /> Maybe
-      </Badge>
-    );
   return (
     <Badge variant="outline" className="text-muted-foreground">
       <CircleDashed className="w-3 h-3 mr-1" /> No reply
     </Badge>
+  );
+}
+
+function DeadlineCard({
+  weddingId,
+  initialDeadline,
+}: {
+  weddingId: string;
+  initialDeadline: string | null;
+}) {
+  const initial = initialDeadline ? initialDeadline.slice(0, 10) : "";
+  const [date, setDate] = useState(initial);
+  const [saving, setSaving] = useState(false);
+  const dirty = date !== initial;
+  const passed = !!initialDeadline && new Date(initialDeadline).getTime() < Date.now();
+
+  const save = async () => {
+    setSaving(true);
+    const value = date ? `${date}T23:59:59Z` : null;
+    const { error } = await supabase
+      .from("weddings")
+      .update({ rsvp_deadline: value })
+      .eq("id", weddingId);
+    setSaving(false);
+    if (error) {
+      toast.error("Could not save deadline.");
+      return;
+    }
+    toast.success(date ? "Deadline saved." : "Deadline cleared.");
+  };
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start gap-3">
+          <div className="rounded-full bg-primary/10 text-primary p-2">
+            <Calendar className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="font-display text-lg">Respond before</h3>
+            <p className="text-xs text-muted-foreground">
+              After this date, guests can no longer submit or change their RSVP.
+            </p>
+            {passed && (
+              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                Deadline has passed — RSVP is closed for guests.
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-44"
+          />
+          <Button onClick={save} disabled={!dirty || saving} size="sm" className="rounded-full">
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
+            Save
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 }

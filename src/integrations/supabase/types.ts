@@ -145,6 +145,7 @@ export type Database = {
       }
       guests: {
         Row: {
+          age_type: Database["public"]["Enums"]["age_type"]
           created_at: string
           email: string | null
           first_name: string
@@ -159,6 +160,7 @@ export type Database = {
           wedding_id: string
         }
         Insert: {
+          age_type?: Database["public"]["Enums"]["age_type"]
           created_at?: string
           email?: string | null
           first_name: string
@@ -173,6 +175,7 @@ export type Database = {
           wedding_id: string
         }
         Update: {
+          age_type?: Database["public"]["Enums"]["age_type"]
           created_at?: string
           email?: string | null
           first_name?: string
@@ -313,6 +316,7 @@ export type Database = {
       }
       rsvp_responses: {
         Row: {
+          attendance: Database["public"]["Enums"]["rsvp_attendance"] | null
           comments: string | null
           created_at: string
           dietary_other: string | null
@@ -326,6 +330,7 @@ export type Database = {
           wedding_id: string
         }
         Insert: {
+          attendance?: Database["public"]["Enums"]["rsvp_attendance"] | null
           comments?: string | null
           created_at?: string
           dietary_other?: string | null
@@ -339,6 +344,7 @@ export type Database = {
           wedding_id: string
         }
         Update: {
+          attendance?: Database["public"]["Enums"]["rsvp_attendance"] | null
           comments?: string | null
           created_at?: string
           dietary_other?: string | null
@@ -832,9 +838,11 @@ export type Database = {
       wedding_storage_used: { Args: { _wedding_id: string }; Returns: number }
     }
     Enums: {
+      age_type: "adult" | "child"
       app_role: "platform_owner"
-      guest_type: "day" | "evening"
+      guest_type: "day" | "evening" | "full_day"
       photo_status: "pending" | "approved" | "hidden"
+      rsvp_attendance: "day" | "evening" | "both"
       rsvp_status: "yes" | "no" | "maybe"
       timeline_visibility: "all" | "day" | "evening"
       todo_priority: "low" | "medium" | "high"
@@ -968,9 +976,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      age_type: ["adult", "child"],
       app_role: ["platform_owner"],
-      guest_type: ["day", "evening"],
+      guest_type: ["day", "evening", "full_day"],
       photo_status: ["pending", "approved", "hidden"],
+      rsvp_attendance: ["day", "evening", "both"],
       rsvp_status: ["yes", "no", "maybe"],
       timeline_visibility: ["all", "day", "evening"],
       todo_priority: ["low", "medium", "high"],

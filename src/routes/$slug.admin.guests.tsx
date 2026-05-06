@@ -38,7 +38,8 @@ interface Guest {
   last_name: string;
   email: string | null;
   invitation_code: string;
-  guest_type: "day" | "evening";
+  guest_type: "day" | "evening" | "full_day";
+  age_type: "adult" | "child";
   guest_group_id: string | null;
   notes: string | null;
   plus_one_allowed: boolean;
@@ -52,7 +53,8 @@ interface Group {
 
 interface RsvpRow {
   guest_id: string;
-  status: "yes" | "no" | "maybe";
+  status: "yes" | "no";
+  attendance: "day" | "evening" | "both" | null;
   plus_one_name: string | null;
   dietary_tags: string[];
   dietary_other: string | null;
@@ -77,13 +79,13 @@ function AdminGuests() {
     const [g, gg, rs] = await Promise.all([
       supabase
         .from("guests")
-        .select("id, first_name, last_name, email, invitation_code, guest_type, guest_group_id, notes, plus_one_allowed")
+        .select("id, first_name, last_name, email, invitation_code, guest_type, age_type, guest_group_id, notes, plus_one_allowed")
         .eq("wedding_id", wedding.id)
         .order("last_name"),
       supabase.from("guest_groups").select("id, name, color").eq("wedding_id", wedding.id).order("position"),
       supabase
         .from("rsvp_responses")
-        .select("guest_id, status, plus_one_name, dietary_tags, dietary_other, comments")
+        .select("guest_id, status, attendance, plus_one_name, dietary_tags, dietary_other, comments")
         .eq("wedding_id", wedding.id),
     ]);
     setGuests((g.data ?? []) as Guest[]);
@@ -282,7 +284,7 @@ function GuestRow({
           {answerLabel(rsvp?.status ?? null)}
           {rsvp?.plus_one_name && ` · +1 ${rsvp.plus_one_name}`}
           {group && ` · ${group.name}`}
-          <span className="ml-1 opacity-70">· {guest.guest_type}</span>
+          <span className="ml-1 opacity-70">· {guestTypeLabel(guest.guest_type)}{guest.age_type === "child" ? " · child" : ""}</span>
         </p>
       </div>
       <button
@@ -309,23 +311,41 @@ function GuestRow({
   );
 }
 
-function StatusDot({ status }: { status: "yes" | "no" | "maybe" | null }) {
+function StatusDot({ status }: { status: "yes" | "no" | null }) {
   const cls =
     status === "yes"
       ? "bg-primary"
-      : status === "maybe"
-        ? "bg-amber-500"
-        : status === "no"
-          ? "bg-muted-foreground/60"
-          : "bg-border";
+      : status === "no"
+        ? "bg-muted-foreground/60"
+        : "bg-border";
   return <span className={`inline-block w-2.5 h-2.5 rounded-full shrink-0 ${cls}`} />;
 }
 
-function answerLabel(a: "yes" | "no" | "maybe" | null): string {
+function answerLabel(a: "yes" | "no" | null): string {
   if (a === "yes") return "Joyfully yes";
   if (a === "no") return "Sadly no";
-  if (a === "maybe") return "Maybe";
   return "Awaiting reply";
+}
+
+function guestTypeLabel(t: "day" | "evening" | "full_day"): string {
+  if (t === "full_day") return "full day";
+  return t;
+}
+
+interface AttendanceOption {
+  value: "day" | "evening" | "both";
+  label: string;
+}
+export function attendanceOptionsFor(
+  gt: "day" | "evening" | "full_day",
+): AttendanceOption[] {
+  if (gt === "day") return [{ value: "day", label: "Day only" }];
+  if (gt === "evening") return [{ value: "evening", label: "Evening only" }];
+  return [
+    { value: "day", label: "Day" },
+    { value: "evening", label: "Evening" },
+    { value: "both", label: "Both" },
+  ];
 }
 
 function generateCode(): string {
@@ -355,13 +375,17 @@ function GuestDialog({
   const [lastName, setLastName] = useState(guest?.last_name ?? "");
   const [email, setEmail] = useState(guest?.email ?? "");
   const [code, setCode] = useState(guest?.invitation_code ?? generateCode());
-  const [guestType, setGuestType] = useState<"day" | "evening">(guest?.guest_type ?? "day");
+  const [guestType, setGuestType] = useState<"day" | "evening" | "full_day">(guest?.guest_type ?? "day");
+  const [ageType, setAgeType] = useState<"adult" | "child">(guest?.age_type ?? "adult");
   const [groupId, setGroupId] = useState<string>(guest?.guest_group_id ?? "none");
   const [notes, setNotes] = useState(guest?.notes ?? "");
   const [plusOneAllowed, setPlusOneAllowed] = useState<boolean>(guest?.plus_one_allowed ?? false);
 
-  const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | "maybe" | "none">(
+  const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | "none">(
     rsvp?.status ?? "none",
+  );
+  const [attendance, setAttendance] = useState<"day" | "evening" | "both" | null>(
+    rsvp?.attendance ?? null,
   );
   const [plusOne, setPlusOne] = useState(rsvp?.plus_one_name ?? "");
   const [tags, setTags] = useState<DietaryValue[]>(
@@ -393,6 +417,7 @@ function GuestDialog({
           email: email.trim() || null,
           invitation_code: code.trim().toUpperCase(),
           guest_type: guestType,
+          age_type: ageType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
           plus_one_allowed: plusOneAllowed,
@@ -421,6 +446,7 @@ function GuestDialog({
           email: email.trim() || null,
           invitation_code: code.trim().toUpperCase(),
           guest_type: guestType,
+          age_type: ageType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
           plus_one_allowed: plusOneAllowed,
@@ -452,6 +478,7 @@ function GuestDialog({
             wedding_id: weddingId,
             guest_id: savedId,
             status: rsvpStatus,
+            attendance: rsvpStatus === "yes" ? attendance : null,
             plus_one_name: plusOne.trim() || null,
             dietary_tags: tags,
             dietary_other: dietaryOther.trim() || null,
@@ -526,27 +553,39 @@ function GuestDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Type</Label>
-              <Select value={guestType} onValueChange={(v) => setGuestType(v as "day" | "evening")}>
+              <Label>Guest type</Label>
+              <Select value={guestType} onValueChange={(v) => setGuestType(v as "day" | "evening" | "full_day")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="day">Day guest</SelectItem>
-                  <SelectItem value="evening">Evening guest</SelectItem>
+                  <SelectItem value="day">Day only</SelectItem>
+                  <SelectItem value="evening">Evening only</SelectItem>
+                  <SelectItem value="full_day">Full day (both)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Group</Label>
-              <Select value={groupId} onValueChange={setGroupId}>
+              <Label>Age</Label>
+              <Select value={ageType} onValueChange={(v) => setAgeType(v as "adult" | "child")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No group</SelectItem>
-                  {groups.map((g) => (
-                    <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
-                  ))}
+                  <SelectItem value="adult">Adult</SelectItem>
+                  <SelectItem value="child">Child</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Group</Label>
+            <Select value={groupId} onValueChange={setGroupId}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No group</SelectItem>
+                {groups.map((g) => (
+                  <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
@@ -577,8 +616,8 @@ function GuestDialog({
 
           <div className="border-t border-border pt-4 space-y-3">
             <h4 className="font-display text-sm">RSVP</h4>
-            <div className="grid grid-cols-4 gap-2">
-              {(["none", "yes", "maybe", "no"] as const).map((v) => (
+            <div className="grid grid-cols-3 gap-2">
+              {(["none", "yes", "no"] as const).map((v) => (
                 <button
                   key={v}
                   type="button"
@@ -593,6 +632,30 @@ function GuestDialog({
                 </button>
               ))}
             </div>
+            {rsvpStatus === "yes" && (
+              <div className="space-y-1.5">
+                <Label className="text-xs">Attending</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {attendanceOptionsFor(guestType).map((opt) => {
+                    const active = attendance === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setAttendance(opt.value)}
+                        className={`text-xs rounded-lg border px-2 py-2 transition-colors ${
+                          active
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background hover:border-primary/40"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {rsvpStatus !== "none" && (
               <>
                 {plusOneAllowed && (
