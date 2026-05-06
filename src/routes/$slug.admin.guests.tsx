@@ -359,13 +359,17 @@ function GuestDialog({
   const [lastName, setLastName] = useState(guest?.last_name ?? "");
   const [email, setEmail] = useState(guest?.email ?? "");
   const [code, setCode] = useState(guest?.invitation_code ?? generateCode());
-  const [guestType, setGuestType] = useState<"day" | "evening">(guest?.guest_type ?? "day");
+  const [guestType, setGuestType] = useState<"day" | "evening" | "full_day">(guest?.guest_type ?? "day");
+  const [ageType, setAgeType] = useState<"adult" | "child">(guest?.age_type ?? "adult");
   const [groupId, setGroupId] = useState<string>(guest?.guest_group_id ?? "none");
   const [notes, setNotes] = useState(guest?.notes ?? "");
   const [plusOneAllowed, setPlusOneAllowed] = useState<boolean>(guest?.plus_one_allowed ?? false);
 
-  const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | "maybe" | "none">(
+  const [rsvpStatus, setRsvpStatus] = useState<"yes" | "no" | "none">(
     rsvp?.status ?? "none",
+  );
+  const [attendance, setAttendance] = useState<"day" | "evening" | "both" | null>(
+    rsvp?.attendance ?? null,
   );
   const [plusOne, setPlusOne] = useState(rsvp?.plus_one_name ?? "");
   const [tags, setTags] = useState<DietaryValue[]>(
@@ -397,6 +401,7 @@ function GuestDialog({
           email: email.trim() || null,
           invitation_code: code.trim().toUpperCase(),
           guest_type: guestType,
+          age_type: ageType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
           plus_one_allowed: plusOneAllowed,
@@ -425,6 +430,7 @@ function GuestDialog({
           email: email.trim() || null,
           invitation_code: code.trim().toUpperCase(),
           guest_type: guestType,
+          age_type: ageType,
           guest_group_id: groupId === "none" ? null : groupId,
           notes: notes.trim() || null,
           plus_one_allowed: plusOneAllowed,
@@ -456,6 +462,7 @@ function GuestDialog({
             wedding_id: weddingId,
             guest_id: savedId,
             status: rsvpStatus,
+            attendance: rsvpStatus === "yes" ? attendance : null,
             plus_one_name: plusOne.trim() || null,
             dietary_tags: tags,
             dietary_other: dietaryOther.trim() || null,
