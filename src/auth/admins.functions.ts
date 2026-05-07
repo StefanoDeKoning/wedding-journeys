@@ -84,7 +84,7 @@ export const inviteCoAdmin = createServerFn({ method: "POST" })
       const { error: mErr } = await admin.from("wedding_members").insert({
         wedding_id: data.weddingId,
         user_id: userId,
-        role: "admin",
+        role: "secondary_admin",
       });
       if (mErr) return { ok: false, error: mErr.message };
     }
@@ -116,7 +116,7 @@ const ListInput = z.object({ weddingId: z.string().uuid() });
 
 export interface AdminMember {
   user_id: string;
-  role: "primary_admin" | "admin";
+  role: "primary_admin" | "secondary_admin";
   email: string | null;
   created_at: string;
 }
@@ -140,7 +140,7 @@ export const listAdmins = createServerFn({ method: "POST" })
     return {
       admins: members.map((m) => ({
         user_id: m.user_id,
-        role: m.role as "primary_admin" | "admin",
+        role: m.role as "primary_admin" | "secondary_admin",
         email: byId.get(m.user_id) ?? null,
         created_at: m.created_at,
       })),
