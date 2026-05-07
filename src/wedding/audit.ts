@@ -21,6 +21,9 @@ export type AuditAction =
   | "photo.approved"
   | "photo.hidden"
   | "photo.deleted"
+  | "playlist.removed"
+  | "admin.invited"
+  | "admin.removed"
   | "wedding.updated";
 
 export interface LogAuditInput {

@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
   XCircle,
-  HelpCircle,
   AlertTriangle,
   Loader2,
   Pencil,
@@ -30,6 +29,7 @@ export const Route = createFileRoute("/$slug/rsvp")({
 
 type Answer = "yes" | "no";
 type Attendance = "day" | "evening" | "both";
+type GuestType = "day" | "evening" | "full_day";
 
 interface RsvpRow {
   id: string;
@@ -43,7 +43,7 @@ interface RsvpRow {
   edited_by_admin: boolean;
 }
 
-function attendanceOptionsFor(gt: "day" | "evening" | "full_day"): { value: Attendance; label: string }[] {
+function attendanceOptionsFor(gt: GuestType): { value: Attendance; label: string }[] {
   if (gt === "day") return [{ value: "day", label: "Day only" }];
   if (gt === "evening") return [{ value: "evening", label: "Evening only" }];
   return [
@@ -84,6 +84,7 @@ function RsvpPage() {
           weddingId={wedding.id}
           guestId={guest.id}
           guestFirstName={guest.first_name}
+          guestType={guest.guest_type}
           plusOneAllowed={guest.plus_one_allowed}
           rsvpDeadline={wedding.rsvp_deadline}
         />
@@ -96,18 +97,18 @@ function RsvpPage() {
   );
 }
 
-// ─────────────────────────── Guest form ───────────────────────────
-
 function GuestRsvpForm({
   weddingId,
   guestId,
   guestFirstName,
+  guestType,
   plusOneAllowed,
   rsvpDeadline,
 }: {
   weddingId: string;
   guestId: string;
   guestFirstName: string;
+  guestType: GuestType;
   plusOneAllowed: boolean;
   rsvpDeadline: string | null;
 }) {
@@ -130,7 +131,6 @@ function GuestRsvpForm({
 
   const attendanceOptions = useMemo(() => attendanceOptionsFor(guestType), [guestType]);
 
-  // Auto-pick attendance if guest has only one possible value (day or evening only)
   useEffect(() => {
     if (answer === "yes" && !attendance && attendanceOptions.length === 1) {
       setAttendance(attendanceOptions[0].value);
@@ -222,7 +222,6 @@ function GuestRsvpForm({
     );
   }
 
-  // Confirmation view
   if (existing && !editing) {
     return (
       <div className="rounded-[1.5rem] border border-border bg-card p-8 text-center shadow-soft">
@@ -230,9 +229,10 @@ function GuestRsvpForm({
         <h2 className="mt-4 font-display text-2xl">Thank you, {guestFirstName}!</h2>
         <p className="mt-2 text-muted-foreground text-sm">
           You replied{" "}
-          <span className="text-foreground font-medium">
-            {answerLabel(existing.status)}
-          </span>
+          <span className="text-foreground font-medium">{answerLabel(existing.status)}</span>
+          {existing.attendance && existing.status === "yes" && (
+            <> · {attendanceLabel(existing.attendance)}</>
+          )}
           .
         </p>
         {existing.dietary_tags.length > 0 && (
@@ -278,11 +278,10 @@ function GuestRsvpForm({
 
       <fieldset disabled={deadlinePassed} className="space-y-3">
         <legend className="font-display text-xl mb-1">My answer</legend>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {(
             [
               { v: "yes", label: "Joyfully yes", Icon: CheckCircle2 },
-              { v: "maybe", label: "Maybe", Icon: HelpCircle },
               { v: "no", label: "Sadly no", Icon: XCircle },
             ] as const
           ).map(({ v, label, Icon }) => {
@@ -305,6 +304,31 @@ function GuestRsvpForm({
           })}
         </div>
       </fieldset>
+
+      {answer === "yes" && attendanceOptions.length > 1 && (
+        <fieldset disabled={deadlinePassed} className="space-y-3">
+          <Label>Which part of the day?</Label>
+          <div className="grid grid-cols-3 gap-3">
+            {attendanceOptions.map((opt) => {
+              const active = attendance === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setAttendance(opt.value)}
+                  className={`rounded-xl border p-3 text-sm transition-all ${
+                    active
+                      ? "border-primary bg-primary/10 text-primary shadow-warm"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      )}
 
       {plusOneAllowed && answer === "yes" && (
         <fieldset disabled={deadlinePassed} className="space-y-3">
@@ -359,10 +383,7 @@ function GuestRsvpForm({
                     : "border-border hover:border-primary/40"
                 }`}
               >
-                <Checkbox
-                  checked={checked}
-                  onCheckedChange={() => toggleTag(opt.value)}
-                />
+                <Checkbox checked={checked} onCheckedChange={() => toggleTag(opt.value)} />
                 <span className="text-sm">{opt.label}</span>
               </label>
             );
@@ -397,6 +418,7 @@ function GuestRsvpForm({
             onClick={() => {
               setEditing(false);
               setAnswer(existing.status);
+              setAttendance(existing.attendance);
               setPlusOne(existing.plus_one_name ?? "");
               setBringingGuest(!!existing.plus_one_name);
               setTags((existing.dietary_tags ?? []) as DietaryValue[]);
@@ -419,23 +441,14 @@ function GuestRsvpForm({
   );
 }
 
-// Admin RSVP management has moved to /$slug/admin/guests
-
-function StatusDot({ status }: { status: Answer | null }) {
-  const cls =
-    status === "yes"
-      ? "bg-primary"
-      : status === "maybe"
-        ? "bg-amber-500"
-        : status === "no"
-          ? "bg-muted-foreground/60"
-          : "bg-border";
-  return <span className={`inline-block w-2.5 h-2.5 rounded-full ${cls}`} />;
-}
-
 function answerLabel(a: Answer | null): string {
   if (a === "yes") return "Joyfully yes";
   if (a === "no") return "Sadly no";
-  if (a === "maybe") return "Maybe";
   return "Awaiting reply";
+}
+
+function attendanceLabel(a: Attendance): string {
+  if (a === "day") return "Day only";
+  if (a === "evening") return "Evening only";
+  return "Day & evening";
 }
