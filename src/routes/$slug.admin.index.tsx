@@ -26,7 +26,6 @@ export const Route = createFileRoute("/$slug/admin/")({
 interface Stats {
   guests: number;
   rsvpYes: number;
-  rsvpMaybe: number;
   rsvpNo: number;
   rsvpNone: number;
   photos: number;
@@ -58,13 +57,12 @@ function AdminOverview() {
         supabase.from("weddings").select("storage_limit_bytes").eq("id", wedding.id).maybeSingle(),
         supabase.from("todo_tasks").select("status").eq("wedding_id", wedding.id),
       ]);
-      const rs = (rsvps.data ?? []) as { status: "yes" | "no" | "maybe" }[];
+      const rs = (rsvps.data ?? []) as { status: "yes" | "no" }[];
       const ps = (photos.data ?? []) as { status: "pending" | "approved" | "hidden" }[];
       const ts = (todos.data ?? []) as { status: "todo" | "in_progress" | "done" }[];
       setStats({
         guests: guests.count ?? 0,
         rsvpYes: rs.filter((r) => r.status === "yes").length,
-        rsvpMaybe: rs.filter((r) => r.status === "maybe").length,
         rsvpNo: rs.filter((r) => r.status === "no").length,
         rsvpNone: (guests.count ?? 0) - rs.length,
         photos: ps.length,
@@ -208,14 +206,14 @@ function AdminOverview() {
           icon={Users}
           label="Guests"
           value={stats.guests}
-          hint={`${stats.rsvpYes} yes · ${stats.rsvpMaybe} maybe · ${stats.rsvpNo} no · ${stats.rsvpNone} no reply`}
+          hint={`${stats.rsvpYes} yes · ${stats.rsvpNo} no · ${stats.rsvpNone} no reply`}
           to="/$slug/admin/guests"
           slug={slug}
         />
         <StatCard
           icon={ListChecks}
           label="RSVPs"
-          value={stats.rsvpYes + stats.rsvpMaybe + stats.rsvpNo}
+          value={stats.rsvpYes + stats.rsvpNo}
           hint={`${stats.rsvpNone} still pending`}
           to="/$slug/admin/rsvp"
           slug={slug}
