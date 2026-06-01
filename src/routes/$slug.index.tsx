@@ -4,7 +4,6 @@ import { useWedding } from "@/wedding/useWedding";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
 import { Button } from "@/components/ui/button";
-import { renderInvitationHtml, getTemplate } from "@/wedding/invitationTemplates";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
