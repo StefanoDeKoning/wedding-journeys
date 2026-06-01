@@ -28,7 +28,6 @@ import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as AdminPlatformTodoTemplatesRouteImport } from './routes/admin.platform.todo-templates'
 import { Route as AdminPlatformClaimRouteImport } from './routes/admin.platform.claim'
 import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
-import { Route as SlugAdminVendorsRouteImport } from './routes/$slug.admin.vendors'
 import { Route as SlugAdminTodoRouteImport } from './routes/$slug.admin.todo'
 import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
 import { Route as SlugAdminStorageRouteImport } from './routes/$slug.admin.storage'
@@ -140,11 +139,6 @@ const SlugGalleryMeRoute = SlugGalleryMeRouteImport.update({
   path: '/me',
   getParentRoute: () => SlugGalleryRoute,
 } as any)
-const SlugAdminVendorsRoute = SlugAdminVendorsRouteImport.update({
-  id: '/vendors',
-  path: '/vendors',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
 const SlugAdminTodoRoute = SlugAdminTodoRouteImport.update({
   id: '/todo',
   path: '/todo',
@@ -245,7 +239,6 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
-  '/$slug/admin/vendors': typeof SlugAdminVendorsRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
@@ -278,7 +271,6 @@ export interface FileRoutesByTo {
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
-  '/$slug/admin/vendors': typeof SlugAdminVendorsRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
@@ -315,7 +307,6 @@ export interface FileRoutesById {
   '/$slug/admin/storage': typeof SlugAdminStorageRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
-  '/$slug/admin/vendors': typeof SlugAdminVendorsRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
@@ -353,7 +344,6 @@ export interface FileRouteTypes {
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
-    | '/$slug/admin/vendors'
     | '/$slug/gallery/me'
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
@@ -386,7 +376,6 @@ export interface FileRouteTypes {
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
-    | '/$slug/admin/vendors'
     | '/$slug/gallery/me'
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
@@ -422,7 +411,6 @@ export interface FileRouteTypes {
     | '/$slug/admin/storage'
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
-    | '/$slug/admin/vendors'
     | '/$slug/gallery/me'
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
@@ -575,13 +563,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugGalleryMeRouteImport
       parentRoute: typeof SlugGalleryRoute
     }
-    '/$slug/admin/vendors': {
-      id: '/$slug/admin/vendors'
-      path: '/vendors'
-      fullPath: '/$slug/admin/vendors'
-      preLoaderRoute: typeof SlugAdminVendorsRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
     '/$slug/admin/todo': {
       id: '/$slug/admin/todo'
       path: '/todo'
@@ -698,7 +679,6 @@ interface SlugAdminRouteChildren {
   SlugAdminStorageRoute: typeof SlugAdminStorageRoute
   SlugAdminTimelineRoute: typeof SlugAdminTimelineRoute
   SlugAdminTodoRoute: typeof SlugAdminTodoRoute
-  SlugAdminVendorsRoute: typeof SlugAdminVendorsRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
 }
 
@@ -717,7 +697,6 @@ const SlugAdminRouteChildren: SlugAdminRouteChildren = {
   SlugAdminStorageRoute: SlugAdminStorageRoute,
   SlugAdminTimelineRoute: SlugAdminTimelineRoute,
   SlugAdminTodoRoute: SlugAdminTodoRoute,
-  SlugAdminVendorsRoute: SlugAdminVendorsRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
 }
 

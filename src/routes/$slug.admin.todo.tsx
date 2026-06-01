@@ -8,7 +8,6 @@ import {
   Sparkles,
   AlertTriangle,
   CalendarDays,
-  Briefcase,
   Wallet,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
@@ -54,13 +53,7 @@ interface Task {
   priority: Priority;
   created_from_template: boolean;
   position: number;
-  vendor_id: string | null;
   budget_item_id: string | null;
-}
-
-interface VendorLite {
-  id: string;
-  name: string;
 }
 
 interface BudgetLite {
@@ -75,7 +68,6 @@ interface Draft {
   deadline: string;
   priority: Priority;
   status: Status;
-  vendor_id: string;
   budget_item_id: string;
 }
 
@@ -86,7 +78,6 @@ const emptyDraft = (): Draft => ({
   deadline: "",
   priority: "medium",
   status: "todo",
-  vendor_id: "",
   budget_item_id: "",
 });
 
@@ -94,7 +85,6 @@ function AdminTodo() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [tasks, setTasks] = useState<Task[] | null>(null);
-  const [vendors, setVendors] = useState<VendorLite[]>([]);
   const [budgets, setBudgets] = useState<BudgetLite[]>([]);
   const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -107,17 +97,12 @@ function AdminTodo() {
 
   const load = async () => {
     if (!wedding) return;
-    const [t, v, b] = await Promise.all([
+    const [t, b] = await Promise.all([
       supabase
         .from("todo_tasks")
         .select("*")
         .eq("wedding_id", wedding.id)
         .order("position", { ascending: true }),
-      supabase
-        .from("vendors" as never)
-        .select("id,name")
-        .eq("wedding_id", wedding.id)
-        .order("name", { ascending: true }),
       supabase
         .from("budget_items" as never)
         .select("id,name")
@@ -129,7 +114,6 @@ function AdminTodo() {
       return;
     }
     setTasks((t.data ?? []) as Task[]);
-    setVendors(((v.data ?? []) as unknown) as VendorLite[]);
     setBudgets(((b.data ?? []) as unknown) as BudgetLite[]);
   };
 
@@ -214,7 +198,6 @@ function AdminTodo() {
       deadline: t.deadline ?? "",
       priority: t.priority,
       status: t.status,
-      vendor_id: t.vendor_id ?? "",
       budget_item_id: t.budget_item_id ?? "",
     });
     setEditing(t);
@@ -240,7 +223,6 @@ function AdminTodo() {
       deadline: draft.deadline || null,
       priority: draft.priority,
       status: draft.status,
-      vendor_id: draft.vendor_id || null,
       budget_item_id: draft.budget_item_id || null,
     };
     if (editing) {
@@ -399,7 +381,6 @@ function AdminTodo() {
                   <TaskRow
                     key={t.id}
                     task={t}
-                    vendor={vendors.find((v) => v.id === t.vendor_id) ?? null}
                     budget={budgets.find((b) => b.id === t.budget_item_id) ?? null}
                     onToggle={() => toggleDone(t)}
                     onEdit={() => openEdit(t)}
@@ -472,44 +453,24 @@ function AdminTodo() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Select
-                value={draft.vendor_id || "__none__"}
-                onValueChange={(v) =>
-                  setDraft({ ...draft, vendor_id: v === "__none__" ? "" : v })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="No vendor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">No vendor</SelectItem>
-                  {vendors.map((v) => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={draft.budget_item_id || "__none__"}
-                onValueChange={(v) =>
-                  setDraft({ ...draft, budget_item_id: v === "__none__" ? "" : v })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="No budget item" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">No budget item</SelectItem>
-                  {budgets.map((b) => (
-                    <SelectItem key={b.id} value={b.id}>
-                      {b.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={draft.budget_item_id || "__none__"}
+              onValueChange={(v) =>
+                setDraft({ ...draft, budget_item_id: v === "__none__" ? "" : v })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="No budget item" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">No budget item</SelectItem>
+                {budgets.map((b) => (
+                  <SelectItem key={b.id} value={b.id}>
+                    {b.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>
@@ -551,14 +512,12 @@ function Stat({
 
 function TaskRow({
   task,
-  vendor,
   budget,
   onToggle,
   onEdit,
   onDelete,
 }: {
   task: Task;
-  vendor: VendorLite | null;
   budget: BudgetLite | null;
   onToggle: () => void;
   onEdit: () => void;
@@ -623,11 +582,6 @@ function TaskRow({
             </span>
           ) : (
             <span>No deadline</span>
-          )}
-          {vendor && (
-            <span className="inline-flex items-center gap-1">
-              <Briefcase className="w-3 h-3" /> {vendor.name}
-            </span>
           )}
           {budget && (
             <span className="inline-flex items-center gap-1">
