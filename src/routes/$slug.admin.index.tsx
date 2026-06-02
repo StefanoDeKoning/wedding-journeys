@@ -207,7 +207,7 @@ function AdminOverview() {
           label="Guests"
           value={stats.guests}
           hint={`${stats.rsvpYes} yes · ${stats.rsvpNo} no · ${stats.rsvpNone} no reply`}
-          to="/$slug/admin/guests"
+          to="/$slug/admin/rsvp"
           slug={slug}
         />
         <StatCard

@@ -37,8 +37,6 @@ import { Route as SlugAdminRsvpRouteImport } from './routes/$slug.admin.rsvp'
 import { Route as SlugAdminPlaylistRouteImport } from './routes/$slug.admin.playlist'
 import { Route as SlugAdminPhotosRouteImport } from './routes/$slug.admin.photos'
 import { Route as SlugAdminInvitationRouteImport } from './routes/$slug.admin.invitation'
-import { Route as SlugAdminGuestsRouteImport } from './routes/$slug.admin.guests'
-import { Route as SlugAdminGroupsRouteImport } from './routes/$slug.admin.groups'
 import { Route as SlugAdminBudgetRouteImport } from './routes/$slug.admin.budget'
 import { Route as SlugAdminAuditRouteImport } from './routes/$slug.admin.audit'
 import { Route as SlugAdminAdminsRouteImport } from './routes/$slug.admin.admins'
@@ -184,16 +182,6 @@ const SlugAdminInvitationRoute = SlugAdminInvitationRouteImport.update({
   path: '/invitation',
   getParentRoute: () => SlugAdminRoute,
 } as any)
-const SlugAdminGuestsRoute = SlugAdminGuestsRouteImport.update({
-  id: '/guests',
-  path: '/guests',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminGroupsRoute = SlugAdminGroupsRouteImport.update({
-  id: '/groups',
-  path: '/groups',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
 const SlugAdminBudgetRoute = SlugAdminBudgetRouteImport.update({
   id: '/budget',
   path: '/budget',
@@ -228,8 +216,6 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/admins': typeof SlugAdminAdminsRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/budget': typeof SlugAdminBudgetRoute
-  '/$slug/admin/groups': typeof SlugAdminGroupsRoute
-  '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
   '/$slug/admin/playlist': typeof SlugAdminPlaylistRoute
@@ -260,8 +246,6 @@ export interface FileRoutesByTo {
   '/$slug/admin/admins': typeof SlugAdminAdminsRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/budget': typeof SlugAdminBudgetRoute
-  '/$slug/admin/groups': typeof SlugAdminGroupsRoute
-  '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
   '/$slug/admin/playlist': typeof SlugAdminPlaylistRoute
@@ -296,8 +280,6 @@ export interface FileRoutesById {
   '/$slug/admin/admins': typeof SlugAdminAdminsRoute
   '/$slug/admin/audit': typeof SlugAdminAuditRoute
   '/$slug/admin/budget': typeof SlugAdminBudgetRoute
-  '/$slug/admin/groups': typeof SlugAdminGroupsRoute
-  '/$slug/admin/guests': typeof SlugAdminGuestsRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
   '/$slug/admin/playlist': typeof SlugAdminPlaylistRoute
@@ -333,8 +315,6 @@ export interface FileRouteTypes {
     | '/$slug/admin/admins'
     | '/$slug/admin/audit'
     | '/$slug/admin/budget'
-    | '/$slug/admin/groups'
-    | '/$slug/admin/guests'
     | '/$slug/admin/invitation'
     | '/$slug/admin/photos'
     | '/$slug/admin/playlist'
@@ -365,8 +345,6 @@ export interface FileRouteTypes {
     | '/$slug/admin/admins'
     | '/$slug/admin/audit'
     | '/$slug/admin/budget'
-    | '/$slug/admin/groups'
-    | '/$slug/admin/guests'
     | '/$slug/admin/invitation'
     | '/$slug/admin/photos'
     | '/$slug/admin/playlist'
@@ -400,8 +378,6 @@ export interface FileRouteTypes {
     | '/$slug/admin/admins'
     | '/$slug/admin/audit'
     | '/$slug/admin/budget'
-    | '/$slug/admin/groups'
-    | '/$slug/admin/guests'
     | '/$slug/admin/invitation'
     | '/$slug/admin/photos'
     | '/$slug/admin/playlist'
@@ -626,20 +602,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminInvitationRouteImport
       parentRoute: typeof SlugAdminRoute
     }
-    '/$slug/admin/guests': {
-      id: '/$slug/admin/guests'
-      path: '/guests'
-      fullPath: '/$slug/admin/guests'
-      preLoaderRoute: typeof SlugAdminGuestsRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/groups': {
-      id: '/$slug/admin/groups'
-      path: '/groups'
-      fullPath: '/$slug/admin/groups'
-      preLoaderRoute: typeof SlugAdminGroupsRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
     '/$slug/admin/budget': {
       id: '/$slug/admin/budget'
       path: '/budget'
@@ -668,8 +630,6 @@ interface SlugAdminRouteChildren {
   SlugAdminAdminsRoute: typeof SlugAdminAdminsRoute
   SlugAdminAuditRoute: typeof SlugAdminAuditRoute
   SlugAdminBudgetRoute: typeof SlugAdminBudgetRoute
-  SlugAdminGroupsRoute: typeof SlugAdminGroupsRoute
-  SlugAdminGuestsRoute: typeof SlugAdminGuestsRoute
   SlugAdminInvitationRoute: typeof SlugAdminInvitationRoute
   SlugAdminPhotosRoute: typeof SlugAdminPhotosRoute
   SlugAdminPlaylistRoute: typeof SlugAdminPlaylistRoute
@@ -686,8 +646,6 @@ const SlugAdminRouteChildren: SlugAdminRouteChildren = {
   SlugAdminAdminsRoute: SlugAdminAdminsRoute,
   SlugAdminAuditRoute: SlugAdminAuditRoute,
   SlugAdminBudgetRoute: SlugAdminBudgetRoute,
-  SlugAdminGroupsRoute: SlugAdminGroupsRoute,
-  SlugAdminGuestsRoute: SlugAdminGuestsRoute,
   SlugAdminInvitationRoute: SlugAdminInvitationRoute,
   SlugAdminPhotosRoute: SlugAdminPhotosRoute,
   SlugAdminPlaylistRoute: SlugAdminPlaylistRoute,
@@ -766,3 +724,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
