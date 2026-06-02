@@ -338,7 +338,7 @@ function StatCard({
   label: string;
   value: number;
   hint: string;
-  to: "/$slug/admin/guests" | "/$slug/admin/photos" | "/$slug/playlist" | "/$slug/admin/rsvp";
+  to: "/$slug/admin/photos" | "/$slug/playlist" | "/$slug/admin/rsvp";
   slug: string;
 }) {
   return (
