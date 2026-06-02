@@ -1,8 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 import {
   LayoutDashboard,
-  Users,
-  Tags,
   Armchair,
   CalendarHeart,
   Image as ImageIcon,
