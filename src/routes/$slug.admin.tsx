@@ -29,8 +29,7 @@ export const Route = createFileRoute("/$slug/admin")({
 
 const tabs = [
   { to: "/$slug/admin" as const, label: "Overview", icon: LayoutDashboard, exact: true },
-  { to: "/$slug/admin/rsvp" as const, label: "RSVP", icon: ClipboardCheck, exact: false },
-  { to: "/$slug/admin/todo" as const, label: "ToDo", icon: ListTodo, exact: false },
+  { to: "/$slug/admin/rsvp" as const, label: "Guests & RSVP", icon: ClipboardCheck, exact: false },
   { to: "/$slug/admin/budget" as const, label: "Budget", icon: Wallet, exact: false },
   { to: "/$slug/admin/guests" as const, label: "Guests", icon: Users, exact: false },
   { to: "/$slug/admin/groups" as const, label: "Groups", icon: Tags, exact: false },
