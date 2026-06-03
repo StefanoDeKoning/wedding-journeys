@@ -133,6 +133,12 @@ function AdminInvitation() {
           </pre>
         </section>
       </div>
+
+      <WishlistEditor
+        weddingId={wedding.id}
+        wishlistEnabled={wedding.wishlist_enabled}
+        onEnabledChange={() => void refresh()}
+      />
     </div>
   );
 }
