@@ -37,6 +37,8 @@ export interface PublicWedding {
   invitation_content: string | null;
   invitation_template: string;
   invitation_visible: boolean;
+  wishlist_enabled: boolean;
+
 }
 
 export const DEFAULT_INVITATION_TEXT = `Dear {FirstName} {LastName},
