@@ -4,6 +4,7 @@ import { MapPin, Loader2 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryMeta } from "@/wedding/timelineCategories";
+import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
 
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
@@ -60,7 +61,10 @@ function TimelinePage() {
   }, [wedding?.id]);
 
   const isEvening = guest?.guest_type === "evening";
-  const isDay = guest?.guest_type === "day";
+  const visibleEvents = useMemo(
+    () => events.filter((e) => canGuestSeeEvent(guest?.guest_type, e.visibility)),
+    [events, guest?.guest_type],
+  );
 
   // Determine the index of the "next" upcoming event today (only if wedding day)
   const nextIdx = useMemo(() => {
@@ -74,13 +78,13 @@ function TimelinePage() {
     ) {
       return -1;
     }
-    return events.findIndex((e) => {
+    return visibleEvents.findIndex((e) => {
       const [h, m] = e.event_time.split(":").map(Number);
       const evDate = new Date(today);
       evDate.setHours(h, m, 0, 0);
       return evDate.getTime() >= now.getTime();
     });
-  }, [events, wedding?.wedding_date, now]);
+  }, [visibleEvents, wedding?.wedding_date, now]);
 
   if (!wedding) return null;
 
@@ -100,20 +104,18 @@ function TimelinePage() {
         <div className="py-12 text-center text-muted-foreground">
           <Loader2 className="w-5 h-5 animate-spin mx-auto" />
         </div>
-      ) : events.length === 0 ? (
+      ) : visibleEvents.length === 0 ? (
         <div className="py-16 text-center text-sm text-muted-foreground">
           The schedule is being prepared. Check back soon.
         </div>
       ) : (
         <ol className="relative border-l-2 border-primary/20 ml-3 sm:ml-5 space-y-8">
-          {events.map((e, i) => {
-            const dimmed =
-              (isEvening && e.visibility === "day") || (isDay && e.visibility === "evening");
+          {visibleEvents.map((e, i) => {
             const isNext = i === nextIdx;
             const meta = categoryMeta(e.category);
             const Icon = meta.Icon;
             return (
-              <li key={e.id} className={`pl-8 sm:pl-10 ${dimmed ? "opacity-50" : ""}`}>
+              <li key={e.id} className="pl-8 sm:pl-10">
                 <span
                   className={`absolute -left-[16px] flex items-center justify-center w-8 h-8 rounded-full shadow-warm ${meta.accent} ${
                     isNext ? "ring-4 ring-primary/30 animate-pulse" : ""
@@ -145,11 +147,6 @@ function TimelinePage() {
                   {e.location && (
                     <p className="mt-2 text-xs text-muted-foreground inline-flex items-center gap-1">
                       <MapPin className="w-3 h-3" /> {e.location}
-                    </p>
-                  )}
-                  {dimmed && (
-                    <p className="mt-2 text-[0.7rem] uppercase tracking-widest text-muted-foreground/80">
-                      {e.visibility === "day" ? "Day guests only" : "Evening guests only"}
                     </p>
                   )}
                 </div>
