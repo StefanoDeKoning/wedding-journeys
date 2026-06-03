@@ -3,6 +3,7 @@ import { CalendarDays, MapPin, Heart, ListChecks } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
+import { WishlistSection } from "@/wedding/WishlistSection";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/$slug/")({
