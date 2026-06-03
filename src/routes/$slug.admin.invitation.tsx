@@ -12,6 +12,7 @@ import {
   DEFAULT_INVITATION_TEMPLATE,
   renderInvitationText,
 } from "@/wedding/invitationTemplate";
+import { WishlistEditor } from "@/wedding/WishlistEditor";
 
 export const Route = createFileRoute("/$slug/admin/invitation")({
   component: AdminInvitation,
