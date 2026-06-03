@@ -24,7 +24,10 @@ export type AuditAction =
   | "playlist.removed"
   | "admin.invited"
   | "admin.removed"
-  | "wedding.updated";
+  | "wedding.updated"
+  | "wishlist.created"
+  | "wishlist.updated"
+  | "wishlist.deleted";
 
 export interface LogAuditInput {
   weddingId: string;

@@ -12,6 +12,7 @@ import {
   DEFAULT_INVITATION_TEMPLATE,
   renderInvitationText,
 } from "@/wedding/invitationTemplate";
+import { WishlistEditor } from "@/wedding/WishlistEditor";
 
 export const Route = createFileRoute("/$slug/admin/invitation")({
   component: AdminInvitation,
@@ -132,6 +133,12 @@ function AdminInvitation() {
           </pre>
         </section>
       </div>
+
+      <WishlistEditor
+        weddingId={wedding.id}
+        wishlistEnabled={wedding.wishlist_enabled}
+        onEnabledChange={() => void refresh()}
+      />
     </div>
   );
 }

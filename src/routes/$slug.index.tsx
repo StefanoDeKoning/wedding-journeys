@@ -3,6 +3,7 @@ import { CalendarDays, MapPin, Heart, ListChecks } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
+import { WishlistSection } from "@/wedding/WishlistSection";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/$slug/")({
@@ -105,8 +106,12 @@ function InvitationPage() {
         />
       </section>
 
+      {/* Wishlist / gift registry */}
+      {wedding.wishlist_enabled && <WishlistSection weddingId={wedding.id} />}
+
       {/* Reverse side — practical info */}
       <section className="mx-auto max-w-4xl px-6 pb-24">
+
         <div className="divider-script">
           <span className="font-script text-2xl">the details</span>
         </div>
