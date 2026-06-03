@@ -4,6 +4,7 @@ import { MapPin, Loader2 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryMeta } from "@/wedding/timelineCategories";
+import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
 
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
@@ -60,7 +61,10 @@ function TimelinePage() {
   }, [wedding?.id]);
 
   const isEvening = guest?.guest_type === "evening";
-  const isDay = guest?.guest_type === "day";
+  const visibleEvents = useMemo(
+    () => events.filter((e) => canGuestSeeEvent(guest?.guest_type, e.visibility)),
+    [events, guest?.guest_type],
+  );
 
   // Determine the index of the "next" upcoming event today (only if wedding day)
   const nextIdx = useMemo(() => {
