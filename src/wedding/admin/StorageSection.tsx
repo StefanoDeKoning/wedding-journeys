@@ -1,13 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { HardDrive, Loader2, Camera } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
-import { formatBytes } from "./$slug.admin.index";
-
-export const Route = createFileRoute("/$slug/admin/storage")({
-  component: AdminStorage,
-});
+import { formatBytes } from "@/routes/$slug.admin.index";
 
 interface UploaderRow {
   uploader_name: string;
@@ -15,9 +9,7 @@ interface UploaderRow {
   bytes: number;
 }
 
-function AdminStorage() {
-  const { slug } = Route.useParams();
-  const { wedding } = useWedding(slug);
+export function StorageSection({ weddingId }: { weddingId: string }) {
   const [used, setUsed] = useState(0);
   const [limit, setLimit] = useState(2_147_483_648);
   const [photoCount, setPhotoCount] = useState(0);
@@ -25,16 +17,12 @@ function AdminStorage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!wedding) return;
     void (async () => {
       setLoading(true);
       const [usedRes, limRes, photos] = await Promise.all([
-        supabase.rpc("wedding_storage_used", { _wedding_id: wedding.id }),
-        supabase.from("weddings").select("storage_limit_bytes").eq("id", wedding.id).maybeSingle(),
-        supabase
-          .from("photos")
-          .select("uploader_name, size_bytes")
-          .eq("wedding_id", wedding.id),
+        supabase.rpc("wedding_storage_used", { _wedding_id: weddingId }),
+        supabase.from("weddings").select("storage_limit_bytes").eq("id", weddingId).maybeSingle(),
+        supabase.from("photos").select("uploader_name, size_bytes").eq("wedding_id", weddingId),
       ]);
       setUsed(Number(usedRes.data ?? 0));
       setLimit(Number(limRes.data?.storage_limit_bytes ?? 2_147_483_648));
@@ -52,15 +40,19 @@ function AdminStorage() {
       );
       setLoading(false);
     })();
-  }, [wedding]);
-
-  if (!wedding) return null;
+  }, [weddingId]);
 
   const pct = Math.min(100, (used / limit) * 100);
   const danger = pct > 90;
 
   return (
     <div className="space-y-6">
+      <div className="grid sm:grid-cols-3 gap-3">
+        <InfoCard label="Storage used" value={formatBytes(used)} />
+        <InfoCard label="Storage limit" value={formatBytes(limit)} />
+        <InfoCard label="Files uploaded" value={String(photoCount)} />
+      </div>
+
       <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
         <div className="flex items-center gap-2 mb-3">
           <HardDrive className="w-4 h-4 text-primary" />
@@ -77,9 +69,7 @@ function AdminStorage() {
             <span className="font-display text-2xl">{formatBytes(used)}</span>
             <span className="text-muted-foreground"> of {formatBytes(limit)}</span>
           </p>
-          <p className="text-xs text-muted-foreground">
-            {photoCount} photo{photoCount === 1 ? "" : "s"} · {pct.toFixed(1)}% full
-          </p>
+          <p className="text-xs text-muted-foreground">{pct.toFixed(1)}% full</p>
         </div>
         {danger && (
           <p className="mt-3 text-xs text-destructive">
@@ -115,6 +105,15 @@ function AdminStorage() {
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="font-display text-2xl mt-1">{value}</p>
     </div>
   );
 }

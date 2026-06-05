@@ -1,7 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Trash2, ShieldCheck, Send } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,13 +8,7 @@ import { listAdmins, inviteCoAdmin, removeCoAdmin, type AdminMember } from "@/au
 import { logAudit } from "@/wedding/audit";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/$slug/admin/admins")({
-  component: AdminCoAdmins,
-});
-
-function AdminCoAdmins() {
-  const { slug } = Route.useParams();
-  const { wedding } = useWedding(slug);
+export function AdminsSection({ weddingId }: { weddingId: string }) {
   const [admins, setAdmins] = useState<AdminMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
@@ -24,10 +16,9 @@ function AdminCoAdmins() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const load = async () => {
-    if (!wedding) return;
     setLoading(true);
     try {
-      const res = await listAdmins({ data: { weddingId: wedding.id } });
+      const res = await listAdmins({ data: { weddingId } });
       setAdmins(res.admins);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not load admins.");
@@ -40,11 +31,9 @@ function AdminCoAdmins() {
   }, []);
 
   useEffect(() => {
-    if (wedding) void load();
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wedding?.id]);
-
-  if (!wedding) return null;
+  }, [weddingId]);
 
   const isPrimary =
     currentUserId !== null &&
@@ -55,7 +44,7 @@ function AdminCoAdmins() {
     if (!email.trim()) return;
     setInviting(true);
     try {
-      const res = await inviteCoAdmin({ data: { weddingId: wedding.id, email: email.trim() } });
+      const res = await inviteCoAdmin({ data: { weddingId, email: email.trim() } });
       if (!res.ok) {
         toast.error(res.error ?? "Could not invite.");
       } else {
@@ -65,7 +54,7 @@ function AdminCoAdmins() {
             : "Co-admin added.",
         );
         void logAudit({
-          weddingId: wedding.id,
+          weddingId,
           action: "admin.invited",
           targetType: "user",
           targetId: res.member?.user_id,
@@ -84,13 +73,13 @@ function AdminCoAdmins() {
     if (m.role === "primary_admin") return;
     if (!confirm(`Remove ${m.email ?? "this co-admin"}?`)) return;
     try {
-      const res = await removeCoAdmin({ data: { weddingId: wedding.id, userId: m.user_id } });
+      const res = await removeCoAdmin({ data: { weddingId, userId: m.user_id } });
       if (!res.ok) {
         toast.error(res.error ?? "Could not remove.");
         return;
       }
       void logAudit({
-        weddingId: wedding.id,
+        weddingId,
         action: "admin.removed",
         targetType: "user",
         targetId: m.user_id,

@@ -294,7 +294,7 @@ function AdminOverview() {
             <h2 className="font-display text-lg">Storage</h2>
           </div>
           <Link
-            to="/$slug/admin/storage"
+            to="/$slug/admin/settings"
             params={{ slug }}
             className="text-xs text-primary hover:underline inline-flex items-center gap-1"
           >
