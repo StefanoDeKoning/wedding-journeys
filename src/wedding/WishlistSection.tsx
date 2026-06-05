@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Gift, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { safeHttpUrl } from "@/lib/safeUrl";
 
 export interface WishlistItem {
   id: string;

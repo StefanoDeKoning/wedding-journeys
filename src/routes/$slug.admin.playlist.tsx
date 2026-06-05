@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
+import { safeHttpUrl } from "@/lib/safeUrl";
 
 export const Route = createFileRoute("/$slug/admin/playlist")({
   component: AdminPlaylist,
@@ -105,9 +106,9 @@ function AdminPlaylist() {
               <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
                 {s.vote_count} vote{s.vote_count === 1 ? "" : "s"}
               </span>
-              {s.spotify_url && (
+              {safeHttpUrl(s.spotify_url) && (
                 <Button asChild variant="ghost" size="sm">
-                  <a href={s.spotify_url} target="_blank" rel="noreferrer">
+                  <a href={safeHttpUrl(s.spotify_url)} target="_blank" rel="noreferrer">
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </Button>

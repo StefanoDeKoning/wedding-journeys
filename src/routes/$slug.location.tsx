@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Navigation, Train, Hotel } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Button } from "@/components/ui/button";
+import { safeHttpUrl } from "@/lib/safeUrl";
 
 export const Route = createFileRoute("/$slug/location")({
   head: () => ({
@@ -48,10 +49,10 @@ function LocationPage() {
         />
       </div>
 
-      {wedding.maps_url && (
+      {safeHttpUrl(wedding.maps_url) && (
         <div className="flex justify-center mb-12">
           <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 h-12 px-8 shadow-warm">
-            <a href={wedding.maps_url} target="_blank" rel="noreferrer">
+            <a href={safeHttpUrl(wedding.maps_url)} target="_blank" rel="noreferrer">
               <Navigation className="w-4 h-4 mr-2" />
               Open in Google Maps
             </a>

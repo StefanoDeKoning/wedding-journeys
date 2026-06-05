@@ -267,9 +267,9 @@ function PlaylistPage() {
                       {mine && " · you"}
                     </p>
                   </div>
-                  {s.spotify_url && (
+                  {safeHttpUrl(s.spotify_url) && (
                     <a
-                      href={s.spotify_url}
+                      href={safeHttpUrl(s.spotify_url)}
                       target="_blank"
                       rel="noreferrer"
                       className="text-muted-foreground hover:text-primary"
