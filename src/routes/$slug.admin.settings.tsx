@@ -6,9 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
+import { AdminsSection } from "@/wedding/admin/AdminsSection";
+import { StorageSection } from "@/wedding/admin/StorageSection";
+import { AuditSection } from "@/wedding/admin/AuditSection";
 
 export const Route = createFileRoute("/$slug/admin/settings")({
   component: AdminSettings,
@@ -18,6 +22,58 @@ function AdminSettings() {
   const { slug } = Route.useParams();
   const { wedding, refresh } = useWedding(slug);
 
+  if (!wedding) {
+    return (
+      <div className="py-12 text-center text-muted-foreground">
+        <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <div className="flex items-center gap-2">
+          <SettingsIcon className="w-4 h-4 text-primary" />
+          <h2 className="font-display text-xl">Wedding settings</h2>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your wedding configuration, admins, storage and activity history in one place.
+        </p>
+      </section>
+
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="w-full sm:w-auto grid grid-cols-4 sm:inline-flex">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="admins">Admins</TabsTrigger>
+          <TabsTrigger value="storage">Storage</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="mt-6">
+          <GeneralTab wedding={wedding} refresh={refresh} />
+        </TabsContent>
+        <TabsContent value="admins" className="mt-6">
+          <AdminsSection weddingId={wedding.id} />
+        </TabsContent>
+        <TabsContent value="storage" className="mt-6">
+          <StorageSection weddingId={wedding.id} />
+        </TabsContent>
+        <TabsContent value="activity" className="mt-6">
+          <AuditSection weddingId={wedding.id} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function GeneralTab({
+  wedding,
+  refresh,
+}: {
+  wedding: NonNullable<ReturnType<typeof useWedding>["wedding"]>;
+  refresh: () => Promise<void> | void;
+}) {
   const [weddingName, setWeddingName] = useState("");
   const [brideName, setBrideName] = useState("");
   const [groomName, setGroomName] = useState("");
@@ -29,7 +85,6 @@ function AdminSettings() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!wedding) return;
     setWeddingName(wedding.wedding_name ?? "");
     setBrideName(wedding.bride_name ?? "");
     setGroomName(wedding.groom_name ?? "");
@@ -39,14 +94,6 @@ function AdminSettings() {
     setLocationAddress(wedding.location_address ?? "");
     setMapsUrl(wedding.maps_url ?? "");
   }, [wedding]);
-
-  if (!wedding) {
-    return (
-      <div className="py-12 text-center text-muted-foreground">
-        <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-      </div>
-    );
-  }
 
   const save = async () => {
     setSaving(true);
@@ -79,16 +126,31 @@ function AdminSettings() {
     void refresh();
   };
 
+  const isPublished = wedding.status === "published";
+
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <div className="flex items-center gap-2">
-          <SettingsIcon className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-xl">Wedding settings</h2>
+      <section className="rounded-2xl border border-border bg-card p-5 shadow-soft flex items-center justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Publish status</p>
+          <p className="font-display text-lg mt-1">
+            {isPublished ? "Published" : "Draft"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {isPublished
+              ? "Your wedding website is live for guests."
+              : "Only admins can see your wedding website. Publish it from the Overview page."}
+          </p>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Update the basics about your wedding. All fields are optional.
-        </p>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${
+            isPublished
+              ? "bg-primary/10 text-primary"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          {isPublished ? "Live" : "Draft"}
+        </span>
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-5">
