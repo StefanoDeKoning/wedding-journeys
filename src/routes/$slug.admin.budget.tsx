@@ -648,9 +648,9 @@ function DetailView({
                   <Phone className="w-3.5 h-3.5" /> {item.vendor_phone}
                 </a>
               )}
-              {item.vendor_website && (
+              {safeHttpUrl(item.vendor_website) && (
                 <a
-                  href={item.vendor_website}
+                  href={safeHttpUrl(item.vendor_website)}
                   target="_blank"
                   rel="noreferrer"
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground truncate"
