@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { safeHttpUrl } from "@/lib/safeUrl";
 
 export const Route = createFileRoute("/$slug/playlist")({
   head: () => ({
@@ -267,9 +268,9 @@ function PlaylistPage() {
                       {mine && " · you"}
                     </p>
                   </div>
-                  {s.spotify_url && (
+                  {safeHttpUrl(s.spotify_url) && (
                     <a
-                      href={s.spotify_url}
+                      href={safeHttpUrl(s.spotify_url)}
                       target="_blank"
                       rel="noreferrer"
                       className="text-muted-foreground hover:text-primary"

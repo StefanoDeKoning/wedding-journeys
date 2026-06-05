@@ -5,6 +5,7 @@ import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
 import { WishlistSection } from "@/wedding/WishlistSection";
 import { Button } from "@/components/ui/button";
+import { safeHttpUrl } from "@/lib/safeUrl";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
@@ -147,9 +148,9 @@ function InvitationPage() {
                 {wedding.location_address}
               </p>
             )}
-            {wedding.maps_url && (
+            {safeHttpUrl(wedding.maps_url) && (
               <a
-                href={wedding.maps_url}
+                href={safeHttpUrl(wedding.maps_url)}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-3 inline-flex items-center gap-1.5 text-sm text-primary hover:underline"

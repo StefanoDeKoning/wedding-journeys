@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { safeHttpUrl } from "@/lib/safeUrl";
 import {
   Dialog,
   DialogContent,
@@ -293,9 +294,9 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
                   )}
                   <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
                     {item.price_text && <span>{item.price_text}</span>}
-                    {item.external_url && (
+                    {safeHttpUrl(item.external_url) && (
                       <a
-                        href={item.external_url}
+                        href={safeHttpUrl(item.external_url)}
                         target="_blank"
                         rel="noreferrer noopener"
                         className="inline-flex items-center gap-1 text-primary hover:underline"
