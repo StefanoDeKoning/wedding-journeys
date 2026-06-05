@@ -77,14 +77,14 @@ export function WishlistSection({ weddingId }: { weddingId: string }) {
               {item.price_text && (
                 <p className="text-sm font-medium text-primary">{item.price_text}</p>
               )}
-              {item.external_url && (
+              {safeHttpUrl(item.external_url) && (
                 <Button
                   asChild
                   size="sm"
                   variant="outline"
                   className="mt-auto self-start rounded-full"
                 >
-                  <a href={item.external_url} target="_blank" rel="noreferrer noopener">
+                  <a href={safeHttpUrl(item.external_url)} target="_blank" rel="noreferrer noopener">
                     <ExternalLink className="w-4 h-4 mr-2" />
                     View gift
                   </a>
