@@ -477,10 +477,8 @@ function BudgetPage() {
               <TableBody>
                 {items.map((item) => {
                   const est = Number(item.estimated_cost ?? 0);
-                  const act = item.actual_cost == null ? null : Number(item.actual_cost);
                   const paid = Number(item.paid_amount ?? 0);
-                  const base = act ?? est;
-                  const remaining = base - paid;
+                  const remaining = est - paid;
                   const linkedTodos = todos.filter((t) => t.budget_item_id === item.id);
                   return (
                     <TableRow
@@ -510,8 +508,8 @@ function BudgetPage() {
                       <TableCell className="text-right tabular-nums">
                         {formatCurrency(est)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums text-muted-foreground">
-                        {act == null ? "—" : formatCurrency(act)}
+                      <TableCell className="text-right tabular-nums">
+                        {formatCurrency(paid)}
                       </TableCell>
                       <TableCell
                         className={`text-right tabular-nums ${
@@ -571,10 +569,8 @@ function DetailView({
   onDelete: () => void;
 }) {
   const est = Number(item.estimated_cost ?? 0);
-  const act = item.actual_cost == null ? null : Number(item.actual_cost);
   const paid = Number(item.paid_amount ?? 0);
-  const base = act ?? est;
-  const remaining = base - paid;
+  const remaining = est - paid;
 
   return (
     <>
@@ -593,8 +589,8 @@ function DetailView({
           </h3>
           <div className="rounded-xl border border-border divide-y divide-border">
             <Row label="Estimated" value={formatCurrency(est)} />
-            <Row label="Paid" value={act == null ? "—" : formatCurrency(act)} />
-            <Row label="Settled" value={formatCurrency(paid)} />
+            <Row label="Paid" value={formatCurrency(paid)} />
+
 
             <Row
               label="Remaining"
