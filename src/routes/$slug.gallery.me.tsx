@@ -29,6 +29,7 @@ function MyPhotosPage() {
   const { slug } = Route.useParams();
   const { wedding, guest } = useWedding(slug);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
