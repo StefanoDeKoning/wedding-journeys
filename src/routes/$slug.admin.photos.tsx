@@ -26,6 +26,7 @@ function AdminPhotos() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "hidden">("all");
 
@@ -38,7 +39,9 @@ function AdminPhotos() {
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    setPhotos((data ?? []) as Photo[]);
+    const list = (data ?? []) as Photo[];
+    setPhotos(list);
+    setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
     setLoading(false);
   };
 
