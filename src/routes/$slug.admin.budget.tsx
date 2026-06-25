@@ -201,12 +201,12 @@ function BudgetPage() {
     }
     const act = form.actual_cost.trim() === "" ? null : Number(form.actual_cost);
     if (act !== null && (Number.isNaN(act) || act < 0)) {
-      toast.error("Actual cost must be a positive number");
+      toast.error("Paid must be a positive number");
       return;
     }
     const paid = Number(form.paid_amount || 0);
     if (Number.isNaN(paid) || paid < 0) {
-      toast.error("Paid amount must be a positive number");
+      toast.error("Settled must be a positive number");
       return;
     }
     setSaving(true);
@@ -272,8 +272,8 @@ function BudgetPage() {
       {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <SummaryCard icon={Wallet} label="Total budget" value={formatCurrency(totals.estimated)} />
-        <SummaryCard icon={TrendingUp} label="Actual cost" value={formatCurrency(totals.actual)} />
-        <SummaryCard icon={CheckCircle2} label="Paid" value={formatCurrency(totals.paid)} tone="success" />
+        <SummaryCard icon={TrendingUp} label="Paid" value={formatCurrency(totals.actual)} />
+        <SummaryCard icon={CheckCircle2} label="Settled" value={formatCurrency(totals.paid)} tone="success" />
         <SummaryCard
           icon={PiggyBank}
           label="Remaining"
@@ -332,7 +332,7 @@ function BudgetPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="act">Actual (optional)</Label>
+                    <Label htmlFor="act">Paid (optional)</Label>
                     <Input
                       id="act"
                       type="number"
@@ -343,7 +343,7 @@ function BudgetPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="paid">Paid</Label>
+                    <Label htmlFor="paid">Settled</Label>
                     <Input
                       id="paid"
                       type="number"
@@ -481,7 +481,7 @@ function BudgetPage() {
                   <TableHead>Item</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead className="text-right">Estimated</TableHead>
-                  <TableHead className="text-right">Actual</TableHead>
+                  <TableHead className="text-right">Paid</TableHead>
                   <TableHead className="text-right">Remaining</TableHead>
                   <TableHead className="w-[60px]"></TableHead>
                 </TableRow>
@@ -605,8 +605,9 @@ function DetailView({
           </h3>
           <div className="rounded-xl border border-border divide-y divide-border">
             <Row label="Estimated" value={formatCurrency(est)} />
-            <Row label="Actual" value={act == null ? "—" : formatCurrency(act)} />
-            <Row label="Paid" value={formatCurrency(paid)} />
+            <Row label="Paid" value={act == null ? "—" : formatCurrency(act)} />
+            <Row label="Settled" value={formatCurrency(paid)} />
+
             <Row
               label="Remaining"
               value={formatCurrency(remaining)}
