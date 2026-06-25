@@ -5,6 +5,7 @@ import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { signPhotoUrls } from "@/lib/photoUrl";
 
 export const Route = createFileRoute("/$slug/gallery/me")({
   head: () => ({
@@ -22,10 +23,6 @@ interface Photo {
   caption: string | null;
   status: "pending" | "approved" | "hidden";
   created_at: string;
-}
-
-function publicUrl(path: string): string {
-  return supabase.storage.from("wedding-photos").getPublicUrl(path).data.publicUrl;
 }
 
 function MyPhotosPage() {
