@@ -6,7 +6,7 @@ import {
   Pencil,
   Trash2,
   Wallet,
-  TrendingUp,
+  
   PiggyBank,
   Briefcase,
   ListTodo,
@@ -156,10 +156,9 @@ function BudgetPage() {
   const totals = useMemo(() => {
     const list = items ?? [];
     const estimated = list.reduce((s, i) => s + Number(i.estimated_cost ?? 0), 0);
-    const actual = list.reduce((s, i) => s + Number(i.actual_cost ?? 0), 0);
     const paid = list.reduce((s, i) => s + Number(i.paid_amount ?? 0), 0);
-    const remaining = (actual || estimated) - paid;
-    return { estimated, actual, paid, remaining, count: list.length };
+    const remaining = estimated - paid;
+    return { estimated, paid, remaining, count: list.length };
   }, [items]);
 
   const openNew = () => {
@@ -270,10 +269,9 @@ function BudgetPage() {
   return (
     <div className="space-y-6">
       {/* Summary cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard icon={Wallet} label="Total budget" value={formatCurrency(totals.estimated)} />
-        <SummaryCard icon={TrendingUp} label="Paid" value={formatCurrency(totals.actual)} />
-        <SummaryCard icon={CheckCircle2} label="Settled" value={formatCurrency(totals.paid)} tone="success" />
+        <SummaryCard icon={CheckCircle2} label="Paid" value={formatCurrency(totals.paid)} tone="success" />
         <SummaryCard
           icon={PiggyBank}
           label="Remaining"
@@ -319,7 +317,7 @@ function BudgetPage() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="est">Estimated</Label>
                     <Input
@@ -332,18 +330,7 @@ function BudgetPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="act">Paid (optional)</Label>
-                    <Input
-                      id="act"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={form.actual_cost}
-                      onChange={(e) => setForm({ ...form, actual_cost: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="paid">Settled</Label>
+                    <Label htmlFor="paid">Paid</Label>
                     <Input
                       id="paid"
                       type="number"
@@ -489,10 +476,8 @@ function BudgetPage() {
               <TableBody>
                 {items.map((item) => {
                   const est = Number(item.estimated_cost ?? 0);
-                  const act = item.actual_cost == null ? null : Number(item.actual_cost);
                   const paid = Number(item.paid_amount ?? 0);
-                  const base = act ?? est;
-                  const remaining = base - paid;
+                  const remaining = est - paid;
                   const linkedTodos = todos.filter((t) => t.budget_item_id === item.id);
                   return (
                     <TableRow
@@ -522,8 +507,8 @@ function BudgetPage() {
                       <TableCell className="text-right tabular-nums">
                         {formatCurrency(est)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums text-muted-foreground">
-                        {act == null ? "—" : formatCurrency(act)}
+                      <TableCell className="text-right tabular-nums">
+                        {formatCurrency(paid)}
                       </TableCell>
                       <TableCell
                         className={`text-right tabular-nums ${
@@ -583,10 +568,8 @@ function DetailView({
   onDelete: () => void;
 }) {
   const est = Number(item.estimated_cost ?? 0);
-  const act = item.actual_cost == null ? null : Number(item.actual_cost);
   const paid = Number(item.paid_amount ?? 0);
-  const base = act ?? est;
-  const remaining = base - paid;
+  const remaining = est - paid;
 
   return (
     <>
@@ -605,8 +588,8 @@ function DetailView({
           </h3>
           <div className="rounded-xl border border-border divide-y divide-border">
             <Row label="Estimated" value={formatCurrency(est)} />
-            <Row label="Paid" value={act == null ? "—" : formatCurrency(act)} />
-            <Row label="Settled" value={formatCurrency(paid)} />
+            <Row label="Paid" value={formatCurrency(paid)} />
+
 
             <Row
               label="Remaining"
