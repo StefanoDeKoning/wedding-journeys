@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { signPhotoUrls } from "@/lib/photoUrl";
 import {
   Dialog,
   DialogContent,
@@ -48,14 +49,11 @@ interface Photo {
   size_bytes: number;
 }
 
-function publicUrl(path: string): string {
-  return supabase.storage.from("wedding-photos").getPublicUrl(path).data.publicUrl;
-}
-
 function GalleryPage() {
   const { slug } = Route.useParams();
   const { wedding, guest } = useWedding(slug);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
@@ -73,7 +71,9 @@ function GalleryPage() {
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    setPhotos((data ?? []) as Photo[]);
+    const list = (data ?? []) as Photo[];
+    setPhotos(list);
+    setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
     setLoading(false);
   };
 
@@ -311,6 +311,7 @@ function GalleryPage() {
             <PhotoTile
               key={p.id}
               photo={p}
+              url={urls[p.storage_path] ?? ""}
               isMine={!!(guest && p.guest_id === guest.id)}
               onDelete={() => remove(p.id, p.storage_path)}
             />
@@ -350,14 +351,15 @@ function GalleryPage() {
 
 function PhotoTile({
   photo,
+  url,
   isMine,
   onDelete,
 }: {
   photo: Photo;
+  url: string;
   isMine: boolean;
   onDelete: () => void;
 }) {
-  const url = publicUrl(photo.storage_path);
   return (
     <figure
       className={`group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-soft ${

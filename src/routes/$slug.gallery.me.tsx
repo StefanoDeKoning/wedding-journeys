@@ -5,6 +5,7 @@ import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { signPhotoUrls } from "@/lib/photoUrl";
 
 export const Route = createFileRoute("/$slug/gallery/me")({
   head: () => ({
@@ -24,14 +25,11 @@ interface Photo {
   created_at: string;
 }
 
-function publicUrl(path: string): string {
-  return supabase.storage.from("wedding-photos").getPublicUrl(path).data.publicUrl;
-}
-
 function MyPhotosPage() {
   const { slug } = Route.useParams();
   const { wedding, guest } = useWedding(slug);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -44,7 +42,9 @@ function MyPhotosPage() {
       .eq("guest_id", guest.id)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    setPhotos((data ?? []) as Photo[]);
+    const list = (data ?? []) as Photo[];
+    setPhotos(list);
+    setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
     setLoading(false);
   };
 
@@ -128,7 +128,7 @@ function MyPhotosPage() {
               className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-soft"
             >
               <img
-                src={publicUrl(p.storage_path)}
+                src={urls[p.storage_path] ?? ""}
                 alt={p.caption ?? "Your photo"}
                 loading="lazy"
                 className="w-full h-full object-cover"
