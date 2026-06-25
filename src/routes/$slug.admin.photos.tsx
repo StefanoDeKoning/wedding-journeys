@@ -142,7 +142,7 @@ function AdminPhotos() {
               }`}
             >
               <img
-                src={publicUrl(p.storage_path)}
+                src={urls[p.storage_path] ?? ""}
                 alt={p.caption ?? `By ${p.uploader_name}`}
                 loading="lazy"
                 className="w-full h-full object-cover"
