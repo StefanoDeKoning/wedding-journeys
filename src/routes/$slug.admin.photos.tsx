@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
+import { signPhotoUrls } from "@/lib/photoUrl";
 
 export const Route = createFileRoute("/$slug/admin/photos")({
   component: AdminPhotos,
@@ -19,10 +20,6 @@ interface Photo {
   status: "pending" | "approved" | "hidden";
   created_at: string;
   size_bytes: number;
-}
-
-function publicUrl(path: string): string {
-  return supabase.storage.from("wedding-photos").getPublicUrl(path).data.publicUrl;
 }
 
 function AdminPhotos() {
