@@ -311,6 +311,7 @@ function GalleryPage() {
             <PhotoTile
               key={p.id}
               photo={p}
+              url={urls[p.storage_path] ?? ""}
               isMine={!!(guest && p.guest_id === guest.id)}
               onDelete={() => remove(p.id, p.storage_path)}
             />
