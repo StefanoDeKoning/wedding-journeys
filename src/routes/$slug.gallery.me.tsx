@@ -42,7 +42,9 @@ function MyPhotosPage() {
       .eq("guest_id", guest.id)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    setPhotos((data ?? []) as Photo[]);
+    const list = (data ?? []) as Photo[];
+    setPhotos(list);
+    setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
     setLoading(false);
   };
 
