@@ -158,7 +158,7 @@ function BudgetPage() {
     const estimated = list.reduce((s, i) => s + Number(i.estimated_cost ?? 0), 0);
     const actual = list.reduce((s, i) => s + Number(i.actual_cost ?? 0), 0);
     const paid = list.reduce((s, i) => s + Number(i.paid_amount ?? 0), 0);
-    const remaining = (actual || estimated) - paid;
+    const remaining = estimated - paid;
     return { estimated, actual, paid, remaining, count: list.length };
   }, [items]);
 
@@ -270,10 +270,9 @@ function BudgetPage() {
   return (
     <div className="space-y-6">
       {/* Summary cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard icon={Wallet} label="Total budget" value={formatCurrency(totals.estimated)} />
-        <SummaryCard icon={TrendingUp} label="Paid" value={formatCurrency(totals.actual)} />
-        <SummaryCard icon={CheckCircle2} label="Settled" value={formatCurrency(totals.paid)} tone="success" />
+        <SummaryCard icon={CheckCircle2} label="Paid" value={formatCurrency(totals.paid)} tone="success" />
         <SummaryCard
           icon={PiggyBank}
           label="Remaining"
@@ -319,7 +318,7 @@ function BudgetPage() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="est">Estimated</Label>
                     <Input
@@ -332,18 +331,7 @@ function BudgetPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="act">Paid (optional)</Label>
-                    <Input
-                      id="act"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={form.actual_cost}
-                      onChange={(e) => setForm({ ...form, actual_cost: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="paid">Settled</Label>
+                    <Label htmlFor="paid">Paid</Label>
                     <Input
                       id="paid"
                       type="number"
