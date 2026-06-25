@@ -6,6 +6,7 @@ export const DIETARY_OPTIONS = [
   { value: "halal", label: "Halal" },
   { value: "kosher", label: "Kosher" },
   { value: "nut_allergy", label: "Nut allergy" },
+  { value: "fish_allergy", label: "Fish allergy" },
 ] as const;
 
 export type DietaryValue = (typeof DIETARY_OPTIONS)[number]["value"];
