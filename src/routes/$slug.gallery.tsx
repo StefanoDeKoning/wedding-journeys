@@ -53,6 +53,7 @@ function GalleryPage() {
   const { slug } = Route.useParams();
   const { wedding, guest } = useWedding(slug);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
@@ -70,7 +71,9 @@ function GalleryPage() {
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    setPhotos((data ?? []) as Photo[]);
+    const list = (data ?? []) as Photo[];
+    setPhotos(list);
+    setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
     setLoading(false);
   };
 
