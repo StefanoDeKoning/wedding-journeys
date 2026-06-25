@@ -128,7 +128,7 @@ function MyPhotosPage() {
               className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-soft"
             >
               <img
-                src={publicUrl(p.storage_path)}
+                src={urls[p.storage_path] ?? ""}
                 alt={p.caption ?? "Your photo"}
                 loading="lazy"
                 className="w-full h-full object-cover"
