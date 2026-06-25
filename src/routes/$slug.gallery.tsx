@@ -351,14 +351,15 @@ function GalleryPage() {
 
 function PhotoTile({
   photo,
+  url,
   isMine,
   onDelete,
 }: {
   photo: Photo;
+  url: string;
   isMine: boolean;
   onDelete: () => void;
 }) {
-  const url = publicUrl(photo.storage_path);
   return (
     <figure
       className={`group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-soft ${
