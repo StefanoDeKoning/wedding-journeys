@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { signPhotoUrls } from "@/lib/photoUrl";
 import {
   Dialog,
   DialogContent,
@@ -46,10 +47,6 @@ interface Photo {
   status: "pending" | "approved" | "hidden";
   created_at: string;
   size_bytes: number;
-}
-
-function publicUrl(path: string): string {
-  return supabase.storage.from("wedding-photos").getPublicUrl(path).data.publicUrl;
 }
 
 function GalleryPage() {
