@@ -6,7 +6,7 @@ import {
   Pencil,
   Trash2,
   Wallet,
-  TrendingUp,
+  
   PiggyBank,
   Briefcase,
   ListTodo,
@@ -156,10 +156,9 @@ function BudgetPage() {
   const totals = useMemo(() => {
     const list = items ?? [];
     const estimated = list.reduce((s, i) => s + Number(i.estimated_cost ?? 0), 0);
-    const actual = list.reduce((s, i) => s + Number(i.actual_cost ?? 0), 0);
     const paid = list.reduce((s, i) => s + Number(i.paid_amount ?? 0), 0);
     const remaining = estimated - paid;
-    return { estimated, actual, paid, remaining, count: list.length };
+    return { estimated, paid, remaining, count: list.length };
   }, [items]);
 
   const openNew = () => {
