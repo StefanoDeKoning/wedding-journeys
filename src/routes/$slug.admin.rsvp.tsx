@@ -894,30 +894,48 @@ function GuestDialog({
     setSaving(true);
     let savedId = guest?.id ?? null;
     if (isNew) {
-      const { data, error } = await supabase
-        .from("guests")
-        .insert({
-          wedding_id: weddingId,
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
-          email: email.trim() || null,
-          invitation_code: code.trim().toUpperCase(),
-          guest_type: guestType,
-          age_type: ageType,
-          guest_group_id: groupId,
-          notes: notes.trim() || null,
-          plus_one_allowed: plusOneAllowed,
-        })
-        .select("id")
-        .single();
-      if (error) {
+      // Retry on unique violation: invitation codes are globally unique so
+      // regenerate automatically if the chosen one is already taken.
+      let attemptCode = code.trim().toUpperCase();
+      let insertedId: string | null = null;
+      let lastError: { code?: string; message: string } | null = null;
+      for (let i = 0; i < 5; i++) {
+        const { data, error } = await supabase
+          .from("guests")
+          .insert({
+            wedding_id: weddingId,
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            email: email.trim() || null,
+            invitation_code: attemptCode,
+            guest_type: guestType,
+            age_type: ageType,
+            guest_group_id: groupId,
+            notes: notes.trim() || null,
+            plus_one_allowed: plusOneAllowed,
+          })
+          .select("id")
+          .single();
+        if (!error && data) {
+          insertedId = data.id;
+          break;
+        }
+        lastError = error;
+        if (error?.code === "23505") {
+          attemptCode = generateCode();
+          continue;
+        }
+        break;
+      }
+      if (!insertedId) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(lastError?.message ?? "Could not save guest.");
         return;
       }
-      savedId = data.id;
+      savedId = insertedId;
       void logAudit({
         weddingId,
+
         action: "guest.added",
         targetType: "guest",
         targetId: savedId,
