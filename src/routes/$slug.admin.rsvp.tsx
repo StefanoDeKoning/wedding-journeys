@@ -625,9 +625,18 @@ function AdminRsvpOverview() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="inline-flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => void copyInvitationLink(g.invitation_code)}
+                            title="Copy invitation link"
+                          >
+                            <LinkIcon className="w-3.5 h-3.5" />
+                          </Button>
                           <Button variant="ghost" size="sm" onClick={() => setEditing(g)}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
+
                           <Button
                             variant="ghost"
                             size="sm"
