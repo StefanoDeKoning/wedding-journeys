@@ -61,7 +61,10 @@ import {
 import { logAudit } from "@/wedding/audit";
 import { downloadCsv, toCsv } from "@/wedding/csv";
 import { dietaryLabel, DIETARY_OPTIONS, type DietaryValue } from "@/wedding/dietary";
+import { buildInvitationLink } from "@/wedding/invitationLink";
+import { Link as LinkIcon } from "lucide-react";
 import jsPDF from "jspdf";
+
 
 export const Route = createFileRoute("/$slug/admin/rsvp")({
   head: () => ({
