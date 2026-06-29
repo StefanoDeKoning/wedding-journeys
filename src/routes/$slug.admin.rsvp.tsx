@@ -285,6 +285,29 @@ function AdminRsvpOverview() {
     downloadCsv(`${wedding.slug}-guests.csv`, toCsv(buildExportRows()));
   };
 
+  const exportInvitationLinks = () => {
+    if (!wedding) return;
+    const rows = guests.map((g) => ({
+      first_name: g.first_name,
+      last_name: g.last_name,
+      invitation_code: g.invitation_code,
+      invitation_link: buildInvitationLink(wedding.slug, g.invitation_code),
+    }));
+    downloadCsv(`${wedding.slug}-invitation-links.csv`, toCsv(rows));
+  };
+
+  const copyInvitationLink = async (code: string) => {
+    if (!wedding) return;
+    const link = buildInvitationLink(wedding.slug, code);
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Invitation link copied.");
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
+
+
   const exportPdf = () => {
     if (!wedding) return;
     const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
