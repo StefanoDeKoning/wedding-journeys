@@ -27,6 +27,7 @@ import { Route as AdminPlatformIndexRouteImport } from './routes/admin.platform.
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
 import { Route as AdminPlatformTodoTemplatesRouteImport } from './routes/admin.platform.todo-templates'
 import { Route as AdminPlatformClaimRouteImport } from './routes/admin.platform.claim'
+import { Route as SlugInviteCodeRouteImport } from './routes/$slug.invite.$code'
 import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
 import { Route as SlugAdminTodoRouteImport } from './routes/$slug.admin.todo'
 import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
@@ -129,6 +130,11 @@ const AdminPlatformClaimRoute = AdminPlatformClaimRouteImport.update({
   path: '/claim',
   getParentRoute: () => AdminPlatformRoute,
 } as any)
+const SlugInviteCodeRoute = SlugInviteCodeRouteImport.update({
+  id: '/invite/$code',
+  path: '/invite/$code',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugGalleryMeRoute = SlugGalleryMeRouteImport.update({
   id: '/me',
   path: '/me',
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
+  '/$slug/invite/$code': typeof SlugInviteCodeRoute
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
@@ -232,6 +239,7 @@ export interface FileRoutesByTo {
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
+  '/$slug/invite/$code': typeof SlugInviteCodeRoute
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
   '/$slug/admin': typeof SlugAdminIndexRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
+  '/$slug/invite/$code': typeof SlugInviteCodeRoute
   '/admin/platform/claim': typeof AdminPlatformClaimRoute
   '/admin/platform/todo-templates': typeof AdminPlatformTodoTemplatesRoute
   '/$slug/admin/': typeof SlugAdminIndexRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
     | '/$slug/gallery/me'
+    | '/$slug/invite/$code'
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
     | '/$slug/admin/'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
     | '/$slug/gallery/me'
+    | '/$slug/invite/$code'
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
     | '/$slug/admin'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
     | '/$slug/gallery/me'
+    | '/$slug/invite/$code'
     | '/admin/platform/claim'
     | '/admin/platform/todo-templates'
     | '/$slug/admin/'
@@ -496,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPlatformClaimRouteImport
       parentRoute: typeof AdminPlatformRoute
     }
+    '/$slug/invite/$code': {
+      id: '/$slug/invite/$code'
+      path: '/invite/$code'
+      fullPath: '/$slug/invite/$code'
+      preLoaderRoute: typeof SlugInviteCodeRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/gallery/me': {
       id: '/$slug/gallery/me'
       path: '/me'
@@ -619,6 +638,7 @@ interface SlugRouteChildren {
   SlugRsvpRoute: typeof SlugRsvpRoute
   SlugTimelineRoute: typeof SlugTimelineRoute
   SlugIndexRoute: typeof SlugIndexRoute
+  SlugInviteCodeRoute: typeof SlugInviteCodeRoute
 }
 
 const SlugRouteChildren: SlugRouteChildren = {
@@ -629,6 +649,7 @@ const SlugRouteChildren: SlugRouteChildren = {
   SlugRsvpRoute: SlugRsvpRoute,
   SlugTimelineRoute: SlugTimelineRoute,
   SlugIndexRoute: SlugIndexRoute,
+  SlugInviteCodeRoute: SlugInviteCodeRoute,
 }
 
 const SlugRouteWithChildren = SlugRoute._addFileChildren(SlugRouteChildren)

@@ -61,7 +61,10 @@ import {
 import { logAudit } from "@/wedding/audit";
 import { downloadCsv, toCsv } from "@/wedding/csv";
 import { dietaryLabel, DIETARY_OPTIONS, type DietaryValue } from "@/wedding/dietary";
+import { buildInvitationLink } from "@/wedding/invitationLink";
+import { Link as LinkIcon } from "lucide-react";
 import jsPDF from "jspdf";
+
 
 export const Route = createFileRoute("/$slug/admin/rsvp")({
   head: () => ({
@@ -282,6 +285,29 @@ function AdminRsvpOverview() {
     downloadCsv(`${wedding.slug}-guests.csv`, toCsv(buildExportRows()));
   };
 
+  const exportInvitationLinks = () => {
+    if (!wedding) return;
+    const rows = guests.map((g) => ({
+      first_name: g.first_name,
+      last_name: g.last_name,
+      invitation_code: g.invitation_code,
+      invitation_link: buildInvitationLink(wedding.slug, g.invitation_code),
+    }));
+    downloadCsv(`${wedding.slug}-invitation-links.csv`, toCsv(rows));
+  };
+
+  const copyInvitationLink = async (code: string) => {
+    if (!wedding) return;
+    const link = buildInvitationLink(wedding.slug, code);
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Invitation link copied.");
+    } catch {
+      toast.error("Could not copy link.");
+    }
+  };
+
+
   const exportPdf = () => {
     if (!wedding) return;
     const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
@@ -472,6 +498,16 @@ function AdminRsvpOverview() {
                 <FileText className="w-3.5 h-3.5 mr-1.5" /> PDF
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={exportInvitationLinks}
+                className="rounded-full"
+                title="Download personal invitation links for every guest"
+              >
+                <LinkIcon className="w-3.5 h-3.5 mr-1.5" /> Invitation links
+              </Button>
+
+              <Button
                 size="sm"
                 onClick={() => setAdding(true)}
                 className="rounded-full bg-primary hover:bg-primary/90"
@@ -589,9 +625,18 @@ function AdminRsvpOverview() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="inline-flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => void copyInvitationLink(g.invitation_code)}
+                            title="Copy invitation link"
+                          >
+                            <LinkIcon className="w-3.5 h-3.5" />
+                          </Button>
                           <Button variant="ghost" size="sm" onClick={() => setEditing(g)}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
+
                           <Button
                             variant="ghost"
                             size="sm"
@@ -849,30 +894,48 @@ function GuestDialog({
     setSaving(true);
     let savedId = guest?.id ?? null;
     if (isNew) {
-      const { data, error } = await supabase
-        .from("guests")
-        .insert({
-          wedding_id: weddingId,
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
-          email: email.trim() || null,
-          invitation_code: code.trim().toUpperCase(),
-          guest_type: guestType,
-          age_type: ageType,
-          guest_group_id: groupId,
-          notes: notes.trim() || null,
-          plus_one_allowed: plusOneAllowed,
-        })
-        .select("id")
-        .single();
-      if (error) {
+      // Retry on unique violation: invitation codes are globally unique so
+      // regenerate automatically if the chosen one is already taken.
+      let attemptCode = code.trim().toUpperCase();
+      let insertedId: string | null = null;
+      let lastError: { code?: string; message: string } | null = null;
+      for (let i = 0; i < 5; i++) {
+        const { data, error } = await supabase
+          .from("guests")
+          .insert({
+            wedding_id: weddingId,
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            email: email.trim() || null,
+            invitation_code: attemptCode,
+            guest_type: guestType,
+            age_type: ageType,
+            guest_group_id: groupId,
+            notes: notes.trim() || null,
+            plus_one_allowed: plusOneAllowed,
+          })
+          .select("id")
+          .single();
+        if (!error && data) {
+          insertedId = data.id;
+          break;
+        }
+        lastError = error;
+        if (error?.code === "23505") {
+          attemptCode = generateCode();
+          continue;
+        }
+        break;
+      }
+      if (!insertedId) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(lastError?.message ?? "Could not save guest.");
         return;
       }
-      savedId = data.id;
+      savedId = insertedId;
       void logAudit({
         weddingId,
+
         action: "guest.added",
         targetType: "guest",
         targetId: savedId,
