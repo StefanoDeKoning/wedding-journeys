@@ -498,6 +498,16 @@ function AdminRsvpOverview() {
                 <FileText className="w-3.5 h-3.5 mr-1.5" /> PDF
               </Button>
               <Button
+                variant="outline"
+                size="sm"
+                onClick={exportInvitationLinks}
+                className="rounded-full"
+                title="Download personal invitation links for every guest"
+              >
+                <LinkIcon className="w-3.5 h-3.5 mr-1.5" /> Invitation links
+              </Button>
+
+              <Button
                 size="sm"
                 onClick={() => setAdding(true)}
                 className="rounded-full bg-primary hover:bg-primary/90"
