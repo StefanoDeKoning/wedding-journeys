@@ -179,7 +179,7 @@ function GuestLoginGate({
         <WatercolorBlot color="sage" size="2xl" className="absolute -bottom-32 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
         <WatercolorBlot color="peach" size="xl" className="absolute top-1/3 -left-12 opacity-35" style={{ animationDelay: "4s" }} />
         <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-20 right-0 opacity-95" />
-        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-20 left-0 opacity-90" />
+        <RoseCluster variant="side-left" size="lg" color="rose" className="absolute bottom-16 left-0 opacity-90" />
         <FloatingPetals count={12} />
       </div>
 
