@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
+import { WatercolorBlot, RoseCluster, FloatingPetals } from "@/wedding/FloralDecorations";
 
 export const Route = createFileRoute("/$slug")({
   head: ({ params }) => ({
