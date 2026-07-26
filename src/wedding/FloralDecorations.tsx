@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
+import type { CSSProperties } from "react";
 
 interface FloralDecorationProps {
   className?: string;
+  style?: CSSProperties;
   variant?: "corner-top-right" | "corner-bottom-left" | "side-left" | "side-right" | "corner-top-left" | "corner-bottom-right";
   color?: "rose" | "sage" | "gold" | "peach";
   opacity?: number;
@@ -24,13 +26,14 @@ const colorMap = {
 
 export function WatercolorBlot({
   className,
+  style,
   color = "rose",
   opacity = 0.35,
   size = "lg",
 }: Omit<FloralDecorationProps, "variant">) {
   const { w, h } = sizeMap[size];
   return (
-    <div className={cn("pointer-events-none", w, h, className)} aria-hidden>
+    <div className={cn("pointer-events-none", w, h, className)} style={style} aria-hidden>
       <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <path
           fill={colorMap[color]}
