@@ -5,7 +5,7 @@ import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryMeta } from "@/wedding/timelineCategories";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
-import { WatercolorBlot, RoseVine, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
+import { WatercolorBlot, RoseCluster, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
 
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
@@ -91,13 +91,13 @@ function TimelinePage() {
 
   return (
     <section className="relative mx-auto max-w-3xl px-6 py-16 sm:py-24">
-      {/* Decorative side elements */}
+      {/* Decorative side elements — climbing roses */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="peach" size="lg" className="absolute top-20 -right-16 opacity-40 rose-glow" />
-        <WatercolorBlot color="sage" size="lg" className="absolute bottom-40 -left-16 opacity-35 rose-glow" style={{ animationDelay: "2s" }} />
-        <RoseVine variant="side-right" size="md" color="rose" className="absolute top-40 -right-4 opacity-40" />
-        <RoseVine variant="side-left" size="md" color="rose" className="absolute bottom-60 -left-4 opacity-40" />
-        <FloatingPetals count={8} />
+        <WatercolorBlot color="peach" size="xl" className="absolute top-20 -right-20 opacity-45 rose-glow" />
+        <WatercolorBlot color="sage" size="xl" className="absolute bottom-40 -left-20 opacity-40 rose-glow" style={{ animationDelay: "2s" }} />
+        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-28 -right-4 opacity-85" />
+        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-44 -left-4 opacity-80" />
+        <FloatingPetals count={10} />
       </div>
 
       <header className="relative z-10 text-center mb-16">
