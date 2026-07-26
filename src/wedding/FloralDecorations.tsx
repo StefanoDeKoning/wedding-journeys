@@ -19,17 +19,17 @@ const sizeMap = {
 };
 
 const colorMap = {
-  rose: "#eeb7b7",
-  sage: "#d1e2d3",
-  gold: "#e8d5a8",
-  peach: "#f4c6a8",
+  rose: "#d49696",
+  sage: "#9bb79e",
+  gold: "#d4b97f",
+  peach: "#e0a884",
 };
 
 const deepColorMap = {
-  rose: "#d8a3a3",
-  sage: "#a8c0aa",
-  gold: "#d4c08c",
-  peach: "#e0b08c",
+  rose: "#b87878",
+  sage: "#7fa382",
+  gold: "#bfa06b",
+  peach: "#c98c64",
 };
 
 export function WatercolorBlot({
