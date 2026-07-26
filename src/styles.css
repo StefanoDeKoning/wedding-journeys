@@ -166,8 +166,11 @@
   .bg-gradient-warm { background: var(--gradient-warm); }
   .bg-gradient-sunset { background: var(--gradient-sunset); }
   .bg-gradient-soft { background: var(--gradient-soft); }
+  .bg-gradient-dream { background: var(--gradient-dream); }
+  .bg-gradient-gold { background: var(--gradient-gold); }
   .shadow-warm { box-shadow: var(--shadow-warm); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
 
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
@@ -190,6 +193,25 @@
       transparent
     );
   }
+
+  .card-romantic {
+    border-radius: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+  }
+
+  .section-inner-frame {
+    position: relative;
+  }
+  .section-inner-frame::before {
+    content: "";
+    position: absolute;
+    inset: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--terracotta) 12%, transparent);
+    border-radius: 1rem;
+    pointer-events: none;
+  }
 }
 
 @keyframes fade-up {
@@ -197,6 +219,31 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up { animation: fade-up 0.8s var(--transition-base) both; }
+
+/* Floral / romantic motion */
+@keyframes sparkle-float {
+  0%, 100% { opacity: 0.2; transform: translateY(0) scale(0.8); }
+  50% { opacity: 0.8; transform: translateY(-12px) scale(1.2); }
+}
+.sparkle-float { animation: sparkle-float 4s ease-in-out infinite; }
+
+@keyframes petal-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.35; }
+  50% { transform: translateY(-18px) rotate(12deg); opacity: 0.6; }
+}
+.petal-float { animation: petal-float 7s ease-in-out infinite; }
+
+@keyframes rose-glow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.04); }
+}
+.rose-glow { animation: rose-glow 6s ease-in-out infinite; }
+
+@keyframes gentle-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.gentle-breathe { animation: gentle-breathe 5s ease-in-out infinite; }
 
 /* ============ Wedding Invitation: Envelope, Wax Seal, Parchment ============ */
 
