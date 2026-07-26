@@ -37,6 +37,7 @@ import {
   HardDrive,
   History,
 } from "lucide-react";
+import { WatercolorBlot, RoseVine, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
 
 export const Route = createFileRoute("/features")({
   head: () => ({
@@ -174,75 +175,84 @@ const categories: Category[] = [
 function FeaturesPage() {
   return (
     <SiteShell>
-      <section className="mx-auto max-w-4xl px-6 pt-20 pb-12 text-center">
-        <p className="font-script text-3xl text-primary">tout ce qu'il faut</p>
-        <h1 className="mt-4 text-5xl md:text-6xl text-balance">Every detail, lovingly handled.</h1>
-        <p className="mt-6 text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
-          OurJourney is a complete wedding platform. One private home for everything from
-          invitations to the after-party playlist.
-        </p>
-      </section>
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <WatercolorBlot color="rose" size="xl" className="absolute -top-20 -right-20 opacity-30 rose-glow" />
+          <WatercolorBlot color="sage" size="xl" className="absolute top-1/3 -left-24 opacity-25 rose-glow" style={{ animationDelay: "2s" }} />
+          <FloatingPetals count={10} />
+        </div>
 
-      <section className="mx-auto max-w-7xl px-6 pb-24 space-y-16">
-        {categories.map((cat) => (
-          <div key={cat.title}>
-            <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
-              <div>
-                <h2 className="text-3xl md:text-4xl">{cat.title}</h2>
-                <p className="text-muted-foreground mt-1">{cat.tagline}</p>
+        <section className="relative z-10 mx-auto max-w-4xl px-6 pt-20 pb-16 text-center">
+          <p className="font-script text-3xl md:text-4xl text-primary">tout ce qu'il faut</p>
+          <h1 className="mt-4 text-5xl md:text-6xl text-balance">Every detail, lovingly handled.</h1>
+          <p className="mt-6 text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
+            OurJourney is a complete wedding platform. One private home for everything from
+            invitations to the after-party playlist.
+          </p>
+        </section>
+
+        <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 space-y-20">
+          {categories.map((cat, idx) => (
+            <div key={cat.title}>
+              <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{String(idx + 1).padStart(2, "0")}</p>
+                  <h2 className="text-3xl md:text-4xl">{cat.title}</h2>
+                  <p className="text-muted-foreground mt-1">{cat.tagline}</p>
+                </div>
+                <div className="h-px flex-1 bg-border hidden md:block" />
               </div>
-              <div className="h-px flex-1 bg-border hidden md:block" />
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {cat.items.map((f) => (
-                <article
-                  key={f.t}
-                  className="rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-soft transition-all"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="h-11 w-11 rounded-full bg-gradient-warm text-primary-foreground flex items-center justify-center shadow-warm">
-                      <f.icon className="w-5 h-5" />
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {cat.items.map((f) => (
+                  <article
+                    key={f.t}
+                    className="card-romantic p-6 hover:border-primary/40 hover:shadow-soft hover:-translate-y-1 transition-all duration-500"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="h-11 w-11 rounded-full bg-gradient-warm text-primary-foreground flex items-center justify-center shadow-warm">
+                        <f.icon className="w-5 h-5" />
+                      </div>
+                      {f.soon && (
+                        <span className="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full bg-primary/10 text-primary">
+                          Coming soon
+                        </span>
+                      )}
                     </div>
-                    {f.soon && (
-                      <span className="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full bg-primary/10 text-primary">
-                        Coming soon
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-lg">{f.t}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{f.d}</p>
-                </article>
+                    <h3 className="text-lg">{f.t}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{f.d}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <section className="relative z-10 mx-auto max-w-5xl px-6 pb-28">
+          <div className="card-romantic p-10 md:p-14 bg-gradient-dream text-center">
+            <p className="font-script text-2xl text-primary">three roles, perfectly cast</p>
+            <h2 className="mt-3 text-3xl md:text-4xl">Built for couples and their people.</h2>
+            <div className="grid md:grid-cols-3 gap-6 mt-10 text-left">
+              {[
+                { t: "Platform Owner", d: "Oversees the platform — onboarding, billing, support." },
+                { t: "Primary Admin", d: "The couple. Full control over their wedding." },
+                { t: "Secondary Admin", d: "A trusted helper — planner, sibling, maid of honor." },
+              ].map((r) => (
+                <div key={r.t} className="card-romantic p-6">
+                  <h3 className="text-lg">{r.t}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{r.d}</p>
+                </div>
               ))}
             </div>
+            <p className="text-sm text-muted-foreground mt-8">
+              Guests don't need an account — they sign in with their name and invitation code, or open
+              their personal link.
+            </p>
+            <Button asChild size="lg" className="mt-8 rounded-full bg-primary hover:bg-primary/90 px-8">
+              <Link to="/create">Create your wedding</Link>
+            </Button>
           </div>
-        ))}
-      </section>
-
-      <section className="mx-auto max-w-5xl px-6 pb-28">
-        <div className="rounded-[2rem] border border-border bg-gradient-soft p-10 md:p-14 text-center">
-          <p className="font-script text-2xl text-primary">three roles, perfectly cast</p>
-          <h2 className="mt-3 text-3xl md:text-4xl">Built for couples and their people.</h2>
-          <div className="grid md:grid-cols-3 gap-6 mt-10 text-left">
-            {[
-              { t: "Platform Owner", d: "Oversees the platform — onboarding, billing, support." },
-              { t: "Primary Admin", d: "The couple. Full control over their wedding." },
-              { t: "Secondary Admin", d: "A trusted helper — planner, sibling, maid of honor." },
-            ].map((r) => (
-              <div key={r.t} className="rounded-xl bg-card border border-border p-6">
-                <h3 className="text-lg">{r.t}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{r.d}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground mt-8">
-            Guests don't need an account — they sign in with their name and invitation code, or open
-            their personal link.
-          </p>
-          <Button asChild size="lg" className="mt-8 rounded-full bg-primary hover:bg-primary/90 px-8">
-            <Link to="/create">Create your wedding</Link>
-          </Button>
-        </div>
-      </section>
+        </section>
+      </div>
     </SiteShell>
   );
 }

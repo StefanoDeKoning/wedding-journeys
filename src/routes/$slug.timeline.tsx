@@ -5,6 +5,7 @@ import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { categoryMeta } from "@/wedding/timelineCategories";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
+import { WatercolorBlot, RoseCluster, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
 
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
@@ -89,12 +90,22 @@ function TimelinePage() {
   if (!wedding) return null;
 
   return (
-    <section className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <header className="text-center mb-12">
-        <p className="font-script text-3xl text-primary">how the day unfolds</p>
-        <h1 className="mt-2 font-display text-4xl">Wedding timeline</h1>
+    <section className="relative mx-auto max-w-3xl px-6 py-16 sm:py-24">
+      {/* Decorative side elements — climbing roses */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+        <WatercolorBlot color="peach" size="xl" className="absolute top-20 right-0 opacity-60 rose-glow" />
+        <WatercolorBlot color="sage" size="xl" className="absolute bottom-40 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
+        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-28 right-0 opacity-95" />
+        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-44 left-0 opacity-90" />
+        <FloatingPetals count={10} />
+      </div>
+
+      <header className="relative z-10 text-center mb-16">
+        <p className="font-script text-3xl md:text-4xl text-primary">how the day unfolds</p>
+        <h1 className="mt-3 font-display text-4xl md:text-5xl">Wedding timeline</h1>
+        <FloralDivider className="mt-6" color="terracotta" />
         {isEvening && (
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-4 text-sm text-muted-foreground">
             You're invited from the evening onwards — but you're welcome to arrive a little earlier.
           </p>
         )}
@@ -109,51 +120,61 @@ function TimelinePage() {
           The schedule is being prepared. Check back soon.
         </div>
       ) : (
-        <ol className="relative border-l-2 border-primary/20 ml-3 sm:ml-5 space-y-8">
-          {visibleEvents.map((e, i) => {
-            const isNext = i === nextIdx;
-            const meta = categoryMeta(e.category);
-            const Icon = meta.Icon;
-            return (
-              <li key={e.id} className="pl-8 sm:pl-10">
-                <span
-                  className={`absolute -left-[16px] flex items-center justify-center w-8 h-8 rounded-full shadow-warm ${meta.accent} ${
-                    isNext ? "ring-4 ring-primary/30 animate-pulse" : ""
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                </span>
-                <div
-                  className={`rounded-2xl border p-5 transition-shadow ${
-                    isNext
-                      ? "border-primary/40 bg-primary/5 shadow-warm"
-                      : "border-border bg-card/70"
-                  }`}
-                >
-                  <div className="flex items-baseline gap-3 flex-wrap">
-                    <span className="font-display text-xl text-primary tabular-nums">
-                      {e.event_time.slice(0, 5)}
-                    </span>
-                    <h3 className="font-display text-lg">{e.title}</h3>
-                    {isNext && (
-                      <span className="text-[0.65rem] uppercase tracking-widest text-primary px-2 py-0.5 rounded-full bg-primary/10">
-                        Up next
+        <div className="relative z-10">
+          {/* Decorative timeline spine */}
+          <div className="absolute left-3 sm:left-5 top-0 bottom-0 w-0.5 rounded-full">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-sage/20 to-transparent w-full blur-[1px]" />
+          </div>
+
+          <ol className="relative space-y-10">
+            {visibleEvents.map((e, i) => {
+              const isNext = i === nextIdx;
+              const meta = categoryMeta(e.category);
+              const Icon = meta.Icon;
+              return (
+                <li key={e.id} className="pl-10 sm:pl-14">
+                  <span
+                    className={`absolute -left-[11px] sm:-left-[9px] flex items-center justify-center w-9 h-9 rounded-full shadow-warm border-2 border-background transition-transform duration-500 hover:scale-110 ${meta.accent} ${
+                      isNext ? "ring-4 ring-primary/20 animate-pulse" : ""
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </span>
+                  <div
+                    className={`card-romantic p-6 transition-all duration-500 hover:-translate-y-1 ${
+                      isNext
+                        ? "border-primary/40 bg-gradient-to-br from-primary/5 to-transparent shadow-warm"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-baseline gap-3 flex-wrap">
+                      <span className="font-display text-xl text-primary tabular-nums">
+                        {e.event_time.slice(0, 5)}
                       </span>
+                      <h3 className="font-display text-lg">{e.title}</h3>
+                      {isNext && (
+                        <span className="text-[0.65rem] uppercase tracking-widest text-primary px-2.5 py-0.5 rounded-full bg-primary/10">
+                          Up next
+                        </span>
+                      )}
+                    </div>
+                    {e.description && (
+                      <p className="mt-2 text-sm text-muted-foreground">{e.description}</p>
+                    )}
+                    {e.location && (
+                      <p className="mt-3 text-xs text-muted-foreground inline-flex items-center gap-1">
+                        <MapPin className="w-3 h-3" /> {e.location}
+                      </p>
                     )}
                   </div>
-                  {e.description && (
-                    <p className="mt-1.5 text-sm text-muted-foreground">{e.description}</p>
-                  )}
-                  {e.location && (
-                    <p className="mt-2 text-xs text-muted-foreground inline-flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> {e.location}
-                    </p>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+                </li>
+              );
+            })}
+          </ol>
+
+          <FloralDivider className="mt-16" color="terracotta" />
+        </div>
       )}
     </section>
   );
