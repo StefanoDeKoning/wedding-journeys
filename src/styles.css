@@ -6,8 +6,8 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * OurJourney — Romantic Autumn design system
- * Dusty Rose, Warm Terracotta, Soft Gold, Cream, Deep Brown
+ * OurJourney — Dreamy Watercolor Wedding Aesthetic
+ * Soft blush, warm peach, dusty rose, sage, muted gold, cream
  */
 
 @theme inline {
@@ -45,6 +45,11 @@
   --color-gold: var(--gold);
   --color-cream: var(--cream);
   --color-ink: var(--ink);
+  --color-blush: var(--blush);
+  --color-peach: var(--peach);
+  --color-sage: var(--sage);
+  --color-dusty-rose: var(--dusty-rose);
+  --color-warm-cream: var(--warm-cream);
 
   --font-display: "Playfair Display", serif;
   --font-body: "Lora", serif;
@@ -52,42 +57,50 @@
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 0.75rem;
 
-  /* Brand — Romantic Autumn */
+  /* Brand — Dreamy Watercolor */
+  --blush: oklch(0.92 0.04 25);         /* #F6E8E8 soft blush */
+  --peach: oklch(0.89 0.05 55);         /* #F4DCCB warm peach */
+  --dusty-rose: oklch(0.72 0.06 25);    /* #D6A6A6 dusty rose */
   --rose: oklch(0.69 0.07 25);          /* #C78C8C dusty rose */
-  --terracotta: oklch(0.65 0.11 40);    /* #C97A5A warm terracotta */
-  --gold: oklch(0.78 0.08 80);          /* #D4B483 soft gold */
-  --cream: oklch(0.96 0.012 75);        /* #F7F2EC cream */
-  --ink: oklch(0.28 0.025 50);          /* #3A2E2A deep brown */
+  --terracotta: oklch(0.65 0.10 40);    /* #C97A5A warm terracotta */
+  --gold: oklch(0.80 0.07 80);          /* #DCC49A muted gold */
+  --sage: oklch(0.82 0.04 140);         /* #C9D4C3 soft sage */
+  --warm-cream: oklch(0.96 0.012 80);   /* #FAF5F0 warm cream */
+  --cream: oklch(0.97 0.01 75);         /* #FCF8F5 cream */
+  --ink: oklch(0.32 0.025 50);          /* #4A3D3A warm brown */
 
   /* Semantic */
-  --background: var(--cream);
+  --background: var(--warm-cream);
   --foreground: var(--ink);
-  --card: oklch(0.985 0.008 75);
+  --card: oklch(0.985 0.008 80);
   --card-foreground: var(--ink);
-  --popover: oklch(0.985 0.008 75);
+  --popover: oklch(0.985 0.008 80);
   --popover-foreground: var(--ink);
   --primary: var(--terracotta);
   --primary-foreground: oklch(0.98 0.01 75);
-  --secondary: var(--rose);
+  --secondary: var(--dusty-rose);
   --secondary-foreground: oklch(0.98 0.01 75);
-  --muted: oklch(0.93 0.012 60);
-  --muted-foreground: oklch(0.45 0.025 50);
+  --muted: oklch(0.93 0.012 70);
+  --muted-foreground: oklch(0.48 0.025 50);
   --accent: var(--gold);
   --accent-foreground: var(--ink);
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: oklch(0.98 0.01 75);
-  --border: oklch(0.88 0.018 60);
-  --input: oklch(0.9 0.015 60);
+  --border: oklch(0.90 0.016 70);
+  --input: oklch(0.92 0.015 70);
   --ring: var(--terracotta);
 
   /* Gradients & shadows */
-  --gradient-warm: linear-gradient(135deg, var(--terracotta), var(--rose));
-  --gradient-sunset: linear-gradient(180deg, color-mix(in oklab, var(--gold) 20%, var(--cream)), var(--cream));
-  --gradient-soft: linear-gradient(180deg, color-mix(in oklab, var(--rose) 10%, var(--cream)), var(--cream));
-  --shadow-warm: 0 20px 50px -20px color-mix(in oklab, var(--terracotta) 35%, transparent);
-  --shadow-soft: 0 10px 30px -15px color-mix(in oklab, var(--ink) 20%, transparent);
+  --gradient-warm: linear-gradient(135deg, var(--terracotta) 0%, var(--dusty-rose) 100%);
+  --gradient-sunset: linear-gradient(180deg, color-mix(in oklab, var(--peach) 60%, var(--cream)) 0%, var(--cream) 100%);
+  --gradient-soft: linear-gradient(180deg, color-mix(in oklab, var(--blush) 70%, var(--cream)) 0%, var(--cream) 100%);
+  --gradient-dream: linear-gradient(135deg, var(--blush) 0%, var(--peach) 50%, var(--cream) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--gold) 0%, color-mix(in oklab, var(--gold) 60%, var(--peach)) 100%);
+  --shadow-warm: 0 20px 50px -20px color-mix(in oklab, var(--terracotta) 28%, transparent);
+  --shadow-soft: 0 10px 30px -15px color-mix(in oklab, var(--ink) 15%, transparent);
+  --shadow-card: 0 12px 40px -18px color-mix(in oklab, var(--ink) 12%, transparent);
 
   --transition-base: cubic-bezier(0.22, 1, 0.36, 1);
 }
