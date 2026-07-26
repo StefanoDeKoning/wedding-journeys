@@ -93,10 +93,10 @@ function TimelinePage() {
     <section className="relative mx-auto max-w-3xl px-6 py-16 sm:py-24">
       {/* Decorative side elements — climbing roses */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="peach" size="xl" className="absolute top-20 -right-20 opacity-45 rose-glow" />
-        <WatercolorBlot color="sage" size="xl" className="absolute bottom-40 -left-20 opacity-40 rose-glow" style={{ animationDelay: "2s" }} />
-        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-28 -right-4 opacity-85" />
-        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-44 -left-4 opacity-80" />
+        <WatercolorBlot color="peach" size="xl" className="absolute top-20 right-0 opacity-60 rose-glow" />
+        <WatercolorBlot color="sage" size="xl" className="absolute bottom-40 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
+        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-28 right-0 opacity-95" />
+        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-44 left-0 opacity-90" />
         <FloatingPetals count={10} />
       </div>
 

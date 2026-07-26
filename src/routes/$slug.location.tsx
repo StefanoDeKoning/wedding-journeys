@@ -30,10 +30,10 @@ function LocationPage() {
     <section className="relative mx-auto max-w-4xl px-6 py-16 sm:py-24">
       {/* Decorative side elements — climbing roses */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="rose" size="xl" className="absolute top-12 -right-20 opacity-45 rose-glow" />
-        <WatercolorBlot color="sage" size="xl" className="absolute bottom-12 -left-20 opacity-40 rose-glow" style={{ animationDelay: "2s" }} />
-        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-16 -right-4 opacity-85" />
-        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-16 -left-4 opacity-80" />
+        <WatercolorBlot color="rose" size="xl" className="absolute top-12 right-0 opacity-60 rose-glow" />
+        <WatercolorBlot color="sage" size="xl" className="absolute bottom-12 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
+        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-16 right-0 opacity-95" />
+        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-16 left-0 opacity-90" />
         <FloatingPetals count={10} />
       </div>
 

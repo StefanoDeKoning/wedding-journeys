@@ -175,11 +175,11 @@ function GuestLoginGate({
     <section className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center px-6 py-12 sm:py-16 overflow-hidden">
       {/* Dreamy side florals framing the gate */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="rose" size="2xl" className="absolute -top-20 -right-24 opacity-40 rose-glow" />
-        <WatercolorBlot color="sage" size="2xl" className="absolute -bottom-32 -left-24 opacity-35 rose-glow" style={{ animationDelay: "2s" }} />
-        <WatercolorBlot color="peach" size="xl" className="absolute top-1/3 -left-20 opacity-25" style={{ animationDelay: "4s" }} />
-        <RoseCluster variant="side-right" size="xl" color="rose" className="absolute top-24 -right-6 opacity-80" />
-        <RoseCluster variant="side-left" size="xl" color="sage" className="absolute bottom-24 -left-6 opacity-75" />
+        <WatercolorBlot color="rose" size="2xl" className="absolute -top-20 right-0 opacity-60 rose-glow" />
+        <WatercolorBlot color="sage" size="2xl" className="absolute -bottom-32 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
+        <WatercolorBlot color="peach" size="xl" className="absolute top-1/3 -left-12 opacity-35" style={{ animationDelay: "4s" }} />
+        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-20 right-0 opacity-95" />
+        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-20 left-0 opacity-90" />
         <FloatingPetals count={12} />
       </div>
 
