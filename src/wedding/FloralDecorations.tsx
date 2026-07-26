@@ -7,7 +7,7 @@ interface FloralDecorationProps {
   variant?: "corner-top-right" | "corner-bottom-left" | "side-left" | "side-right" | "corner-top-left" | "corner-bottom-right";
   color?: "rose" | "sage" | "gold" | "peach";
   opacity?: number;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
 }
 
 const sizeMap = {
@@ -15,6 +15,7 @@ const sizeMap = {
   md: { w: "w-48", h: "h-48" },
   lg: { w: "w-64", h: "h-64" },
   xl: { w: "w-80", h: "h-80" },
+  "2xl": { w: "w-[28rem]", h: "h-[28rem]" },
 };
 
 const colorMap = {
@@ -22,6 +23,13 @@ const colorMap = {
   sage: "#d1e2d3",
   gold: "#e8d5a8",
   peach: "#f4c6a8",
+};
+
+const deepColorMap = {
+  rose: "#d8a3a3",
+  sage: "#a8c0aa",
+  gold: "#d4c08c",
+  peach: "#e0b08c",
 };
 
 export function WatercolorBlot({
@@ -76,7 +84,6 @@ export function RoseVine({
             <stop offset="100%" stopColor={color === "sage" ? "#8fa392" : color === "rose" ? "#c58a91" : "#bfa06b"} />
           </linearGradient>
         </defs>
-        {/* Curved vine path */}
         <path
           d="M20,180 C60,140 80,120 120,100 C150,86 180,60 190,20"
           fill="none"
@@ -93,18 +100,119 @@ export function RoseVine({
           strokeOpacity={opacity * 0.7}
           strokeLinecap="round"
         />
-        {/* Rose buds */}
         <circle cx="120" cy="100" r="10" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity} />
         <circle cx="118" cy="98" r="6" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity * 0.6} />
         <circle cx="190" cy="20" r="14" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity} />
         <circle cx="186" cy="16" r="8" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity * 0.6} />
-        {/* Leaves */}
         <ellipse cx="90" cy="125" rx="8" ry="4" fill="#a8bba9" fillOpacity={opacity * 0.8} transform="rotate(-30 90 125)" />
         <ellipse cx="155" cy="65" rx="9" ry="5" fill="#a8bba9" fillOpacity={opacity * 0.8} transform="rotate(20 155 65)" />
         <ellipse cx="60" cy="150" rx="7" ry="4" fill="#a8bba9" fillOpacity={opacity * 0.7} transform="rotate(-45 60 150)" />
-        {/* Small accent dots */}
         <circle cx="80" cy="110" r="2" fill={colorMap[color]} fillOpacity={opacity} />
         <circle cx="140" cy="80" r="2" fill={colorMap[color]} fillOpacity={opacity} />
+      </svg>
+    </div>
+  );
+}
+
+/**
+ * Dense, upright rose cluster for framing the sides of a page.
+ * Looks like a small watercolor bouquet climbing from the bottom edge.
+ */
+export function RoseCluster({
+  className,
+  variant = "side-right",
+  color = "rose",
+  opacity = 0.75,
+  size = "lg",
+}: FloralDecorationProps) {
+  const { w, h } = sizeMap[size];
+  const flip = variant === "side-left" || variant === "corner-bottom-left";
+  const baseColor = colorMap[color];
+  const deepColor = deepColorMap[color];
+  const leafColor = color === "sage" ? "#9ab69d" : "#a8bba9";
+
+  return (
+    <div
+      className={cn("pointer-events-none", w, h, className)}
+      aria-hidden
+      style={{ transform: flip ? "scaleX(-1)" : undefined }}
+    >
+      <svg viewBox="0 0 200 300" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="roseGradient" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stopColor={baseColor} />
+            <stop offset="100%" stopColor={deepColor} />
+          </radialGradient>
+        </defs>
+        {/* Main vine curve */}
+        <path
+          d="M120,300 C100,240 160,210 130,150 C100,90 40,100 60,40"
+          fill="none"
+          stroke={leafColor}
+          strokeWidth="2.5"
+          strokeOpacity={opacity * 0.8}
+          strokeLinecap="round"
+        />
+        {/* Secondary vine */}
+        <path
+          d="M140,300 C170,250 120,200 150,160 C180,120 220,130 200,80"
+          fill="none"
+          stroke={leafColor}
+          strokeWidth="1.6"
+          strokeOpacity={opacity * 0.55}
+          strokeLinecap="round"
+        />
+
+        {/* Rose 1 (large, lower) */}
+        <g transform="translate(90, 210) rotate(-15)">
+          <circle r="26" fill="url(#roseGradient)" fillOpacity={opacity} />
+          <circle cx="-5" cy="-4" r="18" fill={baseColor} fillOpacity={opacity * 0.85} />
+          <circle cx="4" cy="5" r="12" fill={deepColor} fillOpacity={opacity * 0.7} />
+          <path
+            d="M-8,-8 C-2,-14 8,-14 14,-8 C8,-2 -2,-2 -8,-8"
+            fill="none"
+            stroke={deepColor}
+            strokeWidth="1.5"
+            strokeOpacity={opacity}
+          />
+        </g>
+
+        {/* Rose 2 (mid) */}
+        <g transform="translate(130, 130) rotate(25)">
+          <circle r="20" fill="url(#roseGradient)" fillOpacity={opacity} />
+          <circle cx="-4" cy="-3" r="14" fill={baseColor} fillOpacity={opacity * 0.85} />
+          <circle cx="3" cy="4" r="9" fill={deepColor} fillOpacity={opacity * 0.7} />
+        </g>
+
+        {/* Rose 3 (top) */}
+        <g transform="translate(55, 50) rotate(-10)">
+          <circle r="16" fill="url(#roseGradient)" fillOpacity={opacity} />
+          <circle cx="-3" cy="-2" r="11" fill={baseColor} fillOpacity={opacity * 0.85} />
+          <circle cx="2" cy="3" r="7" fill={deepColor} fillOpacity={opacity * 0.7} />
+        </g>
+
+        {/* Rose 4 (secondary vine, top right) */}
+        <g transform="translate(185, 85) rotate(10)">
+          <circle r="14" fill="url(#roseGradient)" fillOpacity={opacity * 0.85} />
+          <circle cx="-2" cy="-2" r="10" fill={baseColor} fillOpacity={opacity * 0.7} />
+          <circle cx="2" cy="2" r="6" fill={deepColor} fillOpacity={opacity * 0.6} />
+        </g>
+
+        {/* Leaves */}
+        <ellipse cx="105" cy="175" rx="14" ry="7" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(-30 105 175)" />
+        <ellipse cx="155" cy="100" rx="12" ry="6" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(20 155 100)" />
+        <ellipse cx="70" cy="120" rx="11" ry="5" fill={leafColor} fillOpacity={opacity * 0.6} transform="rotate(-40 70 120)" />
+        <ellipse cx="45" cy="80" rx="9" ry="5" fill={leafColor} fillOpacity={opacity * 0.6} transform="rotate(-10 45 80)" />
+        <ellipse cx="140" cy="240" rx="12" ry="6" fill={leafColor} fillOpacity={opacity * 0.65} transform="rotate(30 140 240)" />
+
+        {/* Small buds */}
+        <circle cx="160" cy="210" r="5" fill={deepColor} fillOpacity={opacity * 0.8} />
+        <circle cx="80" cy="160" r="4" fill={deepColor} fillOpacity={opacity * 0.8} />
+        <circle cx="115" cy="80" r="4" fill={deepColor} fillOpacity={opacity * 0.8} />
+
+        {/* Soft watercolor backing */}
+        <circle cx="120" cy="180" r="70" fill={baseColor} fillOpacity={0.12} filter="blur(16px)" />
+        <circle cx="180" cy="120" r="50" fill={baseColor} fillOpacity={0.08} filter="blur(14px)" />
       </svg>
     </div>
   );
