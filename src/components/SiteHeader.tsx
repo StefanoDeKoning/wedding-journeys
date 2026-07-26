@@ -15,7 +15,7 @@ export function SiteHeader() {
   const { isPlatformOwner } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-background/75 border-b border-border/60">
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 h-20 flex items-center justify-between">
         <Logo />
         <nav className="hidden md:flex items-center gap-8">
@@ -52,4 +52,3 @@ export function SiteHeader() {
     </header>
   );
 }
-
