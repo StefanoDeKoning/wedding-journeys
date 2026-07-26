@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { WaxSeal } from "./WaxSeal";
 import { renderInvitationText } from "./invitationTemplate";
+import { WatercolorBlot, FloralDivider } from "./FloralDecorations";
 
 interface EnvelopeLetterProps {
   recipientFirstName: string;
@@ -11,7 +12,8 @@ interface EnvelopeLetterProps {
 
 /**
  * Click-to-open envelope. The wax seal cracks, the flap opens upwards,
- * and a parchment letter slides out and unfolds.
+ * and a parchment letter slides out and unfolds — all wrapped in a
+ * dreamy, romantic presentation with watercolor florals.
  */
 export function EnvelopeLetter({
   recipientFirstName,
@@ -28,6 +30,14 @@ export function EnvelopeLetter({
 
   return (
     <div className="relative w-full">
+      {/* Decorative corner florals around the envelope area */}
+      {!opened && (
+        <>
+          <WatercolorBlot color="rose" size="md" className="absolute -top-8 -left-8 opacity-30 rose-glow" />
+          <WatercolorBlot color="sage" size="md" className="absolute -bottom-8 -right-8 opacity-25 rose-glow" style={{ animationDelay: "2s" }} />
+        </>
+      )}
+
       {!opened && (
         <div className="flex flex-col items-center gap-6">
           <p className="font-script text-2xl md:text-3xl text-primary text-center">
@@ -41,9 +51,9 @@ export function EnvelopeLetter({
             className="group relative focus:outline-none"
           >
             {/* Envelope */}
-            <div className="envelope-float relative" style={{ perspective: "1200px" }}>
+            <div className="envelope-float relative gentle-breathe" style={{ perspective: "1200px" }}>
               <div
-                className="envelope-paper relative rounded-md overflow-hidden"
+                className="envelope-paper relative rounded-lg overflow-hidden"
                 style={{
                   width: "min(420px, 84vw)",
                   height: "min(280px, 56vw)",
@@ -108,6 +118,10 @@ export function EnvelopeLetter({
               transform: "rotate(-0.4deg)",
             }}
           >
+            {/* Internal decorative blots */}
+            <WatercolorBlot color="rose" size="sm" className="absolute -top-4 -right-4 opacity-20" />
+            <WatercolorBlot color="sage" size="sm" className="absolute -bottom-4 -left-4 opacity-20" />
+
             <header className="text-center mb-8">
               <p className="font-parchment-script text-3xl md:text-4xl">an invitation</p>
               <div className="mt-3 inline-block border-t border-b border-current/30 px-6 py-1">
@@ -125,6 +139,10 @@ export function EnvelopeLetter({
               <p className="font-parchment-script text-3xl md:text-4xl mt-2">
                 {coupleSignature}
               </p>
+            </div>
+
+            <div className="mt-8">
+              <FloralDivider color="terracotta" />
             </div>
 
             {/* Tiny re-seal */}
