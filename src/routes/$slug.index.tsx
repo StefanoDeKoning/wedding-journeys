@@ -6,7 +6,7 @@ import { Countdown } from "@/wedding/Countdown";
 import { WishlistSection } from "@/wedding/WishlistSection";
 import { Button } from "@/components/ui/button";
 import { safeHttpUrl } from "@/lib/safeUrl";
-import { WatercolorBlot, RoseVine, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
+import { WatercolorBlot, RoseCluster, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
