@@ -122,7 +122,7 @@ export function RoseCluster({
   className,
   variant = "side-right",
   color = "rose",
-  opacity = 0.75,
+  opacity = 0.9,
   size = "lg",
 }: FloralDecorationProps) {
   const { w, h } = sizeMap[size];
