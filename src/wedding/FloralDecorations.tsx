@@ -131,22 +131,26 @@ export function RoseCluster({
   const deepColor = deepColorMap[color];
   const leafColor = color === "sage" ? "#9ab69d" : "#a8bba9";
 
+  const roseGradientId = `roseGradient-${color}-${flip ? "flip" : "noflip"}`;
+
   return (
     <div
       className={cn("pointer-events-none", w, h, className)}
       aria-hidden
       style={{ transform: flip ? "scaleX(-1)" : undefined }}
     >
-      <svg viewBox="0 0 200 300" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 220 320" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <radialGradient id="roseGradient" cx="30%" cy="30%" r="70%">
+          <radialGradient id={roseGradientId} cx="35%" cy="35%" r="65%">
             <stop offset="0%" stopColor={baseColor} />
-            <stop offset="100%" stopColor={deepColor} />
+            <stop offset="60%" stopColor={deepColor} />
+            <stop offset="100%" stopColor={deepColor} stopOpacity={0.85} />
           </radialGradient>
         </defs>
+
         {/* Main vine curve */}
         <path
-          d="M120,300 C100,240 160,210 130,150 C100,90 40,100 60,40"
+          d="M130,320 C110,260 170,230 140,170 C110,110 50,120 70,60"
           fill="none"
           stroke={leafColor}
           strokeWidth="2.5"
@@ -155,7 +159,7 @@ export function RoseCluster({
         />
         {/* Secondary vine */}
         <path
-          d="M140,300 C170,250 120,200 150,160 C180,120 220,130 200,80"
+          d="M150,320 C180,270 130,220 160,180 C190,140 230,150 210,100"
           fill="none"
           stroke={leafColor}
           strokeWidth="1.6"
@@ -164,55 +168,101 @@ export function RoseCluster({
         />
 
         {/* Rose 1 (large, lower) */}
-        <g transform="translate(90, 210) rotate(-15)">
-          <circle r="26" fill="url(#roseGradient)" fillOpacity={opacity} />
-          <circle cx="-5" cy="-4" r="18" fill={baseColor} fillOpacity={opacity * 0.85} />
-          <circle cx="4" cy="5" r="12" fill={deepColor} fillOpacity={opacity * 0.7} />
+        <g transform="translate(100, 230) rotate(-10)">
+          <circle r="30" fill={`url(#${roseGradientId})`} fillOpacity={opacity} />
           <path
-            d="M-8,-8 C-2,-14 8,-14 14,-8 C8,-2 -2,-2 -8,-8"
-            fill="none"
-            stroke={deepColor}
-            strokeWidth="1.5"
-            strokeOpacity={opacity}
+            d="M-22,-5 C-25,-22 -5,-30 8,-22 C20,-14 22,5 10,18 C-2,26 -20,20 -24,8 C-26,-2 -24,-2 -22,-5Z"
+            fill={baseColor}
+            fillOpacity={opacity * 0.85}
+          />
+          <path
+            d="M-8,-12 C-2,-22 12,-20 18,-10 C22,2 14,14 2,18 C-10,14 -16,2 -12,-8 C-10,-12 -10,-12 -8,-12Z"
+            fill={deepColor}
+            fillOpacity={opacity * 0.75}
+          />
+          <path
+            d="M-2,-2 C6,-8 16,-4 14,6 C12,14 0,16 -6,10 C-12,4 -8,-4 -2,-2Z"
+            fill={baseColor}
+            fillOpacity={opacity * 0.9}
           />
         </g>
 
         {/* Rose 2 (mid) */}
-        <g transform="translate(130, 130) rotate(25)">
-          <circle r="20" fill="url(#roseGradient)" fillOpacity={opacity} />
-          <circle cx="-4" cy="-3" r="14" fill={baseColor} fillOpacity={opacity * 0.85} />
-          <circle cx="3" cy="4" r="9" fill={deepColor} fillOpacity={opacity * 0.7} />
+        <g transform="translate(145, 145) rotate(20)">
+          <circle r="24" fill={`url(#${roseGradientId})`} fillOpacity={opacity} />
+          <path
+            d="M-18,-4 C-20,-18 -4,-24 8,-18 C18,-12 20,4 10,14 C0,22 -16,16 -18,4 C-20,-4 -18,-4 -18,-4Z"
+            fill={baseColor}
+            fillOpacity={opacity * 0.85}
+          />
+          <path
+            d="M-6,-10 C0,-18 14,-16 18,-8 C20,2 12,12 0,14 C-12,10 -16,-2 -10,-10 C-8,-12 -8,-12 -6,-10Z"
+            fill={deepColor}
+            fillOpacity={opacity * 0.75}
+          />
+          <path
+            d="M0,0 C8,-6 16,-2 12,8 C10,14 -2,12 -6,6 C-10,0 -6,-4 0,0Z"
+            fill={baseColor}
+            fillOpacity={opacity * 0.9}
+          />
         </g>
 
         {/* Rose 3 (top) */}
-        <g transform="translate(55, 50) rotate(-10)">
-          <circle r="16" fill="url(#roseGradient)" fillOpacity={opacity} />
-          <circle cx="-3" cy="-2" r="11" fill={baseColor} fillOpacity={opacity * 0.85} />
-          <circle cx="2" cy="3" r="7" fill={deepColor} fillOpacity={opacity * 0.7} />
+        <g transform="translate(65, 60) rotate(-15)">
+          <circle r="18" fill={`url(#${roseGradientId})`} fillOpacity={opacity} />
+          <path
+            d="M-14,-3 C-16,-14 -2,-20 8,-14 C16,-10 18,4 8,12 C-2,18 -16,12 -14,2 C-16,-4 -14,-4 -14,-3Z"
+            fill={baseColor}
+            fillOpacity={opacity * 0.85}
+          />
+          <path
+            d="M-4,-8 C0,-14 12,-12 14,-6 C16,2 8,10 -2,10 C-10,6 -12,-2 -6,-8 C-4,-10 -4,-10 -4,-8Z"
+            fill={deepColor}
+            fillOpacity={opacity * 0.75}
+          />
         </g>
 
-        {/* Rose 4 (secondary vine, top right) */}
-        <g transform="translate(185, 85) rotate(10)">
-          <circle r="14" fill="url(#roseGradient)" fillOpacity={opacity * 0.85} />
-          <circle cx="-2" cy="-2" r="10" fill={baseColor} fillOpacity={opacity * 0.7} />
-          <circle cx="2" cy="2" r="6" fill={deepColor} fillOpacity={opacity * 0.6} />
+        {/* Rose 4 (secondary vine, upper right) */}
+        <g transform="translate(195, 100) rotate(15)">
+          <circle r="16" fill={`url(#${roseGradientId})`} fillOpacity={opacity * 0.9} />
+          <path
+            d="M-12,-2 C-14,-12 -2,-18 8,-12 C14,-8 16,4 8,10 C-2,16 -14,10 -12,0 C-14,-4 -12,-4 -12,-2Z"
+            fill={baseColor}
+            fillOpacity={opacity * 0.8}
+          />
+          <path
+            d="M-4,-6 C0,-12 10,-10 12,-4 C14,4 6,10 -4,8 C-10,4 -10,-2 -6,-6 C-4,-8 -4,-8 -4,-6Z"
+            fill={deepColor}
+            fillOpacity={opacity * 0.7}
+          />
         </g>
 
         {/* Leaves */}
-        <ellipse cx="105" cy="175" rx="14" ry="7" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(-30 105 175)" />
-        <ellipse cx="155" cy="100" rx="12" ry="6" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(20 155 100)" />
-        <ellipse cx="70" cy="120" rx="11" ry="5" fill={leafColor} fillOpacity={opacity * 0.6} transform="rotate(-40 70 120)" />
-        <ellipse cx="45" cy="80" rx="9" ry="5" fill={leafColor} fillOpacity={opacity * 0.6} transform="rotate(-10 45 80)" />
-        <ellipse cx="140" cy="240" rx="12" ry="6" fill={leafColor} fillOpacity={opacity * 0.65} transform="rotate(30 140 240)" />
+        <ellipse cx="120" cy="190" rx="16" ry="8" fill={leafColor} fillOpacity={opacity * 0.75} transform="rotate(-30 120 190)" />
+        <ellipse cx="170" cy="115" rx="14" ry="7" fill={leafColor} fillOpacity={opacity * 0.75} transform="rotate(20 170 115)" />
+        <ellipse cx="80" cy="135" rx="13" ry="6" fill={leafColor} fillOpacity={opacity * 0.65} transform="rotate(-40 80 135)" />
+        <ellipse cx="55" cy="90" rx="11" ry="6" fill={leafColor} fillOpacity={opacity * 0.65} transform="rotate(-10 55 90)" />
+        <ellipse cx="155" cy="260" rx="14" ry="7" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(30 155 260)" />
+        <ellipse cx="100" cy="285" rx="12" ry="6" fill={leafColor} fillOpacity={opacity * 0.6} transform="rotate(-20 100 285)" />
 
         {/* Small buds */}
-        <circle cx="160" cy="210" r="5" fill={deepColor} fillOpacity={opacity * 0.8} />
-        <circle cx="80" cy="160" r="4" fill={deepColor} fillOpacity={opacity * 0.8} />
-        <circle cx="115" cy="80" r="4" fill={deepColor} fillOpacity={opacity * 0.8} />
+        <g transform="translate(175, 210)">
+          <circle r="6" fill={deepColor} fillOpacity={opacity * 0.8} />
+          <ellipse cx="-4" cy="0" rx="6" ry="3" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(-35 -4 0)" />
+        </g>
+        <g transform="translate(85, 170)">
+          <circle r="5" fill={deepColor} fillOpacity={opacity * 0.8} />
+          <ellipse cx="-3" cy="1" rx="5" ry="3" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(-20 -3 1)" />
+        </g>
+        <g transform="translate(125, 90)">
+          <circle r="5" fill={deepColor} fillOpacity={opacity * 0.8} />
+          <ellipse cx="-3" cy="0" rx="5" ry="3" fill={leafColor} fillOpacity={opacity * 0.7} transform="rotate(-45 -3 0)" />
+        </g>
 
         {/* Soft watercolor backing */}
-        <circle cx="120" cy="180" r="70" fill={baseColor} fillOpacity={0.12} filter="blur(16px)" />
-        <circle cx="180" cy="120" r="50" fill={baseColor} fillOpacity={0.08} filter="blur(14px)" />
+        <circle cx="130" cy="200" r="80" fill={baseColor} fillOpacity={0.14} filter="blur(18px)" />
+        <circle cx="190" cy="130" r="55" fill={baseColor} fillOpacity={0.1} filter="blur(16px)" />
+        <circle cx="70" cy="80" r="40" fill={baseColor} fillOpacity={0.08} filter="blur(14px)" />
       </svg>
     </div>
   );
