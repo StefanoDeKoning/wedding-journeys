@@ -61,13 +61,14 @@ function InvitationPage() {
 
   return (
     <div className="relative overflow-hidden">
-      {/* Side floral decorations */}
+      {/* Side floral decorations — more prominent, like roses climbing the page edges */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="rose" size="xl" className="absolute -top-20 -right-20 opacity-40 rose-glow" />
-        <WatercolorBlot color="sage" size="xl" className="absolute -bottom-24 -left-24 opacity-30 rose-glow" style={{ animationDelay: "2s" }} />
-        <RoseVine variant="corner-top-right" size="lg" color="sage" className="absolute top-8 right-8 opacity-60" />
-        <RoseVine variant="corner-bottom-left" size="lg" color="sage" className="absolute bottom-8 left-8 opacity-60" />
-        <FloatingPetals count={10} />
+        <WatercolorBlot color="rose" size="2xl" className="absolute -top-24 -right-28 opacity-45 rose-glow" />
+        <WatercolorBlot color="sage" size="2xl" className="absolute -bottom-32 -left-28 opacity-40 rose-glow" style={{ animationDelay: "2s" }} />
+        <WatercolorBlot color="peach" size="xl" className="absolute top-1/2 -left-20 opacity-25" style={{ animationDelay: "4s" }} />
+        <RoseCluster variant="side-right" size="xl" color="rose" className="absolute top-24 -right-4 opacity-85" />
+        <RoseCluster variant="side-left" size="xl" color="sage" className="absolute bottom-32 -left-4 opacity-80" />
+        <FloatingPetals count={14} />
       </div>
 
       {/* Hero — couple, date, location */}
