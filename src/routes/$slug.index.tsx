@@ -6,6 +6,7 @@ import { Countdown } from "@/wedding/Countdown";
 import { WishlistSection } from "@/wedding/WishlistSection";
 import { Button } from "@/components/ui/button";
 import { safeHttpUrl } from "@/lib/safeUrl";
+import { WatercolorBlot, RoseVine, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
@@ -59,19 +60,28 @@ function InvitationPage() {
       : (wedding.wedding_name ?? "The happy couple");
 
   return (
-    <div>
+    <div className="relative overflow-hidden">
+      {/* Side floral decorations */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+        <WatercolorBlot color="rose" size="xl" className="absolute -top-20 -right-20 opacity-40 rose-glow" />
+        <WatercolorBlot color="sage" size="xl" className="absolute -bottom-24 -left-24 opacity-30 rose-glow" style={{ animationDelay: "2s" }} />
+        <RoseVine variant="corner-top-right" size="lg" color="sage" className="absolute top-8 right-8 opacity-60" />
+        <RoseVine variant="corner-bottom-left" size="lg" color="sage" className="absolute bottom-8 left-8 opacity-60" />
+        <FloatingPetals count={10} />
+      </div>
+
       {/* Hero — couple, date, location */}
-      <section className="relative overflow-hidden">
+      <section className="relative z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-sunset" aria-hidden />
-        <div className="relative mx-auto max-w-4xl px-6 pt-16 pb-12 text-center">
+        <div className="relative mx-auto max-w-4xl px-6 pt-20 pb-16 text-center">
           <p className="font-script text-3xl md:text-4xl text-primary">together with their families</p>
-          <h1 className="mt-4 font-display text-5xl md:text-7xl text-balance">
+          <h1 className="mt-5 font-display text-5xl md:text-7xl lg:text-8xl text-balance">
             {wedding.bride_name}
-            <span className="font-script text-primary mx-3 align-baseline">&</span>
+            <span className="font-script text-primary mx-4 align-baseline">&</span>
             {wedding.groom_name}
           </h1>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-sm md:text-base text-muted-foreground">
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm md:text-base text-muted-foreground">
             {wedding.wedding_date && (
               <span className="flex items-center gap-2">
                 <CalendarDays className="w-4 h-4 text-primary" />
@@ -87,18 +97,15 @@ function InvitationPage() {
           </div>
 
           {target && (
-            <div className="mt-12">
+            <div className="mt-14">
               <Countdown target={target} label={countdownLabel} />
             </div>
           )}
         </div>
       </section>
 
-
-
-
       {/* Envelope + Parchment */}
-      <section className="mx-auto max-w-3xl px-6 py-20">
+      <section className="relative z-10 mx-auto max-w-3xl px-6 py-20 sm:py-28">
         <EnvelopeLetter
           recipientFirstName={recipientFirst}
           recipientLastName={recipientLast}
@@ -111,17 +118,21 @@ function InvitationPage() {
       {wedding.wishlist_enabled && <WishlistSection weddingId={wedding.id} />}
 
       {/* Reverse side — practical info */}
-      <section className="mx-auto max-w-4xl px-6 pb-24">
+      <section className="relative z-10 mx-auto max-w-4xl px-6 pb-28">
+        <FloralDivider color="terracotta" />
 
-        <div className="divider-script">
-          <span className="font-script text-2xl">the details</span>
+        <div className="text-center mt-4 mb-12">
+          <p className="font-script text-3xl md:text-4xl text-primary">the details</p>
         </div>
 
         <div className="mt-10 grid sm:grid-cols-2 gap-6">
-          <div className="rounded-[1.5rem] border border-border bg-card p-7 shadow-soft">
+          <div className="card-romantic p-8 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
+            <div className="absolute top-0 right-0 w-24 h-24 opacity-10 pointer-events-none">
+              <WatercolorBlot color="rose" size="sm" />
+            </div>
             <CalendarDays className="w-5 h-5 text-primary" />
-            <h3 className="mt-3 font-display text-2xl">When</h3>
-            <p className="mt-2 text-foreground">{formatLongDate(wedding.wedding_date)}</p>
+            <h3 className="mt-4 font-display text-2xl">When</h3>
+            <p className="mt-3 text-foreground">{formatLongDate(wedding.wedding_date)}</p>
             {wedding.ceremony_at && (
               <p className="mt-1 text-sm text-muted-foreground">
                 Ceremony at {formatTime(wedding.ceremony_at)}
@@ -139,10 +150,13 @@ function InvitationPage() {
             )}
           </div>
 
-          <div className="rounded-[1.5rem] border border-border bg-card p-7 shadow-soft">
+          <div className="card-romantic p-8 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
+            <div className="absolute top-0 right-0 w-24 h-24 opacity-10 pointer-events-none">
+              <WatercolorBlot color="sage" size="sm" />
+            </div>
             <MapPin className="w-5 h-5 text-primary" />
-            <h3 className="mt-3 font-display text-2xl">Where</h3>
-            <p className="mt-2 text-foreground">{wedding.location_name}</p>
+            <h3 className="mt-4 font-display text-2xl">Where</h3>
+            <p className="mt-3 text-foreground">{wedding.location_name}</p>
             {wedding.location_address && (
               <p className="mt-1 text-sm text-muted-foreground whitespace-pre-line">
                 {wedding.location_address}
@@ -153,7 +167,7 @@ function InvitationPage() {
                 href={safeHttpUrl(wedding.maps_url)}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
               >
                 Open in Google Maps →
               </a>
@@ -161,13 +175,13 @@ function InvitationPage() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 h-12 px-8 shadow-warm">
             <Link to="/$slug/rsvp" params={{ slug }}>
               <ListChecks className="w-4 h-4 mr-2" /> Reply with your wishes
             </Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="rounded-full h-12 px-8">
+          <Button asChild size="lg" variant="outline" className="rounded-full h-12 px-8 border-primary/30 hover:bg-primary/5">
             <Link to="/$slug/timeline" params={{ slug }}>
               <Heart className="w-4 h-4 mr-2" /> See the day
             </Link>
