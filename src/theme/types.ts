@@ -52,11 +52,11 @@ export interface ThemeDecor {
   particles: ParticleKind;
   /** Ambient particle density (0 disables). */
   particleCount: number;
-  /** Whether to render the paper texture overlay on surfaces. */
+  /** Whether to render the paper texture overlay on page surfaces. */
   paperTexture: boolean;
   /** Whether to render the page vignette. */
   vignette: boolean;
-  /** Envelope + wax styling flavour used by the invitation experience. */
+  /** Envelope + seal flavour used by the invitation experience. */
   envelope: "wax-seal" | "gold-band" | "ribbon" | "plain";
 }
 
@@ -65,12 +65,12 @@ export interface ThemeDefinition {
   name: string;
   description: string;
   /**
-   * CSS custom properties applied to the theme root. Keys must be `--ds-*`
-   * or semantic app tokens; values are plain CSS. Anything omitted falls
-   * back to the base token layer in `src/styles.css`.
+   * CSS custom properties applied at the theme root. Keys are `--ds-*` or
+   * semantic app tokens; anything omitted falls back to the base token
+   * layer in `src/styles.css`.
    */
   tokens: Record<string, string>;
-  /** Google Fonts (or other) stylesheet hrefs this theme needs. */
+  /** Font stylesheet hrefs this theme needs (loaded via <link>). */
   fontHrefs: string[];
   decor: ThemeDecor;
 }
