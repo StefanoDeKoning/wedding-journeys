@@ -1,0 +1,817 @@
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+
+@source "../src";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * OurJourney — Dreamy Watercolor Wedding Aesthetic
+ * Soft blush, warm peach, dusty rose, sage, muted gold, cream
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  --color-rose: var(--rose);
+  --color-terracotta: var(--terracotta);
+  --color-gold: var(--gold);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-blush: var(--blush);
+  --color-peach: var(--peach);
+  --color-sage: var(--sage);
+  --color-dusty-rose: var(--dusty-rose);
+  --color-warm-cream: var(--warm-cream);
+
+  /* ---- Design-system palette tokens (theme-driven) ---- */
+  --color-ivory: var(--ds-ivory);
+  --color-champagne: var(--ds-champagne);
+  --color-olive: var(--ds-olive);
+  --color-mist: var(--ds-mist);
+  --color-decor: var(--ds-decor);
+  --color-decor-soft: var(--ds-decor-soft);
+  --color-decor-leaf: var(--ds-decor-leaf);
+  --color-decor-gold: var(--ds-decor-gold);
+
+  /* ---- Radius scale ---- */
+  --radius-paper: var(--ds-radius-paper);
+  --radius-card: var(--ds-radius-card);
+  --radius-frame: var(--ds-radius-frame);
+
+  /* ---- Elevation scale ---- */
+  --shadow-elev-1: var(--ds-elev-1);
+  --shadow-elev-2: var(--ds-elev-2);
+  --shadow-elev-3: var(--ds-elev-3);
+  --shadow-elev-4: var(--ds-elev-4);
+
+  /* ---- Motion ---- */
+  --ease-paper: var(--ds-ease-paper);
+  --ease-soft: var(--ds-ease-soft);
+
+  --font-display: var(--ds-font-display);
+  --font-body: var(--ds-font-body);
+  --font-script: var(--ds-font-script);
+}
+
+
+:root {
+  --radius: 0.75rem;
+
+  /* Brand — Dreamy Watercolor */
+  --blush: oklch(0.92 0.04 25);         /* #F6E8E8 soft blush */
+  --peach: oklch(0.89 0.05 55);         /* #F4DCCB warm peach */
+  --dusty-rose: oklch(0.72 0.06 25);    /* #D6A6A6 dusty rose */
+  --rose: oklch(0.69 0.07 25);          /* #C78C8C dusty rose */
+  --terracotta: oklch(0.65 0.10 40);    /* #C97A5A warm terracotta */
+  --gold: oklch(0.80 0.07 80);          /* #DCC49A muted gold */
+  --sage: oklch(0.82 0.04 140);         /* #C9D4C3 soft sage */
+  --warm-cream: oklch(0.96 0.012 80);   /* #FAF5F0 warm cream */
+  --cream: oklch(0.97 0.01 75);         /* #FCF8F5 cream */
+  --ink: oklch(0.32 0.025 50);          /* #4A3D3A warm brown */
+
+  /* Semantic */
+  --background: var(--warm-cream);
+  --foreground: var(--ink);
+  --card: oklch(0.985 0.008 80);
+  --card-foreground: var(--ink);
+  --popover: oklch(0.985 0.008 80);
+  --popover-foreground: var(--ink);
+  --primary: var(--terracotta);
+  --primary-foreground: oklch(0.98 0.01 75);
+  --secondary: var(--dusty-rose);
+  --secondary-foreground: oklch(0.98 0.01 75);
+  --muted: oklch(0.93 0.012 70);
+  --muted-foreground: oklch(0.48 0.025 50);
+  --accent: var(--gold);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.98 0.01 75);
+  --border: oklch(0.90 0.016 70);
+  --input: oklch(0.92 0.015 70);
+  --ring: var(--terracotta);
+
+  /* Gradients & shadows */
+  --gradient-warm: linear-gradient(135deg, var(--terracotta) 0%, var(--dusty-rose) 100%);
+  --gradient-sunset: linear-gradient(180deg, color-mix(in oklab, var(--peach) 60%, var(--cream)) 0%, var(--cream) 100%);
+  --gradient-soft: linear-gradient(180deg, color-mix(in oklab, var(--blush) 70%, var(--cream)) 0%, var(--cream) 100%);
+  --gradient-dream: linear-gradient(135deg, var(--blush) 0%, var(--peach) 50%, var(--cream) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--gold) 0%, color-mix(in oklab, var(--gold) 60%, var(--peach)) 100%);
+  --shadow-warm: 0 20px 50px -20px color-mix(in oklab, var(--terracotta) 28%, transparent);
+  --shadow-soft: 0 10px 30px -15px color-mix(in oklab, var(--ink) 15%, transparent);
+  --shadow-card: 0 12px 40px -18px color-mix(in oklab, var(--ink) 12%, transparent);
+
+  --transition-base: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark {
+  --background: oklch(0.22 0.02 40);
+  --foreground: oklch(0.96 0.012 75);
+  --card: oklch(0.26 0.022 40);
+  --card-foreground: oklch(0.96 0.012 75);
+  --popover: oklch(0.26 0.022 40);
+  --popover-foreground: oklch(0.96 0.012 75);
+  --primary: var(--terracotta);
+  --primary-foreground: oklch(0.98 0.01 75);
+  --secondary: oklch(0.32 0.04 30);
+  --secondary-foreground: oklch(0.96 0.012 75);
+  --muted: oklch(0.3 0.025 40);
+  --muted-foreground: oklch(0.72 0.02 60);
+  --accent: var(--gold);
+  --accent-foreground: oklch(0.22 0.02 40);
+  --border: oklch(0.35 0.025 40);
+  --input: oklch(0.35 0.025 40);
+  --ring: var(--gold);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    font-feature-settings: "kern", "liga", "calt";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .font-script {
+    font-family: var(--font-script);
+    font-weight: 400;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+}
+
+@layer utilities {
+  .bg-gradient-warm { background: var(--gradient-warm); }
+  .bg-gradient-sunset { background: var(--gradient-sunset); }
+  .bg-gradient-soft { background: var(--gradient-soft); }
+  .bg-gradient-dream { background: var(--gradient-dream); }
+  .bg-gradient-gold { background: var(--gradient-gold); }
+  .shadow-warm { box-shadow: var(--shadow-warm); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  .divider-script {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--terracotta);
+  }
+  .divider-script::before,
+  .divider-script::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in oklab, var(--terracotta) 50%, transparent),
+      transparent
+    );
+  }
+
+  .card-romantic {
+    border-radius: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+  }
+
+  .section-inner-frame {
+    position: relative;
+  }
+  .section-inner-frame::before {
+    content: "";
+    position: absolute;
+    inset: 1.5rem;
+    border: 1px solid color-mix(in oklab, var(--terracotta) 12%, transparent);
+    border-radius: 1rem;
+    pointer-events: none;
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fade-up 0.8s var(--transition-base) both; }
+
+/* Floral / romantic motion */
+@keyframes sparkle-float {
+  0%, 100% { opacity: 0.2; transform: translateY(0) scale(0.8); }
+  50% { opacity: 0.8; transform: translateY(-12px) scale(1.2); }
+}
+.sparkle-float { animation: sparkle-float 4s ease-in-out infinite; }
+
+@keyframes petal-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.35; }
+  50% { transform: translateY(-18px) rotate(12deg); opacity: 0.6; }
+}
+.petal-float { animation: petal-float 7s ease-in-out infinite; }
+
+@keyframes rose-glow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.04); }
+}
+.rose-glow { animation: rose-glow 6s ease-in-out infinite; }
+
+@keyframes gentle-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.gentle-breathe { animation: gentle-breathe 5s ease-in-out infinite; }
+
+/* ============ Wedding Invitation: Envelope, Wax Seal, Parchment ============ */
+
+:root {
+  --parchment-base: oklch(0.93 0.04 80);
+  --parchment-edge: oklch(0.78 0.06 60);
+  --parchment-ink: oklch(0.28 0.04 50);
+  --envelope-paper: oklch(0.86 0.04 70);
+  --envelope-shadow: oklch(0.55 0.04 40);
+  --wax-red: oklch(0.42 0.18 28);
+  --wax-red-dark: oklch(0.32 0.16 28);
+  --wax-gold: oklch(0.78 0.13 75);
+}
+
+/* Vintage parchment texture using layered radial + repeating gradients */
+.parchment {
+  background-color: var(--parchment-base);
+  background-image:
+    radial-gradient(ellipse at 20% 15%, color-mix(in oklab, var(--parchment-edge) 25%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, color-mix(in oklab, var(--parchment-edge) 30%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 60% 30%, color-mix(in oklab, var(--wax-red) 8%, transparent) 0%, transparent 30%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 22px,
+      color-mix(in oklab, var(--parchment-edge) 6%, transparent) 22px,
+      color-mix(in oklab, var(--parchment-edge) 6%, transparent) 23px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 80px,
+      color-mix(in oklab, var(--parchment-edge) 4%, transparent) 80px,
+      color-mix(in oklab, var(--parchment-edge) 4%, transparent) 81px
+    );
+  color: var(--parchment-ink);
+  position: relative;
+  box-shadow:
+    inset 0 0 80px color-mix(in oklab, var(--parchment-edge) 35%, transparent),
+    inset 0 0 12px color-mix(in oklab, var(--parchment-edge) 50%, transparent),
+    0 25px 60px -25px color-mix(in oklab, var(--ink) 50%, transparent),
+    0 8px 20px -8px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+.parchment::before,
+.parchment::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 28px;
+  pointer-events: none;
+  background-repeat: repeat-x;
+  background-size: 40px 28px;
+}
+
+.parchment::before {
+  top: -1px;
+  background-image: radial-gradient(ellipse 22px 14px at 20px 0px, var(--parchment-base) 99%, transparent 100%);
+  filter: drop-shadow(0 -2px 1px color-mix(in oklab, var(--ink) 12%, transparent));
+}
+
+.parchment::after {
+  bottom: -1px;
+  background-image: radial-gradient(ellipse 22px 14px at 20px 28px, var(--parchment-base) 99%, transparent 100%);
+  filter: drop-shadow(0 2px 1px color-mix(in oklab, var(--ink) 12%, transparent));
+}
+
+.font-parchment-script {
+  font-family: var(--font-script);
+  color: var(--parchment-ink);
+}
+
+.font-parchment-display {
+  font-family: var(--font-display);
+  color: var(--parchment-ink);
+}
+
+/* Envelope */
+.envelope-paper {
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklab, var(--envelope-paper) 100%, transparent) 0%,
+      color-mix(in oklab, var(--envelope-paper) 92%, var(--ink)) 100%);
+  box-shadow:
+    0 30px 70px -20px color-mix(in oklab, var(--ink) 55%, transparent),
+    0 12px 25px -10px color-mix(in oklab, var(--ink) 30%, transparent),
+    inset 0 0 60px color-mix(in oklab, var(--envelope-shadow) 18%, transparent);
+}
+
+.envelope-flap {
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--envelope-paper) 100%, transparent) 0%,
+      color-mix(in oklab, var(--envelope-paper) 88%, var(--ink)) 100%);
+  box-shadow: inset 0 -8px 20px color-mix(in oklab, var(--envelope-shadow) 25%, transparent);
+}
+
+/* Floating animation for the closed envelope */
+@keyframes envelope-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+.envelope-float { animation: envelope-float 4s ease-in-out infinite; }
+
+/* Envelope opening */
+@keyframes flap-open {
+  from { transform: rotateX(0deg); }
+  to { transform: rotateX(180deg); }
+}
+.flap-opening { animation: flap-open 0.9s var(--transition-base) forwards; }
+
+/* Letter slide-out */
+@keyframes letter-rise {
+  0%   { transform: translateY(40px) scale(0.92); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.letter-rise { animation: letter-rise 1.2s 0.4s var(--transition-base) both; }
+
+/* Wax seal pulse */
+@keyframes wax-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--wax-red-dark) 45%, transparent)); }
+  50% { transform: scale(1.04); filter: drop-shadow(0 12px 22px color-mix(in oklab, var(--wax-red-dark) 60%, transparent)); }
+}
+.wax-pulse { animation: wax-pulse 2.6s ease-in-out infinite; }
+
+/* Wax shatter on click */
+@keyframes wax-break {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1.6) rotate(20deg); opacity: 0; }
+}
+.wax-break { animation: wax-break 0.5s ease-out forwards; }
+
+/* =====================================================================
+ * DESIGN SYSTEM — token layer
+ * ---------------------------------------------------------------------
+ * All public-facing visuals inherit from these tokens. Themes only
+ * redefine the `--ds-*` variables (see src/theme/themes.ts); components
+ * never hardcode colors, radii, shadows or motion values.
+ * ===================================================================== */
+
+@theme {
+  /* Spacing scale — the only allowed layout rhythm values */
+  --spacing-gutter: 1.5rem;
+  --spacing-stack: 2rem;
+  --spacing-block: 3rem;
+  --spacing-section: 5rem;
+  --spacing-section-lg: 8rem;
+  --spacing-hero: 11rem;
+
+  /* Editorial content widths */
+  --container-prose: 44rem;
+  --container-content: 64rem;
+  --container-wide: 80rem;
+  --container-full: 96rem;
+}
+
+/* ---------------------------------------------------------------------
+ * THEME: Romantic Garden (default)
+ * ------------------------------------------------------------------- */
+:root,
+[data-theme="romantic-garden"] {
+  /* Palette */
+  --ds-ivory: oklch(0.98 0.008 85);
+  --ds-cream: oklch(0.965 0.012 80);
+  --ds-champagne: oklch(0.92 0.035 88);
+  --ds-blush: oklch(0.92 0.04 25);
+  --ds-dusty-rose: oklch(0.72 0.06 25);
+  --ds-sage: oklch(0.82 0.04 140);
+  --ds-olive: oklch(0.62 0.05 120);
+  --ds-gold: oklch(0.80 0.07 80);
+  --ds-terracotta: oklch(0.65 0.10 40);
+  --ds-ink: oklch(0.32 0.025 50);
+  --ds-mist: oklch(0.94 0.014 70);
+
+  /* Decorative artwork colors (SVG illustration system) */
+  --ds-decor: var(--ds-dusty-rose);
+  --ds-decor-soft: var(--ds-blush);
+  --ds-decor-leaf: var(--ds-sage);
+  --ds-decor-gold: var(--ds-gold);
+
+  /* Typography */
+  --ds-font-display: "Playfair Display", serif;
+  --ds-font-body: "Lora", serif;
+  --ds-font-script: "Great Vibes", cursive;
+  --ds-tracking-label: 0.22em;
+
+  /* Radius */
+  --ds-radius-paper: 0.5rem;
+  --ds-radius-card: 1.25rem;
+  --ds-radius-frame: 2rem;
+
+  /* Elevation — soft, warm, never harsh */
+  --ds-elev-1: 0 1px 2px color-mix(in oklab, var(--ds-ink) 6%, transparent);
+  --ds-elev-2: 0 8px 24px -14px color-mix(in oklab, var(--ds-ink) 18%, transparent);
+  --ds-elev-3: 0 18px 44px -22px color-mix(in oklab, var(--ds-ink) 24%, transparent);
+  --ds-elev-4: 0 32px 70px -30px color-mix(in oklab, var(--ds-terracotta) 30%, transparent);
+
+  /* Borders — paper-like */
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-ink) 10%, transparent);
+  --ds-border-paper: 1px solid color-mix(in oklab, var(--ds-terracotta) 18%, transparent);
+  --ds-border-gilded: 1px solid color-mix(in oklab, var(--ds-gold) 55%, transparent);
+
+  /* Motion */
+  --ds-ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
+  --ds-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-dur-fast: 200ms;
+  --ds-dur-base: 450ms;
+  --ds-dur-slow: 900ms;
+  --ds-dur-ambient: 7s;
+
+  /* Surfaces & atmosphere */
+  --ds-texture-opacity: 0.5;
+  --ds-vignette: radial-gradient(
+    ellipse at 50% 20%,
+    transparent 40%,
+    color-mix(in oklab, var(--ds-terracotta) 7%, transparent) 100%
+  );
+  --ds-wash-page: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ds-blush) 45%, var(--ds-cream)) 0%,
+    var(--ds-cream) 45%,
+    color-mix(in oklab, var(--ds-champagne) 35%, var(--ds-cream)) 100%
+  );
+
+  /* Semantic remap — existing shadcn/app components inherit the theme */
+  --background: var(--ds-cream);
+  --foreground: var(--ds-ink);
+  --primary: var(--ds-terracotta);
+  --secondary: var(--ds-dusty-rose);
+  --accent: var(--ds-gold);
+  --muted: var(--ds-mist);
+  --radius: var(--ds-radius-paper);
+  --ring: var(--ds-terracotta);
+}
+
+/* ---------------------------------------------------------------------
+ * Typography scale
+ * ------------------------------------------------------------------- */
+@utility type-hero {
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+@utility type-section-title {
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: clamp(1.875rem, 3.6vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+@utility type-card-title {
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  line-height: 1.25;
+}
+
+@utility type-script {
+  font-family: var(--ds-font-script);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.35;
+  color: var(--primary);
+}
+
+@utility type-script-sm {
+  font-family: var(--ds-font-script);
+  font-weight: 400;
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  line-height: 1.4;
+  color: var(--primary);
+}
+
+@utility type-body-lg {
+  font-family: var(--ds-font-body);
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+@utility type-body {
+  font-family: var(--ds-font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+@utility type-caption {
+  font-family: var(--ds-font-body);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+@utility type-label {
+  font-family: var(--ds-font-body);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: var(--ds-tracking-label);
+  color: color-mix(in oklab, var(--foreground) 62%, transparent);
+}
+
+@utility type-nav {
+  font-family: var(--ds-font-body);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+}
+
+@utility type-button {
+  font-family: var(--ds-font-body);
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+}
+
+/* ---------------------------------------------------------------------
+ * Surfaces, borders, textures
+ * ------------------------------------------------------------------- */
+@utility surface-paper {
+  background-color: var(--card);
+  border: var(--ds-border-paper);
+  border-radius: var(--ds-radius-card);
+  box-shadow: var(--ds-elev-2);
+}
+
+@utility surface-veil {
+  background: color-mix(in oklab, var(--ds-ivory) 72%, transparent);
+  backdrop-filter: blur(10px);
+  border: var(--ds-border-hairline);
+  border-radius: var(--ds-radius-card);
+}
+
+@utility border-paper {
+  border: var(--ds-border-paper);
+}
+
+@utility border-gilded {
+  border: var(--ds-border-gilded);
+}
+
+@utility bg-wash-page {
+  background: var(--ds-wash-page);
+}
+
+@utility texture-paper {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--ds-texture-opacity);
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent 0 23px,
+        color-mix(in oklab, var(--ds-terracotta) 4%, transparent) 23px 24px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0 71px,
+        color-mix(in oklab, var(--ds-terracotta) 3%, transparent) 71px 72px
+      );
+    mix-blend-mode: multiply;
+  }
+}
+
+@utility vignette {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--ds-vignette);
+  }
+}
+
+@utility decor-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 35%, black 65%, transparent);
+}
+
+@utility focus-ring-elegant {
+  &:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--ring) 70%, transparent);
+    outline-offset: 3px;
+    border-radius: var(--ds-radius-paper);
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * Animation system
+ * ------------------------------------------------------------------- */
+@keyframes ds-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ds-reveal-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ds-reveal-left {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ds-reveal-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ds-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ds-paper-lift {
+  from { opacity: 0; transform: translateY(30px) rotate(-1.2deg); }
+  to { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+/* Premium float — subtle, organic movement */
+@keyframes ds-float {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); }
+  25% { transform: translateY(-8px) translateX(2px) rotate(0.8deg); }
+  50% { transform: translateY(-14px) translateX(-2px) rotate(1.2deg); }
+  75% { transform: translateY(-6px) translateX(3px) rotate(0.4deg); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg); }
+}
+
+/* Luxurious drift — slow, graceful descent with subtle rotation */
+@keyframes ds-drift {
+  0% {
+    transform: translate3d(0, -8%, 0) rotate(0deg) scaleY(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+    transform: translate3d(0, -4%, 0) rotate(8deg) scaleY(0.98);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translate3d(var(--ds-drift-x, 20px), 50vh, 0) rotate(110deg) scaleY(1.02);
+  }
+  85% {
+    opacity: 0.4;
+    transform: translate3d(var(--ds-drift-x, 40px), 95vh, 0) rotate(180deg) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ds-drift-x, 40px), 108vh, 0) rotate(220deg) scaleY(1);
+  }
+}
+
+/* Premium shimmer — luxurious glow, not sparkly */
+@keyframes ds-shimmer {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.95) translateY(0);
+    filter: blur(0.5px);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08) translateY(-1px);
+    filter: blur(0px);
+  }
+}
+
+/* Botanical animations — for premium, dreamy feel */
+@keyframes botanical-sway {
+  0%, 100% { transform: rotate(-0.5deg); }
+  50% { transform: rotate(0.5deg); }
+}
+
+@keyframes petal-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-20px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes gold-glow {
+  0%, 100% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 2px rgba(212, 185, 127, 0.3));
+  }
+  50% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 8px rgba(212, 185, 127, 0.6));
+  }
+}
+
+@utility animate-ds-fade { animation: ds-fade-in var(--ds-dur-base) var(--ds-ease-soft) both; }
+@utility animate-ds-reveal { animation: ds-reveal-up var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-reveal-left { animation: ds-reveal-left var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-reveal-right { animation: ds-reveal-right var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-scale { animation: ds-scale-in var(--ds-dur-base) var(--ds-ease-paper) both; }
+@utility animate-ds-paper { animation: ds-paper-lift var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-float { animation: ds-float var(--ds-dur-ambient) var(--ds-ease-soft) infinite; }
+@utility animate-ds-drift { animation: ds-drift linear infinite; }
+@utility animate-ds-shimmer { animation: ds-shimmer 4s var(--ds-ease-soft) infinite; }
+@utility animate-botanical-sway { animation: botanical-sway 6s var(--ds-ease-soft) infinite; }
+@utility animate-petal-bloom { animation: petal-bloom 1.5s var(--ds-ease-paper) forwards; }
+@utility animate-gold-glow { animation: gold-glow 3s var(--ds-ease-soft) infinite; }
+
+@utility hover-lift {
+  transition:
+    transform var(--ds-dur-fast) var(--ds-ease-paper),
+    box-shadow var(--ds-dur-fast) var(--ds-ease-paper);
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ds-elev-3);
+  }
+}
+
+@utility hover-gild {
+  transition: color var(--ds-dur-fast) var(--ds-ease-soft),
+    border-color var(--ds-dur-fast) var(--ds-ease-soft);
+  &:hover {
+    color: var(--primary);
+    border-color: color-mix(in oklab, var(--ds-gold) 60%, transparent);
+  }
+}
+
+/* Reduced motion: keep the composition, remove the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
