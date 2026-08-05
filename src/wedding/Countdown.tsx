@@ -27,9 +27,7 @@ export function Countdown({ target, label }: CountdownProps) {
   }, [target]);
 
   if (t.done) {
-    return (
-      <p className="font-script text-3xl text-primary text-center">today is the day</p>
-    );
+    return <p className="type-script text-center">today is the day</p>;
   }
 
   const items: { value: number; label: string }[] = [
@@ -41,24 +39,20 @@ export function Countdown({ target, label }: CountdownProps) {
 
   return (
     <div className="text-center">
-      {label && (
-        <p className="font-script text-2xl md:text-3xl text-primary mb-3">{label}</p>
-      )}
+      {label && <p className="type-script-sm mb-4">{label}</p>}
       <div className="grid grid-cols-4 gap-3 md:gap-5 max-w-xl mx-auto">
         {items.map((i) => (
           <div
             key={i.label}
-            className="rounded-2xl border border-border bg-card/70 backdrop-blur px-2 md:px-4 py-4 md:py-6"
+            className="surface-veil px-2 md:px-4 py-4 md:py-6 hover-lift"
           >
             <div
-              className="font-display text-3xl md:text-5xl text-foreground tabular-nums"
+              className="type-card-title tabular-nums"
               aria-label={`${i.value} ${i.label}`}
             >
               {String(i.value).padStart(2, "0")}
             </div>
-            <div className="text-[0.65rem] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mt-1">
-              {i.label}
-            </div>
+            <div className="type-label mt-1">{i.label}</div>
           </div>
         ))}
       </div>
