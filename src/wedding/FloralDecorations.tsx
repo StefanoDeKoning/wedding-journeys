@@ -309,22 +309,27 @@ export function FloralDivider({ className, color = "terracotta" }: { className?:
 }
 
 export function FloatingPetals({ className, count = 8 }: { className?: string; count?: number }) {
+  // Deterministic pseudo-random so SSR and client markup match (no hydration mismatch).
+  const rand = (i: number, salt: number) => {
+    const x = Math.sin((i + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  };
   return (
     <div className={cn("pointer-events-none absolute inset-0 overflow-hidden", className)} aria-hidden>
       {Array.from({ length: count }).map((_, i) => (
         <svg
           key={i}
           className="absolute petal-float"
-          width={12 + Math.random() * 16}
-          height={12 + Math.random() * 16}
+          width={12 + rand(i, 1) * 16}
+          height={12 + rand(i, 2) * 16}
           viewBox="0 0 24 24"
           fill={colorMap["rose"]}
           fillOpacity={0.35}
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 6}s`,
-            animationDuration: `${6 + Math.random() * 6}s`,
+            left: `${rand(i, 3) * 100}%`,
+            top: `${rand(i, 4) * 100}%`,
+            animationDelay: `${rand(i, 5) * 6}s`,
+            animationDuration: `${6 + rand(i, 6) * 6}s`,
           }}
         >
           <path d="M12 21C7 16 7 10 12 3C17 10 17 16 12 21Z" />
