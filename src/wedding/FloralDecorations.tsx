@@ -18,18 +18,23 @@ const sizeMap = {
   "2xl": { w: "w-[28rem]", h: "h-[28rem]" },
 };
 
+/**
+ * Colors are sourced from the active theme's decorative roles (`--ds-decor*`,
+ * defined in styles.css) so this artwork re-themes automatically — never
+ * hardcode a literal color here.
+ */
 const colorMap = {
-  rose: "#d49696",
-  sage: "#9bb79e",
-  gold: "#d4b97f",
-  peach: "#e0a884",
+  rose: "var(--ds-decor)",
+  sage: "var(--ds-decor-leaf)",
+  gold: "var(--ds-decor-gold)",
+  peach: "var(--ds-decor-soft)",
 };
 
 const deepColorMap = {
-  rose: "#b87878",
-  sage: "#7fa382",
-  gold: "#bfa06b",
-  peach: "#c98c64",
+  rose: "color-mix(in oklab, var(--ds-decor) 70%, var(--ds-ink) 30%)",
+  sage: "color-mix(in oklab, var(--ds-decor-leaf) 70%, var(--ds-ink) 30%)",
+  gold: "color-mix(in oklab, var(--ds-decor-gold) 70%, var(--ds-ink) 30%)",
+  peach: "color-mix(in oklab, var(--ds-decor-soft) 70%, var(--ds-ink) 30%)",
 };
 
 export function WatercolorBlot({
@@ -80,8 +85,8 @@ export function RoseVine({
       <svg viewBox="0 0 200 200" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id={`vine-${color}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor={color === "sage" ? "#a8bba9" : color === "rose" ? "#d9a3a8" : "#d4b483"} />
-            <stop offset="100%" stopColor={color === "sage" ? "#8fa392" : color === "rose" ? "#c58a91" : "#bfa06b"} />
+            <stop offset="0%" stopColor={colorMap[color]} />
+            <stop offset="100%" stopColor={deepColorMap[color]} />
           </linearGradient>
         </defs>
         <path
@@ -104,9 +109,9 @@ export function RoseVine({
         <circle cx="118" cy="98" r="6" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity * 0.6} />
         <circle cx="190" cy="20" r="14" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity} />
         <circle cx="186" cy="16" r="8" fill={colorMap[color === "sage" ? "rose" : color]} fillOpacity={opacity * 0.6} />
-        <ellipse cx="90" cy="125" rx="8" ry="4" fill="#a8bba9" fillOpacity={opacity * 0.8} transform="rotate(-30 90 125)" />
-        <ellipse cx="155" cy="65" rx="9" ry="5" fill="#a8bba9" fillOpacity={opacity * 0.8} transform="rotate(20 155 65)" />
-        <ellipse cx="60" cy="150" rx="7" ry="4" fill="#a8bba9" fillOpacity={opacity * 0.7} transform="rotate(-45 60 150)" />
+        <ellipse cx="90" cy="125" rx="8" ry="4" fill="var(--ds-decor-leaf)" fillOpacity={opacity * 0.8} transform="rotate(-30 90 125)" />
+        <ellipse cx="155" cy="65" rx="9" ry="5" fill="var(--ds-decor-leaf)" fillOpacity={opacity * 0.8} transform="rotate(20 155 65)" />
+        <ellipse cx="60" cy="150" rx="7" ry="4" fill="var(--ds-decor-leaf)" fillOpacity={opacity * 0.7} transform="rotate(-45 60 150)" />
         <circle cx="80" cy="110" r="2" fill={colorMap[color]} fillOpacity={opacity} />
         <circle cx="140" cy="80" r="2" fill={colorMap[color]} fillOpacity={opacity} />
       </svg>
@@ -129,7 +134,7 @@ export function RoseCluster({
   const flip = variant === "side-left" || variant === "corner-bottom-left";
   const baseColor = colorMap[color];
   const deepColor = deepColorMap[color];
-  const leafColor = color === "sage" ? "#9ab69d" : "#a8bba9";
+  const leafColor = "var(--ds-decor-leaf)";
 
   const roseGradientId = `roseGradient-${color}-${flip ? "flip" : "noflip"}`;
 
@@ -289,10 +294,10 @@ export function SparkleField({ className, count = 12 }: { className?: string; co
 
 export function FloralDivider({ className, color = "terracotta" }: { className?: string; color?: "terracotta" | "rose" | "gold" | "sage" }) {
   const colorValue = {
-    terracotta: "#c97a5a",
-    rose: "#c78c8c",
-    gold: "#d4b483",
-    sage: "#9a7b4f",
+    terracotta: "var(--ds-terracotta)",
+    rose: "var(--ds-decor)",
+    gold: "var(--ds-decor-gold)",
+    sage: "var(--ds-decor-leaf)",
   }[color];
 
   return (

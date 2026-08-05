@@ -85,18 +85,6 @@
 :root {
   --radius: 0.75rem;
 
-  /* Brand — Dreamy Watercolor */
-  --blush: oklch(0.92 0.04 25);         /* #F6E8E8 soft blush */
-  --peach: oklch(0.89 0.05 55);         /* #F4DCCB warm peach */
-  --dusty-rose: oklch(0.72 0.06 25);    /* #D6A6A6 dusty rose */
-  --rose: oklch(0.69 0.07 25);          /* #C78C8C dusty rose */
-  --terracotta: oklch(0.65 0.10 40);    /* #C97A5A warm terracotta */
-  --gold: oklch(0.80 0.07 80);          /* #DCC49A muted gold */
-  --sage: oklch(0.82 0.04 140);         /* #C9D4C3 soft sage */
-  --warm-cream: oklch(0.96 0.012 80);   /* #FAF5F0 warm cream */
-  --cream: oklch(0.97 0.01 75);         /* #FCF8F5 cream */
-  --ink: oklch(0.32 0.025 50);          /* #4A3D3A warm brown */
-
   /* Semantic */
   --background: var(--warm-cream);
   --foreground: var(--ink);
@@ -127,8 +115,6 @@
   --shadow-warm: 0 20px 50px -20px color-mix(in oklab, var(--terracotta) 28%, transparent);
   --shadow-soft: 0 10px 30px -15px color-mix(in oklab, var(--ink) 15%, transparent);
   --shadow-card: 0 12px 40px -18px color-mix(in oklab, var(--ink) 12%, transparent);
-
-  --transition-base: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
@@ -272,44 +258,35 @@
 .gentle-breathe { animation: gentle-breathe 5s ease-in-out infinite; }
 
 /* ============ Wedding Invitation: Envelope, Wax Seal, Parchment ============ */
-
-:root {
-  --parchment-base: oklch(0.93 0.04 80);
-  --parchment-edge: oklch(0.78 0.06 60);
-  --parchment-ink: oklch(0.28 0.04 50);
-  --envelope-paper: oklch(0.86 0.04 70);
-  --envelope-shadow: oklch(0.55 0.04 40);
-  --wax-red: oklch(0.42 0.18 28);
-  --wax-red-dark: oklch(0.32 0.16 28);
-  --wax-gold: oklch(0.78 0.13 75);
-}
+/* Token values now live in the theme-scoped block below (see "DESIGN SYSTEM —
+ * token layer") so a future theme can ship its own envelope/wax/parchment look. */
 
 /* Vintage parchment texture using layered radial + repeating gradients */
 .parchment {
-  background-color: var(--parchment-base);
+  background-color: var(--ds-parchment-base);
   background-image:
-    radial-gradient(ellipse at 20% 15%, color-mix(in oklab, var(--parchment-edge) 25%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 85%, color-mix(in oklab, var(--parchment-edge) 30%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 60% 30%, color-mix(in oklab, var(--wax-red) 8%, transparent) 0%, transparent 30%),
+    radial-gradient(ellipse at 20% 15%, color-mix(in oklab, var(--ds-parchment-edge) 25%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, color-mix(in oklab, var(--ds-parchment-edge) 30%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 60% 30%, color-mix(in oklab, var(--ds-wax-primary) 8%, transparent) 0%, transparent 30%),
     repeating-linear-gradient(
       0deg,
       transparent 0px,
       transparent 22px,
-      color-mix(in oklab, var(--parchment-edge) 6%, transparent) 22px,
-      color-mix(in oklab, var(--parchment-edge) 6%, transparent) 23px
+      color-mix(in oklab, var(--ds-parchment-edge) 6%, transparent) 22px,
+      color-mix(in oklab, var(--ds-parchment-edge) 6%, transparent) 23px
     ),
     repeating-linear-gradient(
       90deg,
       transparent 0px,
       transparent 80px,
-      color-mix(in oklab, var(--parchment-edge) 4%, transparent) 80px,
-      color-mix(in oklab, var(--parchment-edge) 4%, transparent) 81px
+      color-mix(in oklab, var(--ds-parchment-edge) 4%, transparent) 80px,
+      color-mix(in oklab, var(--ds-parchment-edge) 4%, transparent) 81px
     );
-  color: var(--parchment-ink);
+  color: var(--ds-parchment-ink);
   position: relative;
   box-shadow:
-    inset 0 0 80px color-mix(in oklab, var(--parchment-edge) 35%, transparent),
-    inset 0 0 12px color-mix(in oklab, var(--parchment-edge) 50%, transparent),
+    inset 0 0 80px color-mix(in oklab, var(--ds-parchment-edge) 35%, transparent),
+    inset 0 0 12px color-mix(in oklab, var(--ds-parchment-edge) 50%, transparent),
     0 25px 60px -25px color-mix(in oklab, var(--ink) 50%, transparent),
     0 8px 20px -8px color-mix(in oklab, var(--ink) 25%, transparent);
 }
@@ -328,44 +305,44 @@
 
 .parchment::before {
   top: -1px;
-  background-image: radial-gradient(ellipse 22px 14px at 20px 0px, var(--parchment-base) 99%, transparent 100%);
+  background-image: radial-gradient(ellipse 22px 14px at 20px 0px, var(--ds-parchment-base) 99%, transparent 100%);
   filter: drop-shadow(0 -2px 1px color-mix(in oklab, var(--ink) 12%, transparent));
 }
 
 .parchment::after {
   bottom: -1px;
-  background-image: radial-gradient(ellipse 22px 14px at 20px 28px, var(--parchment-base) 99%, transparent 100%);
+  background-image: radial-gradient(ellipse 22px 14px at 20px 28px, var(--ds-parchment-base) 99%, transparent 100%);
   filter: drop-shadow(0 2px 1px color-mix(in oklab, var(--ink) 12%, transparent));
 }
 
 .font-parchment-script {
   font-family: var(--font-script);
-  color: var(--parchment-ink);
+  color: var(--ds-parchment-ink);
 }
 
 .font-parchment-display {
   font-family: var(--font-display);
-  color: var(--parchment-ink);
+  color: var(--ds-parchment-ink);
 }
 
 /* Envelope */
 .envelope-paper {
   background:
     linear-gradient(135deg,
-      color-mix(in oklab, var(--envelope-paper) 100%, transparent) 0%,
-      color-mix(in oklab, var(--envelope-paper) 92%, var(--ink)) 100%);
+      color-mix(in oklab, var(--ds-envelope-paper) 100%, transparent) 0%,
+      color-mix(in oklab, var(--ds-envelope-paper) 92%, var(--ink)) 100%);
   box-shadow:
     0 30px 70px -20px color-mix(in oklab, var(--ink) 55%, transparent),
     0 12px 25px -10px color-mix(in oklab, var(--ink) 30%, transparent),
-    inset 0 0 60px color-mix(in oklab, var(--envelope-shadow) 18%, transparent);
+    inset 0 0 60px color-mix(in oklab, var(--ds-envelope-shadow) 18%, transparent);
 }
 
 .envelope-flap {
   background:
     linear-gradient(180deg,
-      color-mix(in oklab, var(--envelope-paper) 100%, transparent) 0%,
-      color-mix(in oklab, var(--envelope-paper) 88%, var(--ink)) 100%);
-  box-shadow: inset 0 -8px 20px color-mix(in oklab, var(--envelope-shadow) 25%, transparent);
+      color-mix(in oklab, var(--ds-envelope-paper) 100%, transparent) 0%,
+      color-mix(in oklab, var(--ds-envelope-paper) 88%, var(--ink)) 100%);
+  box-shadow: inset 0 -8px 20px color-mix(in oklab, var(--ds-envelope-shadow) 25%, transparent);
 }
 
 /* Floating animation for the closed envelope */
@@ -392,8 +369,8 @@
 
 /* Wax seal pulse */
 @keyframes wax-pulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--wax-red-dark) 45%, transparent)); }
-  50% { transform: scale(1.04); filter: drop-shadow(0 12px 22px color-mix(in oklab, var(--wax-red-dark) 60%, transparent)); }
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--ds-wax-primary-dark) 45%, transparent)); }
+  50% { transform: scale(1.04); filter: drop-shadow(0 12px 22px color-mix(in oklab, var(--ds-wax-primary-dark) 60%, transparent)); }
 }
 .wax-pulse { animation: wax-pulse 2.6s ease-in-out infinite; }
 
@@ -446,6 +423,35 @@
   --ds-ink: oklch(0.32 0.025 50);
   --ds-mist: oklch(0.94 0.014 70);
 
+  /* Legacy brand tokens (pre-dating the --ds-* layer). Kept as real,
+   * theme-scoped entries — rather than deleted — so the gradients, shadows,
+   * `card-romantic`, `divider-script`, envelope, wax-seal and parchment CSS
+   * below stay overridable per-theme without any component changes.
+   * Exact duplicates of a --ds-* value are aliased; the rest (--peach,
+   * --rose, --cream, --warm-cream) have no --ds-* equivalent and keep their
+   * own value. */
+  --blush: var(--ds-blush);
+  --peach: oklch(0.89 0.05 55);
+  --dusty-rose: var(--ds-dusty-rose);
+  --rose: oklch(0.69 0.07 25);
+  --terracotta: var(--ds-terracotta);
+  --gold: var(--ds-gold);
+  --sage: var(--ds-sage);
+  --warm-cream: oklch(0.96 0.012 80);
+  --cream: oklch(0.97 0.01 75);
+  --ink: var(--ds-ink);
+  --transition-base: var(--ds-ease-paper);
+
+  /* Envelope / wax-seal / parchment (invitation presentation) */
+  --ds-parchment-base: oklch(0.93 0.04 80);
+  --ds-parchment-edge: oklch(0.78 0.06 60);
+  --ds-parchment-ink: oklch(0.28 0.04 50);
+  --ds-envelope-paper: oklch(0.86 0.04 70);
+  --ds-envelope-shadow: oklch(0.55 0.04 40);
+  --ds-wax-primary: oklch(0.42 0.18 28);
+  --ds-wax-primary-dark: oklch(0.32 0.16 28);
+  --ds-wax-gold: oklch(0.78 0.13 75);
+
   /* Decorative artwork colors (SVG illustration system) */
   --ds-decor: var(--ds-dusty-rose);
   --ds-decor-soft: var(--ds-blush);
@@ -481,6 +487,8 @@
   --ds-dur-base: 450ms;
   --ds-dur-slow: 900ms;
   --ds-dur-ambient: 7s;
+  /* Max translateY applied by useParallax(); themes may widen/narrow the effect. */
+  --ds-parallax-shift: 32px;
 
   /* Surfaces & atmosphere */
   --ds-texture-opacity: 0.5;

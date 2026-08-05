@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Mail, ListChecks, CalendarHeart, Image as ImageIcon, Music, MapPin, LogOut, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthProvider";
-import { Button } from "@/components/ui/button";
+import { ThemedButton } from "@/design-system";
 
 const tabs = [
   { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true },
@@ -27,43 +27,46 @@ export function WeddingHeader({
   const { signOut } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="h-16 flex items-center justify-between gap-4">
-          <Link to="/$slug" params={{ slug }} className="flex items-baseline gap-2 min-w-0">
-            <span className="font-script text-2xl text-primary truncate">{title}</span>
+    <header className="sticky top-0 z-40 backdrop-blur-lg bg-background/75 border-b border-paper shadow-elev-1">
+      <div className="mx-auto max-w-6xl px-gutter">
+        <div className="h-20 flex items-center justify-between gap-6">
+          <Link
+            to="/$slug"
+            params={{ slug }}
+            className="flex items-baseline gap-2 min-w-0 hover-gild"
+          >
+            <span className="type-script-sm truncate">{title}</span>
           </Link>
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
             {guestFirstName && (
-              <span className="hidden sm:inline text-xs text-muted-foreground">
+              <span className="hidden sm:inline type-caption">
                 Hi, <span className="text-foreground font-medium">{guestFirstName}</span>
               </span>
             )}
             {isAdmin && (
-              <Button asChild variant="outline" size="sm" className="rounded-full">
+              <ThemedButton asChild variant="gilded" size="sm">
                 <Link to="/$slug/admin" params={{ slug }}>
-                  <Settings className="w-3.5 h-3.5 mr-1.5" />
+                  <Settings className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Admin</span>
                 </Link>
-              </Button>
+              </ThemedButton>
             )}
-            <Button
+            <ThemedButton
               variant="ghost"
               size="sm"
               onClick={async () => {
                 await signOut();
                 window.location.href = `/${slug}`;
               }}
-              className="text-muted-foreground hover:text-foreground"
             >
-              <LogOut className="w-4 h-4 mr-1.5" />
+              <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Sign out</span>
-            </Button>
+            </ThemedButton>
           </div>
         </div>
 
         {/* Tabs */}
-        <nav className="flex gap-1 overflow-x-auto -mx-4 px-4 sm:-mx-6 sm:px-6 pb-2 scrollbar-thin">
+        <nav className="flex gap-2 overflow-x-auto -mx-gutter px-gutter pb-4 scrollbar-thin">
           {tabs.map((t) => {
             const Icon = t.icon;
             return (
@@ -72,10 +75,10 @@ export function WeddingHeader({
                 to={t.to}
                 params={{ slug }}
                 activeOptions={{ exact: t.exact }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                className="type-nav flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-muted-foreground border border-transparent transition-[color,background-color,border-color,transform] duration-300 ease-[var(--ds-ease-soft)] hover:text-primary hover:bg-primary/8 hover:-translate-y-0.5 focus-ring-elegant"
                 activeProps={{
                   className:
-                    "flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap bg-primary text-primary-foreground hover:bg-primary/90",
+                    "type-nav flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-primary bg-primary/10 border-gilded shadow-elev-1 focus-ring-elegant",
                 }}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -106,9 +109,9 @@ export function WeddingShell({
     <div className="min-h-screen flex flex-col bg-gradient-soft">
       <WeddingHeader slug={slug} title={title} guestFirstName={guestFirstName} isAdmin={isAdmin} />
       <main className="flex-1">{children}</main>
-      <footer className="text-center text-xs text-muted-foreground py-8">
+      <footer className="text-center type-caption py-block">
         Made with love on{" "}
-        <Link to="/" className="text-primary hover:underline">
+        <Link to="/" className="text-primary hover-gild">
           OurJourney
         </Link>
       </footer>

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 import { DecorMotifArt } from "./decor/Illustrations";
@@ -229,6 +229,7 @@ export function WishCard({
   children,
   action,
   className,
+  style,
 }: {
   title: ReactNode;
   price?: ReactNode;
@@ -236,9 +237,10 @@ export function WishCard({
   children?: ReactNode;
   action?: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
-    <ThemedCard interactive className={cn("flex flex-col gap-3 p-0", className)}>
+    <ThemedCard interactive className={cn("flex flex-col gap-3 p-0", className)} style={style}>
       {image && (
         <img
           src={image}
