@@ -6,6 +6,7 @@
  */
 
 export { PageCanvas, Container, Section } from "./Layout";
+export { useParallax } from "./hooks";
 export {
   ThemedButton,
   ThemedCard,

@@ -65,13 +65,13 @@ export function EnvelopeLetter({
                     <path
                       d="M0,140 L210,260 L420,140"
                       fill="none"
-                      stroke="oklch(0.55 0.04 40 / 0.18)"
+                      stroke="color-mix(in oklab, var(--ds-envelope-shadow) 18%, transparent)"
                       strokeWidth="1"
                     />
                     <path
                       d="M0,0 L210,140 L420,0"
                       fill="none"
-                      stroke="oklch(0.55 0.04 40 / 0.12)"
+                      stroke="color-mix(in oklab, var(--ds-envelope-shadow) 12%, transparent)"
                       strokeWidth="1"
                     />
                   </svg>
@@ -79,7 +79,7 @@ export function EnvelopeLetter({
 
                 {/* Centered name plate */}
                 <div className="absolute inset-x-0 bottom-6 text-center px-6">
-                  <p className="font-script text-xl md:text-2xl text-[oklch(0.32_0.06_40)]">
+                  <p className="font-script text-xl md:text-2xl text-[var(--ds-parchment-ink)]">
                     {recipientFirstName} {recipientLastName}
                   </p>
                 </div>

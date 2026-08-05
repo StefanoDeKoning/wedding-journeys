@@ -14,17 +14,17 @@ export function WaxSeal({ size = 140 }: { size?: number }) {
     >
       <defs>
         <radialGradient id="wax-warm" cx="40%" cy="35%" r="70%">
-          <stop offset="0%" stopColor="oklch(0.62 0.14 28)" />
-          <stop offset="55%" stopColor="oklch(0.48 0.16 28)" />
-          <stop offset="100%" stopColor="oklch(0.35 0.12 28)" />
+          <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-primary) 70%, white)" />
+          <stop offset="55%" stopColor="var(--ds-wax-primary)" />
+          <stop offset="100%" stopColor="var(--ds-wax-primary-dark)" />
         </radialGradient>
         <radialGradient id="waxRim-warm" cx="50%" cy="50%" r="50%">
           <stop offset="85%" stopColor="transparent" />
-          <stop offset="100%" stopColor="oklch(0.28 0.10 28)" />
+          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark) 85%, black)" />
         </radialGradient>
         <linearGradient id="gold-warm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(0.88 0.10 80)" />
-          <stop offset="100%" stopColor="oklch(0.68 0.09 70)" />
+          <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-gold) 70%, white)" />
+          <stop offset="100%" stopColor="var(--ds-wax-gold)" />
         </linearGradient>
       </defs>
 
@@ -52,7 +52,7 @@ export function WaxSeal({ size = 140 }: { size?: number }) {
 
       {/* Embossed inner ring */}
       <circle cx="100" cy="100" r="74" fill="none" stroke="url(#gold-warm)" strokeWidth="1.2" opacity="0.6" />
-      <circle cx="100" cy="100" r="70" fill="none" stroke="oklch(0.22 0.10 28)" strokeWidth="0.8" opacity="0.5" />
+      <circle cx="100" cy="100" r="70" fill="none" stroke="var(--ds-wax-primary-dark)" strokeWidth="0.8" opacity="0.5" />
 
       {/* Tiny dots around the rim */}
       {Array.from({ length: 16 }).map((_, i) => {
@@ -79,7 +79,7 @@ export function WaxSeal({ size = 140 }: { size?: number }) {
         <path
           d="M -12 -18 C -8 -24, -2 -26, 2 -22"
           fill="none"
-          stroke="oklch(0.98 0.05 80)"
+          stroke="color-mix(in oklab, var(--ds-wax-gold) 60%, white)"
           strokeWidth="1.5"
           strokeLinecap="round"
           opacity="0.7"
@@ -88,8 +88,16 @@ export function WaxSeal({ size = 140 }: { size?: number }) {
 
       {/* Banner ribbon below */}
       <g transform="translate(100 166)">
-        <path d="M -40 0 L 40 0 L 34 9 L -34 9 Z" fill="oklch(0.28 0.10 28)" stroke="url(#gold-warm)" strokeWidth="0.8" />
-        <text x="0" y="6.5" textAnchor="middle" fontFamily="Playfair Display, serif" fontSize="5.5" fill="url(#gold-warm)" letterSpacing="1.5">
+        <path d="M -40 0 L 40 0 L 34 9 L -34 9 Z" fill="var(--ds-wax-primary-dark)" stroke="url(#gold-warm)" strokeWidth="0.8" />
+        <text
+          x="0"
+          y="6.5"
+          textAnchor="middle"
+          fontSize="5.5"
+          fill="url(#gold-warm)"
+          letterSpacing="1.5"
+          style={{ fontFamily: "var(--ds-font-display)" }}
+        >
           OURJOURNEY
         </text>
       </g>
