@@ -27,7 +27,13 @@ export type AuditAction =
   | "wedding.updated"
   | "wishlist.created"
   | "wishlist.updated"
-  | "wishlist.deleted";
+  | "wishlist.deleted"
+  | "story.added"
+  | "story.updated"
+  | "story.removed"
+  | "guestbook.hidden"
+  | "guestbook.shown"
+  | "guestbook.removed";
 
 export interface LogAuditInput {
   weddingId: string;
@@ -90,6 +96,12 @@ export function describeAction(a: string): string {
     case "photo.hidden": return "hid a photo";
     case "photo.deleted": return "deleted a photo";
     case "wedding.updated": return "updated wedding settings";
+    case "story.added": return "added a story chapter";
+    case "story.updated": return "edited a story chapter";
+    case "story.removed": return "removed a story chapter";
+    case "guestbook.hidden": return "hid a guestbook message";
+    case "guestbook.shown": return "unhid a guestbook message";
+    case "guestbook.removed": return "removed a guestbook message";
     default: return a;
   }
 }

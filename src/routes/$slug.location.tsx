@@ -1,9 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navigation } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
-import { Button } from "@/components/ui/button";
 import { safeHttpUrl } from "@/lib/safeUrl";
-import { WatercolorBlot, RoseCluster, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
+import {
+  PageCanvas,
+  Section,
+  ThemedCard,
+  ThemedButton,
+  IllustrationFrame,
+} from "@/design-system";
+import { DecorMotifArt } from "@/design-system/decor/Illustrations";
 
 export const Route = createFileRoute("/$slug/location")({
   head: () => ({
@@ -25,51 +31,52 @@ function LocationPage() {
     [wedding.location_name, wedding.location_address].filter(Boolean).join(", "),
   );
   const embedSrc = `https://www.google.com/maps?q=${query}&output=embed`;
+  const mapsUrl = safeHttpUrl(wedding.maps_url);
 
   return (
-    <section className="relative mx-auto max-w-4xl px-6 py-16 sm:py-24">
-      {/* Decorative side elements — climbing roses */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="rose" size="xl" className="absolute top-12 right-0 opacity-60 rose-glow" />
-        <WatercolorBlot color="sage" size="xl" className="absolute bottom-12 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
-        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-16 right-0 opacity-95" />
-        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-16 left-0 opacity-90" />
-        <FloatingPetals count={10} />
-      </div>
-
-      <header className="relative z-10 text-center mb-12">
-        <p className="font-script text-3xl md:text-4xl text-primary">find us here</p>
-        <h1 className="mt-3 font-display text-4xl md:text-5xl">{wedding.location_name}</h1>
-        <FloralDivider className="mt-6" color="terracotta" />
-        {wedding.location_address && (
-          <p className="mt-4 text-sm text-muted-foreground whitespace-pre-line">
-            {wedding.location_address}
-          </p>
-        )}
-      </header>
-
-      <div className="relative z-10 rounded-[2rem] overflow-hidden border border-border shadow-card mb-8">
-        <iframe
-          title="Map"
-          src={embedSrc}
-          width="100%"
-          height="420"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="block w-full"
-        />
-      </div>
-
-      {safeHttpUrl(wedding.maps_url) && (
-        <div className="relative z-10 flex justify-center">
-          <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 h-12 px-8 shadow-warm">
-            <a href={safeHttpUrl(wedding.maps_url)} target="_blank" rel="noreferrer">
-              <Navigation className="w-4 h-4 mr-2" />
-              Open in Google Maps
-            </a>
-          </Button>
+    <PageCanvas density="regular">
+      <Section size="hero" width="prose">
+        <div className="flex flex-col items-center gap-stack text-center">
+          <p className="type-script animate-ds-fade">find us here</p>
+          <h1 className="type-hero animate-ds-reveal">{wedding.location_name}</h1>
+          {wedding.location_address && (
+            <p className="type-body text-muted-foreground whitespace-pre-line animate-ds-reveal" style={{ animationDelay: "120ms" }}>
+              {wedding.location_address}
+            </p>
+          )}
         </div>
-      )}
-    </section>
+      </Section>
+
+      <Section size="spacious" width="content">
+        <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
+          <IllustrationFrame caption="Every road leads here">
+            <iframe
+              title="Map"
+              src={embedSrc}
+              width="100%"
+              height="420"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="block w-full"
+            />
+          </IllustrationFrame>
+
+          <ThemedCard variant="veil" className="flex flex-col items-center gap-4 text-center lg:w-56">
+            <DecorMotifArt motif="castle" size="sm" intensity={0.9} />
+            <p className="type-body text-muted-foreground">
+              We can't wait to welcome you at {wedding.location_name}.
+            </p>
+            {mapsUrl && (
+              <ThemedButton asChild size="lg" className="w-full">
+                <a href={mapsUrl} target="_blank" rel="noreferrer">
+                  <Navigation className="w-4 h-4" />
+                  Open in Google Maps
+                </a>
+              </ThemedButton>
+            )}
+          </ThemedCard>
+        </div>
+      </Section>
+    </PageCanvas>
   );
 }

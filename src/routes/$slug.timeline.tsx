@@ -3,9 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { MapPin, Loader2 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
-import { categoryMeta } from "@/wedding/timelineCategories";
+import { illustrationFor } from "@/wedding/timelineCategories";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
-import { WatercolorBlot, RoseCluster, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
+import {
+  PageCanvas,
+  Section,
+  ThemedCard,
+  Badge,
+  Divider,
+} from "@/design-system";
+import { DecorMotifArt } from "@/design-system/decor/Illustrations";
 
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
@@ -90,92 +97,101 @@ function TimelinePage() {
   if (!wedding) return null;
 
   return (
-    <section className="relative mx-auto max-w-3xl px-6 py-16 sm:py-24">
-      {/* Decorative side elements — climbing roses */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="peach" size="xl" className="absolute top-20 right-0 opacity-60 rose-glow" />
-        <WatercolorBlot color="sage" size="xl" className="absolute bottom-40 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
-        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-28 right-0 opacity-95" />
-        <RoseCluster variant="side-left" size="lg" color="sage" className="absolute bottom-44 left-0 opacity-90" />
-        <FloatingPetals count={10} />
-      </div>
-
-      <header className="relative z-10 text-center mb-16">
-        <p className="font-script text-3xl md:text-4xl text-primary">how the day unfolds</p>
-        <h1 className="mt-3 font-display text-4xl md:text-5xl">Wedding timeline</h1>
-        <FloralDivider className="mt-6" color="terracotta" />
-        {isEvening && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            You're invited from the evening onwards — but you're welcome to arrive a little earlier.
-          </p>
-        )}
-      </header>
+    <PageCanvas density="regular">
+      <Section size="hero" width="prose">
+        <div className="flex flex-col items-center gap-stack text-center">
+          <p className="type-script animate-ds-fade">how the day unfolds</p>
+          <h1 className="type-hero animate-ds-reveal">Wedding timeline</h1>
+          {isEvening && (
+            <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
+              You're invited from the evening onwards — but you're welcome to arrive a little earlier.
+            </p>
+          )}
+        </div>
+      </Section>
 
       {loading ? (
-        <div className="py-12 text-center text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-        </div>
-      ) : visibleEvents.length === 0 ? (
-        <div className="py-16 text-center text-sm text-muted-foreground">
-          The schedule is being prepared. Check back soon.
-        </div>
-      ) : (
-        <div className="relative z-10">
-          {/* Decorative timeline spine */}
-          <div className="absolute left-3 sm:left-5 top-0 bottom-0 w-0.5 rounded-full">
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-sage/20 to-transparent w-full blur-[1px]" />
+        <Section size="compact">
+          <div className="py-12 text-center text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin mx-auto" />
           </div>
-
-          <ol className="relative space-y-10">
-            {visibleEvents.map((e, i) => {
-              const isNext = i === nextIdx;
-              const meta = categoryMeta(e.category);
-              const Icon = meta.Icon;
-              return (
-                <li key={e.id} className="pl-10 sm:pl-14">
-                  <span
-                    className={`absolute -left-[11px] sm:-left-[9px] flex items-center justify-center w-9 h-9 rounded-full shadow-warm border-2 border-background transition-transform duration-500 hover:scale-110 ${meta.accent} ${
-                      isNext ? "ring-4 ring-primary/20 animate-pulse" : ""
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </span>
-                  <div
-                    className={`card-romantic p-6 transition-all duration-500 hover:-translate-y-1 ${
-                      isNext
-                        ? "border-primary/40 bg-gradient-to-br from-primary/5 to-transparent shadow-warm"
-                        : ""
-                    }`}
-                  >
-                    <div className="flex items-baseline gap-3 flex-wrap">
-                      <span className="font-display text-xl text-primary tabular-nums">
-                        {e.event_time.slice(0, 5)}
-                      </span>
-                      <h3 className="font-display text-lg">{e.title}</h3>
-                      {isNext && (
-                        <span className="text-[0.65rem] uppercase tracking-widest text-primary px-2.5 py-0.5 rounded-full bg-primary/10">
-                          Up next
-                        </span>
-                      )}
-                    </div>
-                    {e.description && (
-                      <p className="mt-2 text-sm text-muted-foreground">{e.description}</p>
-                    )}
-                    {e.location && (
-                      <p className="mt-3 text-xs text-muted-foreground inline-flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> {e.location}
-                      </p>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-
-          <FloralDivider className="mt-16" color="terracotta" />
-        </div>
+        </Section>
+      ) : visibleEvents.length === 0 ? (
+        <Section size="compact">
+          <div className="py-16 text-center text-sm text-muted-foreground">
+            The schedule is being prepared. Check back soon.
+          </div>
+        </Section>
+      ) : (
+        <Section size="spacious" width="wide">
+          <div className="relative">
+            {/* Center spine — desktop only, aligned with badge column below */}
+            <div
+              className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-px -translate-x-1/2 bg-linear-to-b from-transparent via-primary/30 to-transparent lg:block"
+              aria-hidden
+            />
+            <ol className="relative flex flex-col gap-block lg:gap-section">
+              {visibleEvents.map((e, i) => {
+                const isNext = i === nextIdx;
+                const isLeft = i % 2 === 0;
+                return (
+                  <li key={e.id}>
+                    <TimelineChapter event={e} isNext={isNext} isLeft={isLeft} />
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+          <Divider className="mt-section" />
+        </Section>
       )}
-    </section>
+    </PageCanvas>
+  );
+}
+
+function TimelineChapter({
+  event: e,
+  isNext,
+  isLeft,
+}: {
+  event: TEvent;
+  isNext: boolean;
+  isLeft: boolean;
+}) {
+  const motif = illustrationFor(e.category, e.title);
+
+  return (
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] lg:items-start lg:gap-x-6">
+      <span
+        className={`relative z-10 mx-auto mb-4 flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full surface-veil border-gilded shadow-elev-2 lg:col-start-2 lg:row-start-1 lg:mb-0 ${
+          isNext ? "shadow-elev-4 ring-2 ring-primary/40" : ""
+        }`}
+      >
+        <DecorMotifArt motif={motif} size="sm" intensity={0.95} />
+      </span>
+
+      <ThemedCard
+        variant={isNext ? "framed" : "paper"}
+        ornament={isNext}
+        interactive
+        className={`${isNext ? "shadow-elev-3" : ""} ${
+          isLeft
+            ? "lg:col-start-1 lg:row-start-1 animate-ds-reveal-left"
+            : "lg:col-start-3 lg:row-start-1 animate-ds-reveal-right"
+        }`}
+      >
+        <div className="flex flex-wrap items-baseline gap-3">
+          <span className="type-card-title text-primary tabular-nums">{e.event_time.slice(0, 5)}</span>
+          <h3 className="type-card-title">{e.title}</h3>
+          {isNext && <Badge tone="primary">Up next</Badge>}
+        </div>
+        {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
+        {e.location && (
+          <p className="type-caption mt-3 inline-flex items-center gap-1">
+            <MapPin className="w-3 h-3" /> {e.location}
+          </p>
+        )}
+      </ThemedCard>
+    </div>
   );
 }

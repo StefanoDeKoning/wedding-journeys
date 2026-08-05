@@ -4,8 +4,8 @@ import { ArrowLeft, Camera, Loader2, Trash2 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { signPhotoUrls } from "@/lib/photoUrl";
+import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/gallery/me")({
   head: () => ({
@@ -69,87 +69,94 @@ function MyPhotosPage() {
 
   if (!guest) {
     return (
-      <section className="mx-auto max-w-md px-6 py-16 text-center">
-        <h1 className="font-display text-2xl">Sign in as a guest</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Your personal photo page is only available when you're signed in with your
-          invitation code.
-        </p>
-        <Button asChild variant="outline" className="mt-6 rounded-full">
-          <Link to="/$slug/gallery" params={{ slug }}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back to gallery
-          </Link>
-        </Button>
-      </section>
+      <PageCanvas density="quiet">
+        <Section size="hero" width="prose">
+          <ThemedCard className="text-center">
+            <h1 className="type-section-title">Sign in as a guest</h1>
+            <p className="type-body mt-2 text-muted-foreground">
+              Your personal photo page is only available when you're signed in with your
+              invitation code.
+            </p>
+            <ThemedButton asChild variant="secondary" className="mt-6">
+              <Link to="/$slug/gallery" params={{ slug }}>
+                <ArrowLeft className="w-4 h-4" /> Back to gallery
+              </Link>
+            </ThemedButton>
+          </ThemedCard>
+        </Section>
+      </PageCanvas>
     );
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      <Link
-        to="/$slug/gallery"
-        params={{ slug }}
-        className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground mb-6"
-      >
-        <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to gallery
-      </Link>
+    <PageCanvas density="regular">
+      <Section size="hero" width="wide">
+        <Link
+          to="/$slug/gallery"
+          params={{ slug }}
+          className="type-caption inline-flex items-center hover-gild"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to gallery
+        </Link>
 
-      <header className="text-center mb-10">
-        <p className="font-script text-3xl text-primary">your moments</p>
-        <h1 className="mt-2 font-display text-4xl">
-          {guest.first_name}'s photos
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Everything you've uploaded — visible only to you and the couple.
-        </p>
-      </header>
-
-      {loading ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-        </div>
-      ) : photos.length === 0 ? (
-        <div className="text-center py-16 rounded-2xl border border-dashed border-border">
-          <Camera className="w-8 h-8 mx-auto text-muted-foreground opacity-40" />
-          <p className="mt-3 text-sm text-muted-foreground">
-            You haven't uploaded any photos yet.
+        <div className="mt-stack flex flex-col items-center gap-stack text-center">
+          <p className="type-script animate-ds-fade">your moments</p>
+          <h1 className="type-hero animate-ds-reveal">{guest.first_name}'s photos</h1>
+          <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
+            Everything you've uploaded — visible only to you and the couple.
           </p>
-          <Button asChild className="mt-6 rounded-full bg-primary hover:bg-primary/90">
-            <Link to="/$slug/gallery" params={{ slug }}>
-              Upload your first photo
-            </Link>
-          </Button>
         </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {photos.map((p) => (
-            <figure
-              key={p.id}
-              className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-soft"
-            >
-              <img
-                src={urls[p.storage_path] ?? ""}
-                alt={p.caption ?? "Your photo"}
-                loading="lazy"
-                className="w-full h-full object-cover"
-              />
-              {p.status !== "approved" && (
-                <div className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-background/90 backdrop-blur text-foreground border border-border">
-                  {p.status}
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => remove(p.id, p.storage_path)}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Delete"
+      </Section>
+
+      <Section size="spacious" width="wide">
+        {loading ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+          </div>
+        ) : photos.length === 0 ? (
+          <div className="text-center py-block rounded-card border-2 border-dashed border-primary/20">
+            <Camera className="w-8 h-8 mx-auto text-muted-foreground opacity-40" />
+            <p className="mt-3 type-body text-muted-foreground">
+              You haven't uploaded any photos yet.
+            </p>
+            <ThemedButton asChild className="mt-6">
+              <Link to="/$slug/gallery" params={{ slug }}>
+                Upload your first photo
+              </Link>
+            </ThemedButton>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {photos.map((p) => (
+              <figure
+                key={p.id}
+                className="group relative aspect-square overflow-hidden rounded-card border-paper shadow-elev-2 hover-lift bg-muted"
               >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </figure>
-          ))}
-        </div>
-      )}
-    </section>
+                <img
+                  src={urls[p.storage_path] ?? ""}
+                  alt={p.caption ?? "Your photo"}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-[var(--ease-paper)] group-hover:scale-[1.04]"
+                />
+                {p.status !== "approved" && (
+                  <div className="absolute top-2 left-2 type-caption px-2 py-0.5 rounded-full bg-background/90 backdrop-blur border-paper">
+                    {p.status}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => remove(p.id, p.storage_path)}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity focus-ring-elegant"
+                  aria-label="Delete"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </figure>
+            ))}
+          </div>
+        )}
+      </Section>
+    </PageCanvas>
   );
 }

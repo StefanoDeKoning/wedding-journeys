@@ -8,7 +8,6 @@ import {
   Pencil,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { DIETARY_OPTIONS, dietaryLabel, type DietaryValue } from "@/wedding/dietary";
+import {
+  PageCanvas,
+  Section,
+  FormPanel,
+  ThemedCard,
+  ThemedButton,
+} from "@/design-system";
 
 export const Route = createFileRoute("/$slug/rsvp")({
   head: () => ({
@@ -60,40 +66,44 @@ function RsvpPage() {
   if (!wedding) return null;
 
   return (
-    <section className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
-      <header className="text-center mb-10">
-        <p className="font-script text-3xl text-primary">your reply</p>
-        <h1 className="mt-2 font-display text-4xl">Will you join us?</h1>
-        {wedding.rsvp_deadline && (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Please respond by{" "}
-            <span className="text-foreground">
-              {new Date(wedding.rsvp_deadline).toLocaleDateString(undefined, {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
-            .
+    <PageCanvas density="regular">
+      <Section size="hero" width="prose">
+        <div className="flex flex-col items-center gap-stack text-center">
+          <p className="type-script animate-ds-fade">your reply</p>
+          <h1 className="type-hero animate-ds-reveal">Will you join us?</h1>
+          {wedding.rsvp_deadline && (
+            <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
+              Please respond by{" "}
+              <span className="text-foreground font-medium">
+                {new Date(wedding.rsvp_deadline).toLocaleDateString(undefined, {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+              .
+            </p>
+          )}
+        </div>
+      </Section>
+
+      <Section size="compact" width="prose">
+        {guest ? (
+          <GuestRsvpForm
+            weddingId={wedding.id}
+            guestId={guest.id}
+            guestFirstName={guest.first_name}
+            guestType={guest.guest_type}
+            plusOneAllowed={guest.plus_one_allowed}
+            rsvpDeadline={wedding.rsvp_deadline}
+          />
+        ) : (
+          <p className="text-center type-body text-muted-foreground">
+            Sign in with your invitation code to reply.
           </p>
         )}
-      </header>
-
-      {guest ? (
-        <GuestRsvpForm
-          weddingId={wedding.id}
-          guestId={guest.id}
-          guestFirstName={guest.first_name}
-          guestType={guest.guest_type}
-          plusOneAllowed={guest.plus_one_allowed}
-          rsvpDeadline={wedding.rsvp_deadline}
-        />
-      ) : (
-        <p className="text-center text-sm text-muted-foreground">
-          Sign in with your invitation code to reply.
-        </p>
-      )}
-    </section>
+      </Section>
+    </PageCanvas>
   );
 }
 
@@ -216,18 +226,18 @@ function GuestRsvpForm({
 
   if (loading) {
     return (
-      <div className="rounded-[1.5rem] border border-border bg-card p-10 text-center shadow-soft">
+      <ThemedCard className="text-center py-block">
         <Loader2 className="w-5 h-5 animate-spin text-primary mx-auto" />
-      </div>
+      </ThemedCard>
     );
   }
 
   if (existing && !editing) {
     return (
-      <div className="rounded-[1.5rem] border border-border bg-card p-8 text-center shadow-soft">
+      <ThemedCard variant="framed" ornament className="text-center animate-ds-scale">
         <CheckCircle2 className="w-12 h-12 text-primary mx-auto" />
-        <h2 className="mt-4 font-display text-2xl">Thank you, {guestFirstName}!</h2>
-        <p className="mt-2 text-muted-foreground text-sm">
+        <h2 className="type-section-title mt-4">Thank you, {guestFirstName}!</h2>
+        <p className="type-body mt-2 text-muted-foreground">
           You replied{" "}
           <span className="text-foreground font-medium">{answerLabel(existing.status)}</span>
           {existing.attendance && existing.status === "yes" && (
@@ -236,208 +246,194 @@ function GuestRsvpForm({
           .
         </p>
         {existing.dietary_tags.length > 0 && (
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="type-caption mt-1">
             Dietary: {existing.dietary_tags.map(dietaryLabel).join(", ")}
           </p>
         )}
         {existing.edited_by_admin && (
-          <p className="mt-2 text-[11px] text-muted-foreground italic">
-            Last updated by an admin.
-          </p>
+          <p className="type-caption mt-2 italic">Last updated by an admin.</p>
         )}
         {!deadlinePassed && (
-          <Button
-            variant="outline"
-            className="mt-6 rounded-full"
-            onClick={() => setEditing(true)}
-          >
-            <Pencil className="w-3.5 h-3.5 mr-1.5" />
+          <ThemedButton variant="secondary" className="mt-6" onClick={() => setEditing(true)}>
+            <Pencil className="w-3.5 h-3.5" />
             Edit my reply
-          </Button>
+          </ThemedButton>
         )}
-      </div>
+      </ThemedCard>
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-[1.5rem] border border-border bg-card p-7 sm:p-9 shadow-soft space-y-7"
-    >
-      {deadlinePassed && (
-        <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4">
-          <AlertTriangle className="w-5 h-5 text-destructive shrink-0" />
-          <div className="text-sm">
-            <p className="font-medium">RSVP deadline has passed</p>
-            <p className="text-muted-foreground mt-1">
-              Replies are now closed. Please reach out to the couple directly.
-            </p>
+    <FormPanel>
+      <form onSubmit={handleSubmit} className="space-y-7">
+        {deadlinePassed && (
+          <div className="flex items-start gap-3 rounded-card border border-destructive/30 bg-destructive/5 p-4">
+            <AlertTriangle className="w-5 h-5 text-destructive shrink-0" />
+            <div className="type-body">
+              <p className="font-medium">RSVP deadline has passed</p>
+              <p className="text-muted-foreground mt-1">
+                Replies are now closed. Please reach out to the couple directly.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <fieldset disabled={deadlinePassed} className="space-y-3">
-        <legend className="font-display text-xl mb-1">My answer</legend>
-        <div className="grid grid-cols-2 gap-3">
-          {(
-            [
-              { v: "yes", label: "Joyfully yes", Icon: CheckCircle2 },
-              { v: "no", label: "Sadly no", Icon: XCircle },
-            ] as const
-          ).map(({ v, label, Icon }) => {
-            const active = answer === v;
-            return (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setAnswer(v)}
-                className={`rounded-2xl border p-4 text-center transition-all ${
-                  active
-                    ? "border-primary bg-primary/10 text-primary shadow-warm"
-                    : "border-border bg-background hover:border-primary/40"
-                }`}
-              >
-                <Icon className="w-6 h-6 mx-auto" />
-                <span className="block mt-2 text-xs font-medium">{label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      {answer === "yes" && attendanceOptions.length > 1 && (
         <fieldset disabled={deadlinePassed} className="space-y-3">
-          <Label>Which part of the day?</Label>
-          <div className="grid grid-cols-3 gap-3">
-            {attendanceOptions.map((opt) => {
-              const active = attendance === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setAttendance(opt.value)}
-                  className={`rounded-xl border p-3 text-sm transition-all ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary shadow-warm"
-                      : "border-border bg-background hover:border-primary/40"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-      )}
-
-      {plusOneAllowed && answer === "yes" && (
-        <fieldset disabled={deadlinePassed} className="space-y-3">
-          <Label>Will you bring a guest?</Label>
+          <legend className="type-card-title mb-1">My answer</legend>
           <div className="grid grid-cols-2 gap-3">
             {(
               [
-                { v: true, label: "Yes, +1" },
-                { v: false, label: "No, just me" },
+                { v: "yes", label: "Joyfully yes", Icon: CheckCircle2 },
+                { v: "no", label: "Sadly no", Icon: XCircle },
               ] as const
-            ).map(({ v, label }) => {
-              const active = bringingGuest === v;
+            ).map(({ v, label, Icon }) => {
+              const active = answer === v;
               return (
                 <button
-                  key={String(v)}
+                  key={v}
                   type="button"
-                  onClick={() => setBringingGuest(v)}
-                  className={`rounded-2xl border p-3 text-center transition-all text-sm ${
+                  onClick={() => setAnswer(v)}
+                  className={`rounded-card p-4 text-center transition-all focus-ring-elegant ${
                     active
-                      ? "border-primary bg-primary/10 text-primary shadow-warm"
-                      : "border-border bg-background hover:border-primary/40"
+                      ? "border-gilded bg-primary/10 text-primary shadow-elev-2"
+                      : "border-paper hover:border-primary/40"
                   }`}
                 >
-                  {label}
+                  <Icon className="w-6 h-6 mx-auto" />
+                  <span className="block mt-2 type-label !normal-case !tracking-normal">{label}</span>
                 </button>
               );
             })}
           </div>
-          {bringingGuest && (
-            <Input
-              id="plusOne"
-              value={plusOne}
-              onChange={(e) => setPlusOne(e.target.value)}
-              placeholder="Name of your guest (optional)"
-              maxLength={120}
-            />
-          )}
         </fieldset>
-      )}
 
-      <fieldset disabled={deadlinePassed} className="space-y-3">
-        <Label>Dietary restrictions</Label>
-        <div className="grid sm:grid-cols-2 gap-2">
-          {DIETARY_OPTIONS.map((opt) => {
-            const checked = tags.includes(opt.value);
-            return (
-              <label
-                key={opt.value}
-                className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors ${
-                  checked
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/40"
-                }`}
-              >
-                <Checkbox checked={checked} onCheckedChange={() => toggleTag(opt.value)} />
-                <span className="text-sm">{opt.label}</span>
-              </label>
-            );
-          })}
-        </div>
-        <Input
-          value={dietaryOther}
-          onChange={(e) => setDietaryOther(e.target.value)}
-          placeholder="Other (e.g. specific allergies)"
-          maxLength={200}
-        />
-      </fieldset>
-
-      <fieldset disabled={deadlinePassed} className="space-y-2">
-        <Label htmlFor="comments">Additional comments</Label>
-        <Textarea
-          id="comments"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          placeholder="A song you'd love to hear, an arrival note, anything…"
-          rows={3}
-          maxLength={1000}
-        />
-      </fieldset>
-
-      <div className="flex gap-3">
-        {existing && (
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-full"
-            onClick={() => {
-              setEditing(false);
-              setAnswer(existing.status);
-              setAttendance(existing.attendance);
-              setPlusOne(existing.plus_one_name ?? "");
-              setBringingGuest(!!existing.plus_one_name);
-              setTags((existing.dietary_tags ?? []) as DietaryValue[]);
-              setDietaryOther(existing.dietary_other ?? "");
-              setComments(existing.comments ?? "");
-            }}
-          >
-            Cancel
-          </Button>
+        {answer === "yes" && attendanceOptions.length > 1 && (
+          <fieldset disabled={deadlinePassed} className="space-y-3">
+            <Label>Which part of the day?</Label>
+            <div className="grid grid-cols-3 gap-3">
+              {attendanceOptions.map((opt) => {
+                const active = attendance === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setAttendance(opt.value)}
+                    className={`rounded-card p-3 type-body transition-all focus-ring-elegant ${
+                      active
+                        ? "border-gilded bg-primary/10 text-primary shadow-elev-2"
+                        : "border-paper hover:border-primary/40"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
         )}
-        <Button
-          type="submit"
-          disabled={submitting || deadlinePassed}
-          className="flex-1 rounded-full bg-primary hover:bg-primary/90 h-11"
-        >
-          {submitting ? "Sending…" : existing ? "Update my reply" : "Send my reply"}
-        </Button>
-      </div>
-    </form>
+
+        {plusOneAllowed && answer === "yes" && (
+          <fieldset disabled={deadlinePassed} className="space-y-3">
+            <Label>Will you bring a guest?</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {(
+                [
+                  { v: true, label: "Yes, +1" },
+                  { v: false, label: "No, just me" },
+                ] as const
+              ).map(({ v, label }) => {
+                const active = bringingGuest === v;
+                return (
+                  <button
+                    key={String(v)}
+                    type="button"
+                    onClick={() => setBringingGuest(v)}
+                    className={`rounded-card p-3 text-center transition-all type-body focus-ring-elegant ${
+                      active
+                        ? "border-gilded bg-primary/10 text-primary shadow-elev-2"
+                        : "border-paper hover:border-primary/40"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            {bringingGuest && (
+              <Input
+                id="plusOne"
+                value={plusOne}
+                onChange={(e) => setPlusOne(e.target.value)}
+                placeholder="Name of your guest (optional)"
+                maxLength={120}
+              />
+            )}
+          </fieldset>
+        )}
+
+        <fieldset disabled={deadlinePassed} className="space-y-3">
+          <Label>Dietary restrictions</Label>
+          <div className="grid sm:grid-cols-2 gap-2">
+            {DIETARY_OPTIONS.map((opt) => {
+              const checked = tags.includes(opt.value);
+              return (
+                <label
+                  key={opt.value}
+                  className={`flex items-center gap-2.5 rounded-card border-paper px-3 py-2.5 cursor-pointer transition-colors ${
+                    checked ? "border-gilded bg-primary/5" : "hover:border-primary/40"
+                  }`}
+                >
+                  <Checkbox checked={checked} onCheckedChange={() => toggleTag(opt.value)} />
+                  <span className="type-body">{opt.label}</span>
+                </label>
+              );
+            })}
+          </div>
+          <Input
+            value={dietaryOther}
+            onChange={(e) => setDietaryOther(e.target.value)}
+            placeholder="Other (e.g. specific allergies)"
+            maxLength={200}
+          />
+        </fieldset>
+
+        <fieldset disabled={deadlinePassed} className="space-y-2">
+          <Label htmlFor="comments">Additional comments</Label>
+          <Textarea
+            id="comments"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+            placeholder="A song you'd love to hear, an arrival note, anything…"
+            rows={3}
+            maxLength={1000}
+          />
+        </fieldset>
+
+        <div className="flex gap-3">
+          {existing && (
+            <ThemedButton
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setEditing(false);
+                setAnswer(existing.status);
+                setAttendance(existing.attendance);
+                setPlusOne(existing.plus_one_name ?? "");
+                setBringingGuest(!!existing.plus_one_name);
+                setTags((existing.dietary_tags ?? []) as DietaryValue[]);
+                setDietaryOther(existing.dietary_other ?? "");
+                setComments(existing.comments ?? "");
+              }}
+            >
+              Cancel
+            </ThemedButton>
+          )}
+          <ThemedButton type="submit" size="lg" disabled={submitting || deadlinePassed} className="flex-1">
+            {submitting ? "Sending…" : existing ? "Update my reply" : "Send my reply"}
+          </ThemedButton>
+        </div>
+      </form>
+    </FormPanel>
   );
 }
 
