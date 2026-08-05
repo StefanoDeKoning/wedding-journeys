@@ -51,10 +51,36 @@
   --color-dusty-rose: var(--dusty-rose);
   --color-warm-cream: var(--warm-cream);
 
-  --font-display: "Playfair Display", serif;
-  --font-body: "Lora", serif;
-  --font-script: "Great Vibes", cursive;
+  /* ---- Design-system palette tokens (theme-driven) ---- */
+  --color-ivory: var(--ds-ivory);
+  --color-champagne: var(--ds-champagne);
+  --color-olive: var(--ds-olive);
+  --color-mist: var(--ds-mist);
+  --color-decor: var(--ds-decor);
+  --color-decor-soft: var(--ds-decor-soft);
+  --color-decor-leaf: var(--ds-decor-leaf);
+  --color-decor-gold: var(--ds-decor-gold);
+
+  /* ---- Radius scale ---- */
+  --radius-paper: var(--ds-radius-paper);
+  --radius-card: var(--ds-radius-card);
+  --radius-frame: var(--ds-radius-frame);
+
+  /* ---- Elevation scale ---- */
+  --shadow-elev-1: var(--ds-elev-1);
+  --shadow-elev-2: var(--ds-elev-2);
+  --shadow-elev-3: var(--ds-elev-3);
+  --shadow-elev-4: var(--ds-elev-4);
+
+  /* ---- Motion ---- */
+  --ease-paper: var(--ds-ease-paper);
+  --ease-soft: var(--ds-ease-soft);
+
+  --font-display: var(--ds-font-display);
+  --font-body: var(--ds-font-body);
+  --font-script: var(--ds-font-script);
 }
+
 
 :root {
   --radius: 0.75rem;
