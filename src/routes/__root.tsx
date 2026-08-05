@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/auth/AuthProvider";
 import { installSupabaseAuthFetch } from "@/integrations/supabase/fetch-interceptor";
+import { ThemeProvider, DEFAULT_THEME_ID } from "@/design-system";
 
 import appCss from "../styles.css?url";
 
@@ -79,9 +80,11 @@ function RootComponent() {
     installSupabaseAuthFetch();
   }, []);
   return (
-    <AuthProvider>
-      <Outlet />
-      <Toaster />
-    </AuthProvider>
+    <ThemeProvider themeId={DEFAULT_THEME_ID}>
+      <AuthProvider>
+        <Outlet />
+        <Toaster />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

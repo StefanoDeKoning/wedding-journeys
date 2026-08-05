@@ -41,37 +41,37 @@ const sections = [
     icon: MailOpen,
     t: "Invitation",
     d: "A romantic letter opening with a countdown to the day.",
-    to: `/${DEMO_SLUG}` as const,
+    to: "/$slug" as const,
   },
   {
     icon: CalendarClock,
     t: "Timeline",
     d: "Ceremony · cocktails · dinner · dancing — hour by hour.",
-    to: `/${DEMO_SLUG}/timeline` as const,
+    to: "/$slug/timeline" as const,
   },
   {
     icon: MailCheck,
     t: "RSVP",
     d: "Elegant response form with meal choices and dietary needs.",
-    to: `/${DEMO_SLUG}/rsvp` as const,
+    to: "/$slug/rsvp" as const,
   },
   {
     icon: MapPin,
     t: "Location",
     d: "Directions and everything guests need to arrive on time.",
-    to: `/${DEMO_SLUG}/location` as const,
+    to: "/$slug/location" as const,
   },
   {
     icon: Camera,
     t: "Gallery",
     d: "A growing memory book, with guest uploads.",
-    to: `/${DEMO_SLUG}/gallery` as const,
+    to: "/$slug/gallery" as const,
   },
   {
     icon: Music2,
     t: "Playlist",
     d: "The evening's soundtrack, built together.",
-    to: `/${DEMO_SLUG}/playlist` as const,
+    to: "/$slug/playlist" as const,
   },
 ];
 
@@ -154,6 +154,7 @@ function DemoPage() {
               <Link
                 key={s.t}
                 to={s.to}
+                params={{ slug: DEMO_SLUG }}
                 className="group card-romantic p-6 hover:border-primary/40 hover:shadow-soft hover:-translate-y-1 transition-all duration-500"
               >
                 <div className="h-11 w-11 rounded-full bg-gradient-warm text-primary-foreground flex items-center justify-center mb-4 shadow-warm">

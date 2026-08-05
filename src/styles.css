@@ -51,10 +51,36 @@
   --color-dusty-rose: var(--dusty-rose);
   --color-warm-cream: var(--warm-cream);
 
-  --font-display: "Playfair Display", serif;
-  --font-body: "Lora", serif;
-  --font-script: "Great Vibes", cursive;
+  /* ---- Design-system palette tokens (theme-driven) ---- */
+  --color-ivory: var(--ds-ivory);
+  --color-champagne: var(--ds-champagne);
+  --color-olive: var(--ds-olive);
+  --color-mist: var(--ds-mist);
+  --color-decor: var(--ds-decor);
+  --color-decor-soft: var(--ds-decor-soft);
+  --color-decor-leaf: var(--ds-decor-leaf);
+  --color-decor-gold: var(--ds-decor-gold);
+
+  /* ---- Radius scale ---- */
+  --radius-paper: var(--ds-radius-paper);
+  --radius-card: var(--ds-radius-card);
+  --radius-frame: var(--ds-radius-frame);
+
+  /* ---- Elevation scale ---- */
+  --shadow-elev-1: var(--ds-elev-1);
+  --shadow-elev-2: var(--ds-elev-2);
+  --shadow-elev-3: var(--ds-elev-3);
+  --shadow-elev-4: var(--ds-elev-4);
+
+  /* ---- Motion ---- */
+  --ease-paper: var(--ds-ease-paper);
+  --ease-soft: var(--ds-ease-soft);
+
+  --font-display: var(--ds-font-display);
+  --font-body: var(--ds-font-body);
+  --font-script: var(--ds-font-script);
 }
+
 
 :root {
   --radius: 0.75rem;
@@ -377,3 +403,349 @@
   100% { transform: scale(1.6) rotate(20deg); opacity: 0; }
 }
 .wax-break { animation: wax-break 0.5s ease-out forwards; }
+
+/* =====================================================================
+ * DESIGN SYSTEM — token layer
+ * ---------------------------------------------------------------------
+ * All public-facing visuals inherit from these tokens. Themes only
+ * redefine the `--ds-*` variables (see src/theme/themes.ts); components
+ * never hardcode colors, radii, shadows or motion values.
+ * ===================================================================== */
+
+@theme {
+  /* Spacing scale — the only allowed layout rhythm values */
+  --spacing-gutter: 1.5rem;
+  --spacing-stack: 2rem;
+  --spacing-block: 3rem;
+  --spacing-section: 5rem;
+  --spacing-section-lg: 8rem;
+  --spacing-hero: 11rem;
+
+  /* Editorial content widths */
+  --container-prose: 44rem;
+  --container-content: 64rem;
+  --container-wide: 80rem;
+  --container-full: 96rem;
+}
+
+/* ---------------------------------------------------------------------
+ * THEME: Romantic Garden (default)
+ * ------------------------------------------------------------------- */
+:root,
+[data-theme="romantic-garden"] {
+  /* Palette */
+  --ds-ivory: oklch(0.98 0.008 85);
+  --ds-cream: oklch(0.965 0.012 80);
+  --ds-champagne: oklch(0.92 0.035 88);
+  --ds-blush: oklch(0.92 0.04 25);
+  --ds-dusty-rose: oklch(0.72 0.06 25);
+  --ds-sage: oklch(0.82 0.04 140);
+  --ds-olive: oklch(0.62 0.05 120);
+  --ds-gold: oklch(0.80 0.07 80);
+  --ds-terracotta: oklch(0.65 0.10 40);
+  --ds-ink: oklch(0.32 0.025 50);
+  --ds-mist: oklch(0.94 0.014 70);
+
+  /* Decorative artwork colors (SVG illustration system) */
+  --ds-decor: var(--ds-dusty-rose);
+  --ds-decor-soft: var(--ds-blush);
+  --ds-decor-leaf: var(--ds-sage);
+  --ds-decor-gold: var(--ds-gold);
+
+  /* Typography */
+  --ds-font-display: "Playfair Display", serif;
+  --ds-font-body: "Lora", serif;
+  --ds-font-script: "Great Vibes", cursive;
+  --ds-tracking-label: 0.22em;
+
+  /* Radius */
+  --ds-radius-paper: 0.5rem;
+  --ds-radius-card: 1.25rem;
+  --ds-radius-frame: 2rem;
+
+  /* Elevation — soft, warm, never harsh */
+  --ds-elev-1: 0 1px 2px color-mix(in oklab, var(--ds-ink) 6%, transparent);
+  --ds-elev-2: 0 8px 24px -14px color-mix(in oklab, var(--ds-ink) 18%, transparent);
+  --ds-elev-3: 0 18px 44px -22px color-mix(in oklab, var(--ds-ink) 24%, transparent);
+  --ds-elev-4: 0 32px 70px -30px color-mix(in oklab, var(--ds-terracotta) 30%, transparent);
+
+  /* Borders — paper-like */
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-ink) 10%, transparent);
+  --ds-border-paper: 1px solid color-mix(in oklab, var(--ds-terracotta) 18%, transparent);
+  --ds-border-gilded: 1px solid color-mix(in oklab, var(--ds-gold) 55%, transparent);
+
+  /* Motion */
+  --ds-ease-paper: cubic-bezier(0.22, 1, 0.36, 1);
+  --ds-ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-dur-fast: 200ms;
+  --ds-dur-base: 450ms;
+  --ds-dur-slow: 900ms;
+  --ds-dur-ambient: 7s;
+
+  /* Surfaces & atmosphere */
+  --ds-texture-opacity: 0.5;
+  --ds-vignette: radial-gradient(
+    ellipse at 50% 20%,
+    transparent 40%,
+    color-mix(in oklab, var(--ds-terracotta) 7%, transparent) 100%
+  );
+  --ds-wash-page: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ds-blush) 45%, var(--ds-cream)) 0%,
+    var(--ds-cream) 45%,
+    color-mix(in oklab, var(--ds-champagne) 35%, var(--ds-cream)) 100%
+  );
+
+  /* Semantic remap — existing shadcn/app components inherit the theme */
+  --background: var(--ds-cream);
+  --foreground: var(--ds-ink);
+  --primary: var(--ds-terracotta);
+  --secondary: var(--ds-dusty-rose);
+  --accent: var(--ds-gold);
+  --muted: var(--ds-mist);
+  --radius: var(--ds-radius-paper);
+  --ring: var(--ds-terracotta);
+}
+
+/* ---------------------------------------------------------------------
+ * Typography scale
+ * ------------------------------------------------------------------- */
+@utility type-hero {
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+@utility type-section-title {
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: clamp(1.875rem, 3.6vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+@utility type-card-title {
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  line-height: 1.25;
+}
+
+@utility type-script {
+  font-family: var(--ds-font-script);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.35;
+  color: var(--primary);
+}
+
+@utility type-script-sm {
+  font-family: var(--ds-font-script);
+  font-weight: 400;
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  line-height: 1.4;
+  color: var(--primary);
+}
+
+@utility type-body-lg {
+  font-family: var(--ds-font-body);
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+@utility type-body {
+  font-family: var(--ds-font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+@utility type-caption {
+  font-family: var(--ds-font-body);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+@utility type-label {
+  font-family: var(--ds-font-body);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: var(--ds-tracking-label);
+  color: color-mix(in oklab, var(--foreground) 62%, transparent);
+}
+
+@utility type-nav {
+  font-family: var(--ds-font-body);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+}
+
+@utility type-button {
+  font-family: var(--ds-font-body);
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+}
+
+/* ---------------------------------------------------------------------
+ * Surfaces, borders, textures
+ * ------------------------------------------------------------------- */
+@utility surface-paper {
+  background-color: var(--card);
+  border: var(--ds-border-paper);
+  border-radius: var(--ds-radius-card);
+  box-shadow: var(--ds-elev-2);
+}
+
+@utility surface-veil {
+  background: color-mix(in oklab, var(--ds-ivory) 72%, transparent);
+  backdrop-filter: blur(10px);
+  border: var(--ds-border-hairline);
+  border-radius: var(--ds-radius-card);
+}
+
+@utility border-paper {
+  border: var(--ds-border-paper);
+}
+
+@utility border-gilded {
+  border: var(--ds-border-gilded);
+}
+
+@utility bg-wash-page {
+  background: var(--ds-wash-page);
+}
+
+@utility texture-paper {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--ds-texture-opacity);
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent 0 23px,
+        color-mix(in oklab, var(--ds-terracotta) 4%, transparent) 23px 24px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0 71px,
+        color-mix(in oklab, var(--ds-terracotta) 3%, transparent) 71px 72px
+      );
+    mix-blend-mode: multiply;
+  }
+}
+
+@utility vignette {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--ds-vignette);
+  }
+}
+
+@utility decor-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 35%, black 65%, transparent);
+}
+
+@utility focus-ring-elegant {
+  &:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--ring) 70%, transparent);
+    outline-offset: 3px;
+    border-radius: var(--ds-radius-paper);
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * Animation system
+ * ------------------------------------------------------------------- */
+@keyframes ds-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ds-reveal-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ds-reveal-left {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ds-reveal-right {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes ds-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ds-paper-lift {
+  from { opacity: 0; transform: translateY(30px) rotate(-1.2deg); }
+  to { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+@keyframes ds-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1.5deg); }
+}
+@keyframes ds-drift {
+  0% { transform: translate3d(0, -8%, 0) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.7; }
+  85% { opacity: 0.5; }
+  100% { transform: translate3d(var(--ds-drift-x, 40px), 108vh, 0) rotate(220deg); opacity: 0; }
+}
+@keyframes ds-shimmer {
+  0%, 100% { opacity: 0.25; transform: scale(0.9); }
+  50% { opacity: 0.9; transform: scale(1.15); }
+}
+
+@utility animate-ds-fade { animation: ds-fade-in var(--ds-dur-base) var(--ds-ease-soft) both; }
+@utility animate-ds-reveal { animation: ds-reveal-up var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-reveal-left { animation: ds-reveal-left var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-reveal-right { animation: ds-reveal-right var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-scale { animation: ds-scale-in var(--ds-dur-base) var(--ds-ease-paper) both; }
+@utility animate-ds-paper { animation: ds-paper-lift var(--ds-dur-slow) var(--ds-ease-paper) both; }
+@utility animate-ds-float { animation: ds-float var(--ds-dur-ambient) var(--ds-ease-soft) infinite; }
+@utility animate-ds-drift { animation: ds-drift linear infinite; }
+@utility animate-ds-shimmer { animation: ds-shimmer 4s var(--ds-ease-soft) infinite; }
+
+@utility hover-lift {
+  transition:
+    transform var(--ds-dur-fast) var(--ds-ease-paper),
+    box-shadow var(--ds-dur-fast) var(--ds-ease-paper);
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ds-elev-3);
+  }
+}
+
+@utility hover-gild {
+  transition: color var(--ds-dur-fast) var(--ds-ease-soft),
+    border-color var(--ds-dur-fast) var(--ds-ease-soft);
+  &:hover {
+    color: var(--primary);
+    border-color: color-mix(in oklab, var(--ds-gold) 60%, transparent);
+  }
+}
+
+/* Reduced motion: keep the composition, remove the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
