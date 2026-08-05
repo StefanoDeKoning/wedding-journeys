@@ -27,7 +27,20 @@ export type DecorMotif =
   | "eucalyptus"
   | "vine"
   | "flourish"
-  | "gold-leaf";
+  | "gold-leaf"
+  // Figurative motifs — used contextually (timeline/story chapters), never as
+  // ambient corner/side decor. Same layered-watercolor construction rules apply.
+  | "castle"
+  | "ceremony-arch"
+  | "toast"
+  | "cake"
+  | "dinner"
+  | "bouquet"
+  | "music-note"
+  | "dancing"
+  | "pizza"
+  | "fireworks"
+  | "sunset";
 
 export type DecorPlacement =
   | "corner-top-left"

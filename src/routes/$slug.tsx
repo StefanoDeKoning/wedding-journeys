@@ -6,14 +6,13 @@ import { Loader2 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { WeddingShell } from "@/wedding/WeddingShell";
 import { SiteShell } from "@/components/SiteShell";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
-import { WatercolorBlot, RoseCluster, FloatingPetals } from "@/wedding/FloralDecorations";
+import { PageCanvas, Section, FormPanel, ThemedButton } from "@/design-system";
 
 export const Route = createFileRoute("/$slug")({
   head: ({ params }) => ({
@@ -46,7 +45,7 @@ function WeddingLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-soft">
+      <div className="min-h-screen flex items-center justify-center bg-wash-page">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
@@ -76,13 +75,17 @@ function WeddingLayout() {
   if (wedding.status === "draft" && !isAdmin) {
     return (
       <SiteShell>
-        <div className="mx-auto max-w-md text-center px-6 py-24">
-          <h1 className="font-display text-3xl">Coming soon</h1>
-          <p className="mt-3 text-muted-foreground">
-            The couple is still finishing their site. You'll be able to view it once
-            they publish.
-          </p>
-        </div>
+        <PageCanvas density="quiet">
+          <Section size="hero" width="prose">
+            <div className="text-center">
+              <h1 className="type-hero">Coming soon</h1>
+              <p className="type-body-lg mt-3 text-muted-foreground">
+                The couple is still finishing their site. You'll be able to view it once
+                they publish.
+              </p>
+            </div>
+          </Section>
+        </PageCanvas>
       </SiteShell>
     );
   }
@@ -102,13 +105,17 @@ function WeddingLayout() {
 function NotFoundForGuest({ slug }: { slug: string }) {
   return (
     <SiteShell>
-      <div className="mx-auto max-w-md text-center px-6 py-24">
-        <h1 className="font-display text-3xl">We couldn't find that wedding</h1>
-        <p className="mt-3 text-muted-foreground">
-          The address <span className="font-mono">/{slug}</span> doesn't lead anywhere
-          yet. Double-check the link from your invitation.
-        </p>
-      </div>
+      <PageCanvas density="quiet">
+        <Section size="hero" width="prose">
+          <div className="text-center">
+            <h1 className="type-hero">We couldn't find that wedding</h1>
+            <p className="type-body-lg mt-3 text-muted-foreground">
+              The address <span className="font-mono">/{slug}</span> doesn't lead anywhere
+              yet. Double-check the link from your invitation.
+            </p>
+          </div>
+        </Section>
+      </PageCanvas>
     </SiteShell>
   );
 }
@@ -172,87 +179,73 @@ function GuestLoginGate({
   };
 
   return (
-    <section className="relative min-h-[calc(100vh-5rem)] flex items-center justify-center px-6 py-12 sm:py-16 overflow-hidden">
-      {/* Dreamy side florals framing the gate */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <WatercolorBlot color="rose" size="2xl" className="absolute -top-20 right-0 opacity-60 rose-glow" />
-        <WatercolorBlot color="sage" size="2xl" className="absolute -bottom-32 left-0 opacity-55 rose-glow" style={{ animationDelay: "2s" }} />
-        <WatercolorBlot color="peach" size="xl" className="absolute top-1/3 -left-12 opacity-35" style={{ animationDelay: "4s" }} />
-        <RoseCluster variant="side-right" size="lg" color="rose" className="absolute top-20 right-0 opacity-95" />
-        <RoseCluster variant="side-left" size="lg" color="rose" className="absolute bottom-16 left-0 opacity-90" />
-        <FloatingPetals count={12} />
-      </div>
-
-      <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-block wax-pulse">
-            <WaxSeal size={96} />
+    <PageCanvas density="lavish">
+      <Section size="hero" width="prose">
+        <div className="mx-auto w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="inline-block wax-pulse">
+              <WaxSeal size={96} />
+            </div>
+            <p className="type-script mt-4">welcome</p>
+            <h1 className="type-hero mt-2">{weddingTitle}</h1>
+            <p className="type-body mt-3 text-muted-foreground">
+              Enter your name and the invitation code from your envelope to open the
+              letter.
+            </p>
           </div>
-          <p className="font-script text-3xl text-primary mt-4">welcome</p>
-          <h1 className="mt-2 text-3xl font-display">{weddingTitle}</h1>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Enter your name and the invitation code from your envelope to open the
-            letter.
-          </p>
+
+          <FormPanel>
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName">First name</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Sophie"
+                    autoComplete="given-name"
+                    aria-invalid={!!errors.firstName}
+                  />
+                  {errors.firstName && (
+                    <p className="type-caption text-destructive">{errors.firstName}</p>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName">Last name</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Laurent"
+                    autoComplete="family-name"
+                    aria-invalid={!!errors.lastName}
+                  />
+                  {errors.lastName && (
+                    <p className="type-caption text-destructive">{errors.lastName}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="invitationCode">Invitation code</Label>
+                <Input
+                  id="invitationCode"
+                  name="invitationCode"
+                  placeholder="ROSE-2026"
+                  className="uppercase tracking-widest"
+                  aria-invalid={!!errors.invitationCode}
+                />
+                {errors.invitationCode && (
+                  <p className="type-caption text-destructive">{errors.invitationCode}</p>
+                )}
+              </div>
+
+              <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
+                {submitting ? "Opening…" : "Open my invitation"}
+              </ThemedButton>
+            </form>
+          </FormPanel>
         </div>
-
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="rounded-[1.5rem] border border-border/70 bg-card/80 backdrop-blur-sm p-7 shadow-soft space-y-5"
-        >
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="firstName">First name</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                placeholder="Sophie"
-                autoComplete="given-name"
-                aria-invalid={!!errors.firstName}
-              />
-              {errors.firstName && (
-                <p className="text-xs text-destructive">{errors.firstName}</p>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="lastName">Last name</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                placeholder="Laurent"
-                autoComplete="family-name"
-                aria-invalid={!!errors.lastName}
-              />
-              {errors.lastName && (
-                <p className="text-xs text-destructive">{errors.lastName}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="invitationCode">Invitation code</Label>
-            <Input
-              id="invitationCode"
-              name="invitationCode"
-              placeholder="ROSE-2026"
-              className="uppercase tracking-widest"
-              aria-invalid={!!errors.invitationCode}
-            />
-            {errors.invitationCode && (
-              <p className="text-xs text-destructive">{errors.invitationCode}</p>
-            )}
-          </div>
-
-          <Button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-full bg-primary hover:bg-primary/90 h-11"
-          >
-            {submitting ? "Opening…" : "Open my invitation"}
-          </Button>
-        </form>
-      </div>
-    </section>
+      </Section>
+    </PageCanvas>
   );
 }

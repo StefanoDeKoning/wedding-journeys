@@ -315,6 +315,173 @@ export function DecorMotifArt({
             ))}
           </>
         );
+      case "castle":
+        return (
+          <>
+            <WatercolorWash color="decor-soft" size="lg" intensity={intensity * 0.5} className="absolute inset-0" />
+            <g style={{ filter: "blur(1.5px)" }}>
+              <path
+                d="M46,150V96h14V80h12v16h14V64h16v32h14V80h12v16h14v54Z"
+                fill={soft}
+                fillOpacity={intensity * 0.6}
+              />
+              <path d="M60,96v-14M86,80v-14M114,64v-14M142,80v-14" stroke={gold} strokeOpacity={intensity * 0.55} strokeWidth="1.2" />
+            </g>
+            <path d="M40,150C70,146,130,146,160,150" fill="none" stroke={fill} strokeOpacity={intensity * 0.4} strokeWidth="1.4" strokeLinecap="round" />
+          </>
+        );
+      case "ceremony-arch":
+        return (
+          <>
+            <path
+              d="M50,168V110C50,76,72,52,100,52C128,52,150,76,150,110V168"
+              fill="none"
+              stroke={leaf}
+              strokeOpacity={intensity * 0.55}
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            <g transform="translate(58 56) scale(0.34)">
+              <RosePaint fill={fill} soft={soft} intensity={intensity} />
+            </g>
+            <g transform="translate(122 56) scale(0.3)">
+              <RosePaint fill={fill} soft={soft} intensity={intensity * 0.85} />
+            </g>
+            <g transform="translate(96 40) scale(0.4)">
+              <RosePaint fill={fill} soft={soft} intensity={intensity} />
+            </g>
+            <LeafPaint fill={leaf} intensity={intensity} x={70} y={70} rotate={-40} scale={0.6} />
+            <LeafPaint fill={leaf} intensity={intensity} x={130} y={70} rotate={220} scale={0.6} />
+          </>
+        );
+      case "toast":
+        return (
+          <>
+            <WatercolorWash color="decor-gold" size="md" intensity={intensity * 0.35} className="absolute inset-0" />
+            <path d="M76,60L68,120C67,132,89,138,90,120L84,60Z" fill="none" stroke={fill} strokeOpacity={intensity * 0.7} strokeWidth="1.6" />
+            <path d="M124,52L118,118C117,130,137,136,138,118L130,52Z" fill="none" stroke={gold} strokeOpacity={intensity * 0.75} strokeWidth="1.6" />
+            <path d="M74,58C78,66,86,66,90,58" fill="none" stroke={fill} strokeOpacity={intensity * 0.5} strokeWidth="1.2" />
+            <path d="M122,50C126,58,134,58,138,50" fill="none" stroke={gold} strokeOpacity={intensity * 0.55} strokeWidth="1.2" />
+            <circle cx="86" cy="44" r="2" fill={gold} fillOpacity={intensity * 0.7} />
+            <circle cx="112" cy="36" r="1.6" fill={gold} fillOpacity={intensity * 0.6} />
+          </>
+        );
+      case "cake":
+        return (
+          <>
+            <path d="M52,158C52,150,148,150,148,158L146,164C120,168,80,168,54,164Z" fill={fill} fillOpacity={intensity * 0.5} style={{ filter: "blur(1.5px)" }} />
+            <path d="M60,158V128C60,122,140,122,140,128V158" fill={soft} fillOpacity={intensity * 0.55} style={{ filter: "blur(2px)" }} />
+            <path d="M68,128V104C68,99,132,99,132,104V128" fill={fill} fillOpacity={intensity * 0.62} style={{ filter: "blur(1.5px)" }} />
+            <path d="M78,104V86C78,82,122,82,122,86V104" fill={soft} fillOpacity={intensity * 0.68} />
+            <path d="M98,86V66" stroke={gold} strokeOpacity={intensity * 0.8} strokeWidth="1.6" strokeLinecap="round" />
+            <path d="M98,66C94,60,102,56,98,50" fill="none" stroke={gold} strokeOpacity={intensity * 0.7} strokeWidth="1.2" />
+          </>
+        );
+      case "dinner":
+        return (
+          <>
+            <ellipse cx="100" cy="128" rx="58" ry="14" fill={soft} fillOpacity={intensity * 0.4} style={{ filter: "blur(3px)" }} />
+            <ellipse cx="100" cy="120" rx="34" ry="12" fill="none" stroke={fill} strokeOpacity={intensity * 0.6} strokeWidth="1.4" />
+            <path d="M56,90V132M52,90V104C52,108,56,108,56,104V90M60,90V104C60,108,56,108,56,104" fill="none" stroke={fill} strokeOpacity={intensity * 0.5} strokeWidth="1.1" strokeLinecap="round" />
+            <path d="M144,90C136,94,136,110,144,116V132" fill="none" stroke={gold} strokeOpacity={intensity * 0.55} strokeWidth="1.1" strokeLinecap="round" />
+            <LeafPaint fill={leaf} intensity={intensity * 0.8} x={92} y={112} rotate={-20} scale={0.5} />
+          </>
+        );
+      case "bouquet":
+        return (
+          <>
+            <g transform="translate(100 88) scale(0.9)">
+              <RosePaint fill={fill} soft={soft} intensity={intensity} />
+            </g>
+            <g transform="translate(66 104) scale(0.5)">
+              <RosePaint fill={fill} soft={soft} intensity={intensity * 0.8} />
+            </g>
+            <g transform="translate(136 100) scale(0.46)">
+              <RosePaint fill={fill} soft={soft} intensity={intensity * 0.75} />
+            </g>
+            <LeafPaint fill={leaf} intensity={intensity} x={78} y={124} rotate={200} scale={0.7} />
+            <LeafPaint fill={leaf} intensity={intensity} x={126} y={128} rotate={-20} scale={0.7} />
+            <path d="M92,146C96,158,104,158,108,146" fill="none" stroke={gold} strokeOpacity={intensity * 0.6} strokeWidth="2" strokeLinecap="round" />
+          </>
+        );
+      case "music-note":
+        return (
+          <>
+            <WatercolorWash color="decor-soft" size="sm" intensity={intensity * 0.4} className="absolute inset-0" />
+            <path d="M112,52V128" stroke={fill} strokeOpacity={intensity * 0.75} strokeWidth="2.4" strokeLinecap="round" />
+            <path d="M112,52C124,56,132,64,130,74" fill="none" stroke={gold} strokeOpacity={intensity * 0.6} strokeWidth="1.6" strokeLinecap="round" />
+            <ellipse cx="102" cy="132" rx="12" ry="9" fill={fill} fillOpacity={intensity * 0.7} transform="rotate(-18 102 132)" />
+          </>
+        );
+      case "dancing":
+        return (
+          <>
+            <path
+              d="M60,150C50,120,80,110,80,86C80,66,60,58,64,40"
+              fill="none"
+              stroke={fill}
+              strokeOpacity={intensity * 0.6}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              style={{ filter: "blur(1px)" }}
+            />
+            <path
+              d="M140,150C150,120,120,110,120,86C120,66,140,58,136,40"
+              fill="none"
+              stroke={gold}
+              strokeOpacity={intensity * 0.55}
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              style={{ filter: "blur(1px)" }}
+            />
+            <circle cx="64" cy="40" r="6" fill={fill} fillOpacity={intensity * 0.7} />
+            <circle cx="136" cy="40" r="6" fill={gold} fillOpacity={intensity * 0.65} />
+          </>
+        );
+      case "pizza":
+        return (
+          <>
+            <path d="M100,54L150,148C120,164,80,164,50,148Z" fill={soft} fillOpacity={intensity * 0.55} style={{ filter: "blur(2px)" }} />
+            <path d="M100,54L150,148C120,164,80,164,50,148Z" fill="none" stroke={fill} strokeOpacity={intensity * 0.5} strokeWidth="1.4" />
+            <circle cx="92" cy="92" r="4.5" fill={fill} fillOpacity={intensity * 0.7} />
+            <circle cx="112" cy="106" r="4" fill={gold} fillOpacity={intensity * 0.65} />
+            <circle cx="96" cy="124" r="4.2" fill={fill} fillOpacity={intensity * 0.6} />
+            <circle cx="118" cy="132" r="3.6" fill={gold} fillOpacity={intensity * 0.55} />
+          </>
+        );
+      case "fireworks":
+        return (
+          <>
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <line
+                key={angle}
+                x1="100"
+                y1="100"
+                x2={100 + 46 * Math.cos((angle * Math.PI) / 180)}
+                y2={100 + 46 * Math.sin((angle * Math.PI) / 180)}
+                stroke={angle % 90 === 0 ? gold : fill}
+                strokeOpacity={intensity * 0.55}
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                style={{ filter: "blur(1px)" }}
+              />
+            ))}
+            <circle cx="100" cy="100" r="10" fill={soft} fillOpacity={intensity * 0.5} style={{ filter: "blur(6px)" }} />
+            <circle cx="100" cy="100" r="4" fill={gold} fillOpacity={intensity * 0.85} />
+          </>
+        );
+      case "sunset":
+        return (
+          <>
+            <g style={{ filter: "blur(10px)" }}>
+              <rect x="20" y="120" width="160" height="18" fill={fill} fillOpacity={intensity * 0.3} />
+              <rect x="20" y="140" width="160" height="18" fill={leaf} fillOpacity={intensity * 0.3} />
+              <rect x="20" y="160" width="160" height="18" fill={gold} fillOpacity={intensity * 0.25} />
+            </g>
+            <circle cx="100" cy="112" r="26" fill={gold} fillOpacity={intensity * 0.55} style={{ filter: "blur(4px)" }} />
+            <circle cx="100" cy="112" r="16" fill={soft} fillOpacity={intensity * 0.7} />
+          </>
+        );
       case "flourish":
       default:
         return (

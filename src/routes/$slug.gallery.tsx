@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useWedding } from "@/wedding/useWedding";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +24,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  PageCanvas,
+  Section,
+  SectionHeader,
+  FormPanel,
+  ThemedButton,
+} from "@/design-system";
 
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
 
@@ -176,19 +182,6 @@ function GalleryPage() {
     }
   };
 
-  const moderate = async (id: string, status: Photo["status"]) => {
-    const { error } = await supabase
-      .from("photos")
-      .update({ status })
-      .eq("id", id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(status === "approved" ? "Approved" : "Hidden");
-    void load();
-  };
-
   const remove = async (id: string, path: string) => {
     if (!confirm("Delete this photo permanently?")) return;
     const { error: stErr } = await supabase.storage
@@ -213,111 +206,115 @@ function GalleryPage() {
       : `/${slug}/gallery`;
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-      <header className="text-center mb-8">
-        <p className="font-script text-3xl text-primary">the day in pictures</p>
-        <h1 className="mt-2 font-display text-4xl">Gallery</h1>
-        <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
-          Share your photos with us — every angle, every smile.
-        </p>
-        {uploadWindow.label && (
-          <p className="mt-2 text-xs text-muted-foreground italic">
-            {uploadWindow.label}
+    <PageCanvas density="regular">
+      <Section size="hero" width="prose">
+        <div className="flex flex-col items-center gap-stack text-center">
+          <p className="type-script animate-ds-fade">the day in pictures</p>
+          <h1 className="type-hero animate-ds-reveal">Gallery</h1>
+          <p className="type-body-lg text-muted-foreground max-w-md animate-ds-reveal" style={{ animationDelay: "120ms" }}>
+            Share your photos with us — every angle, every smile.
           </p>
-        )}
-      </header>
-
-      {/* Upload + QR */}
-      <div className="rounded-[1.5rem] border border-border bg-card p-6 shadow-soft mb-8">
-        <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
-          <div className="flex-1 space-y-2">
-            <Input
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Add an optional caption…"
-              maxLength={200}
-              disabled={!guest || uploading}
-            />
-            <input
-              ref={fileInput}
-              type="file"
-              accept="image/*"
-              multiple
-              hidden
-              onChange={(e) => handleFiles(e.target.files)}
-            />
-            <Button
-              onClick={() => fileInput.current?.click()}
-              disabled={!guest || uploading}
-              className="w-full sm:w-auto rounded-full bg-primary hover:bg-primary/90"
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Uploading…
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload photos (max 20MB each)
-                </>
-              )}
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setQrOpen(true)}
-              className="rounded-full"
-            >
-              <QrCode className="w-4 h-4 mr-2" />
-              QR code
-            </Button>
-            {guest && (
-              <Button asChild variant="outline" className="rounded-full">
-                <Link to="/$slug/gallery/me" params={{ slug }}>
-                  <User className="w-4 h-4 mr-2" />
-                  My photos
-                </Link>
-              </Button>
-            )}
-          </div>
+          {uploadWindow.label && (
+            <p className="type-caption italic animate-ds-reveal" style={{ animationDelay: "200ms" }}>
+              {uploadWindow.label}
+            </p>
+          )}
         </div>
-        {!guest && (
-          <p className="mt-3 text-xs text-muted-foreground text-center">
-            Sign in as a guest to upload your own photos.
-          </p>
-        )}
-      </div>
+      </Section>
 
-      {loading ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-        </div>
-      ) : visiblePhotos.length === 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-square rounded-2xl border border-dashed border-border bg-card flex items-center justify-center text-muted-foreground"
-            >
-              <Camera className="w-7 h-7 opacity-40" />
+      <Section size="compact" width="content">
+        <FormPanel>
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+            <div className="flex-1 space-y-2">
+              <Input
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Add an optional caption…"
+                maxLength={200}
+                disabled={!guest || uploading}
+              />
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={(e) => handleFiles(e.target.files)}
+              />
+              <ThemedButton
+                onClick={() => fileInput.current?.click()}
+                disabled={!guest || uploading}
+                className="w-full sm:w-auto"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Uploading…
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Upload photos (max 20MB each)
+                  </>
+                )}
+              </ThemedButton>
             </div>
-          ))}
+            <div className="flex gap-2">
+              <ThemedButton variant="secondary" onClick={() => setQrOpen(true)}>
+                <QrCode className="w-4 h-4" />
+                QR code
+              </ThemedButton>
+              {guest && (
+                <ThemedButton variant="secondary" asChild>
+                  <Link to="/$slug/gallery/me" params={{ slug }}>
+                    <User className="w-4 h-4" />
+                    My photos
+                  </Link>
+                </ThemedButton>
+              )}
+            </div>
+          </div>
+          {!guest && (
+            <p className="mt-3 type-caption text-center">
+              Sign in as a guest to upload your own photos.
+            </p>
+          )}
+        </FormPanel>
+      </Section>
+
+      <Section size="spacious" width="wide">
+        <SectionHeader eyebrow="every angle" title="Moments captured" align="center" />
+        <div className="mt-block">
+          {loading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+            </div>
+          ) : visiblePhotos.length === 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square rounded-card border-2 border-dashed border-primary/20 flex items-center justify-center text-muted-foreground"
+                >
+                  <Camera className="w-7 h-7 opacity-40" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {visiblePhotos.map((p) => (
+                <PhotoTile
+                  key={p.id}
+                  photo={p}
+                  url={urls[p.storage_path] ?? ""}
+                  isMine={!!(guest && p.guest_id === guest.id)}
+                  onDelete={() => remove(p.id, p.storage_path)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {visiblePhotos.map((p) => (
-            <PhotoTile
-              key={p.id}
-              photo={p}
-              url={urls[p.storage_path] ?? ""}
-              isMine={!!(guest && p.guest_id === guest.id)}
-              onDelete={() => remove(p.id, p.storage_path)}
-            />
-          ))}
-        </div>
-      )}
+      </Section>
 
       {/* QR dialog */}
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
@@ -330,14 +327,14 @@ function GalleryPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-4 rounded-2xl bg-white">
+            <div className="p-4 rounded-card bg-white">
               <QRCodeSVG value={uploadUrl} size={220} level="M" />
             </div>
             <a
               href={uploadUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+              className="type-caption text-primary hover-gild inline-flex items-center gap-1"
             >
               {uploadUrl}
               <ExternalLink className="w-3 h-3" />
@@ -345,7 +342,7 @@ function GalleryPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </section>
+    </PageCanvas>
   );
 }
 
@@ -362,7 +359,7 @@ function PhotoTile({
 }) {
   return (
     <figure
-      className={`group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted shadow-soft ${
+      className={`group relative aspect-square overflow-hidden rounded-card border-paper shadow-elev-2 hover-lift bg-muted ${
         photo.status === "hidden" ? "opacity-50" : ""
       }`}
     >
@@ -370,10 +367,11 @@ function PhotoTile({
         src={url}
         alt={photo.caption ?? `Photo by ${photo.uploader_name}`}
         loading="lazy"
-        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+        decoding="async"
+        className="w-full h-full object-cover transition-transform duration-700 ease-[var(--ease-paper)] group-hover:scale-[1.04]"
       />
       {photo.status !== "approved" && (
-        <div className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-background/90 backdrop-blur text-foreground border border-border flex items-center gap-1">
+        <div className="absolute top-2 left-2 type-caption px-2 py-0.5 rounded-full bg-background/90 backdrop-blur border-paper flex items-center gap-1">
           {photo.status === "pending" ? (
             <Clock className="w-2.5 h-2.5" />
           ) : (
@@ -382,7 +380,7 @@ function PhotoTile({
           {photo.status}
         </div>
       )}
-      <figcaption className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/70 to-transparent text-white text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
+      <figcaption className="absolute inset-x-0 bottom-0 p-2 bg-linear-to-t from-foreground/70 to-transparent type-caption text-background opacity-0 group-hover:opacity-100 transition-opacity">
         <p className="truncate">
           {photo.caption ?? `By ${photo.uploader_name}`}
         </p>
@@ -392,7 +390,7 @@ function PhotoTile({
           <button
             type="button"
             onClick={onDelete}
-            className="p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground"
+            className="p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground focus-ring-elegant"
             aria-label="Delete"
             title="Delete"
           >

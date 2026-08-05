@@ -1,5 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, ListChecks, CalendarHeart, Image as ImageIcon, Music, MapPin, LogOut, Settings } from "lucide-react";
+import {
+  Mail,
+  ListChecks,
+  BookHeart,
+  CalendarHeart,
+  Image as ImageIcon,
+  Music,
+  MessageCircleHeart,
+  MapPin,
+  LogOut,
+  Settings,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { ThemedButton } from "@/design-system";
@@ -7,9 +18,11 @@ import { ThemedButton } from "@/design-system";
 const tabs = [
   { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true },
   { to: "/$slug/rsvp" as const, label: "RSVP", icon: ListChecks, exact: false },
+  { to: "/$slug/story" as const, label: "Story", icon: BookHeart, exact: false },
   { to: "/$slug/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false },
   { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false },
   { to: "/$slug/playlist" as const, label: "Playlist", icon: Music, exact: false },
+  { to: "/$slug/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false },
   { to: "/$slug/location" as const, label: "Location", icon: MapPin, exact: false },
 ];
 
@@ -106,7 +119,7 @@ export function WeddingShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-soft">
+    <div className="min-h-screen flex flex-col bg-wash-page">
       <WeddingHeader slug={slug} title={title} guestFirstName={guestFirstName} isAdmin={isAdmin} />
       <main className="flex-1">{children}</main>
       <footer className="text-center type-caption py-block">

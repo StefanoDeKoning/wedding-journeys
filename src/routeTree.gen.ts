@@ -18,9 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
 import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
+import { Route as SlugStoryRouteImport } from './routes/$slug.story'
 import { Route as SlugRsvpRouteImport } from './routes/$slug.rsvp'
 import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
 import { Route as SlugLocationRouteImport } from './routes/$slug.location'
+import { Route as SlugGuestbookRouteImport } from './routes/$slug.guestbook'
 import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugAdminRouteImport } from './routes/$slug.admin'
 import { Route as AdminPlatformIndexRouteImport } from './routes/admin.platform.index'
@@ -31,12 +33,14 @@ import { Route as SlugInviteCodeRouteImport } from './routes/$slug.invite.$code'
 import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
 import { Route as SlugAdminTodoRouteImport } from './routes/$slug.admin.todo'
 import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
+import { Route as SlugAdminStoryRouteImport } from './routes/$slug.admin.story'
 import { Route as SlugAdminSettingsRouteImport } from './routes/$slug.admin.settings'
 import { Route as SlugAdminSeatingRouteImport } from './routes/$slug.admin.seating'
 import { Route as SlugAdminRsvpRouteImport } from './routes/$slug.admin.rsvp'
 import { Route as SlugAdminPlaylistRouteImport } from './routes/$slug.admin.playlist'
 import { Route as SlugAdminPhotosRouteImport } from './routes/$slug.admin.photos'
 import { Route as SlugAdminInvitationRouteImport } from './routes/$slug.admin.invitation'
+import { Route as SlugAdminGuestbookRouteImport } from './routes/$slug.admin.guestbook'
 import { Route as SlugAdminBudgetRouteImport } from './routes/$slug.admin.budget'
 
 const LoginRoute = LoginRouteImport.update({
@@ -84,6 +88,11 @@ const SlugTimelineRoute = SlugTimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => SlugRoute,
 } as any)
+const SlugStoryRoute = SlugStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => SlugRoute,
+} as any)
 const SlugRsvpRoute = SlugRsvpRouteImport.update({
   id: '/rsvp',
   path: '/rsvp',
@@ -97,6 +106,11 @@ const SlugPlaylistRoute = SlugPlaylistRouteImport.update({
 const SlugLocationRoute = SlugLocationRouteImport.update({
   id: '/location',
   path: '/location',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugGuestbookRoute = SlugGuestbookRouteImport.update({
+  id: '/guestbook',
+  path: '/guestbook',
   getParentRoute: () => SlugRoute,
 } as any)
 const SlugGalleryRoute = SlugGalleryRouteImport.update({
@@ -150,6 +164,11 @@ const SlugAdminTimelineRoute = SlugAdminTimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => SlugAdminRoute,
 } as any)
+const SlugAdminStoryRoute = SlugAdminStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
 const SlugAdminSettingsRoute = SlugAdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -180,6 +199,11 @@ const SlugAdminInvitationRoute = SlugAdminInvitationRouteImport.update({
   path: '/invitation',
   getParentRoute: () => SlugAdminRoute,
 } as any)
+const SlugAdminGuestbookRoute = SlugAdminGuestbookRouteImport.update({
+  id: '/guestbook',
+  path: '/guestbook',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
 const SlugAdminBudgetRoute = SlugAdminBudgetRouteImport.update({
   id: '/budget',
   path: '/budget',
@@ -195,19 +219,23 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/$slug/admin': typeof SlugAdminRouteWithChildren
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
+  '/$slug/guestbook': typeof SlugGuestbookRoute
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
+  '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/budget': typeof SlugAdminBudgetRoute
+  '/$slug/admin/guestbook': typeof SlugAdminGuestbookRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
   '/$slug/admin/playlist': typeof SlugAdminPlaylistRoute
   '/$slug/admin/rsvp': typeof SlugAdminRsvpRoute
   '/$slug/admin/seating': typeof SlugAdminSeatingRoute
   '/$slug/admin/settings': typeof SlugAdminSettingsRoute
+  '/$slug/admin/story': typeof SlugAdminStoryRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
@@ -224,18 +252,22 @@ export interface FileRoutesByTo {
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
+  '/$slug/guestbook': typeof SlugGuestbookRoute
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
+  '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/$slug': typeof SlugIndexRoute
   '/$slug/admin/budget': typeof SlugAdminBudgetRoute
+  '/$slug/admin/guestbook': typeof SlugAdminGuestbookRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
   '/$slug/admin/playlist': typeof SlugAdminPlaylistRoute
   '/$slug/admin/rsvp': typeof SlugAdminRsvpRoute
   '/$slug/admin/seating': typeof SlugAdminSeatingRoute
   '/$slug/admin/settings': typeof SlugAdminSettingsRoute
+  '/$slug/admin/story': typeof SlugAdminStoryRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
@@ -255,19 +287,23 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/$slug/admin': typeof SlugAdminRouteWithChildren
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
+  '/$slug/guestbook': typeof SlugGuestbookRoute
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/rsvp': typeof SlugRsvpRoute
+  '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/admin/platform': typeof AdminPlatformRouteWithChildren
   '/$slug/': typeof SlugIndexRoute
   '/$slug/admin/budget': typeof SlugAdminBudgetRoute
+  '/$slug/admin/guestbook': typeof SlugAdminGuestbookRoute
   '/$slug/admin/invitation': typeof SlugAdminInvitationRoute
   '/$slug/admin/photos': typeof SlugAdminPhotosRoute
   '/$slug/admin/playlist': typeof SlugAdminPlaylistRoute
   '/$slug/admin/rsvp': typeof SlugAdminRsvpRoute
   '/$slug/admin/seating': typeof SlugAdminSeatingRoute
   '/$slug/admin/settings': typeof SlugAdminSettingsRoute
+  '/$slug/admin/story': typeof SlugAdminStoryRoute
   '/$slug/admin/timeline': typeof SlugAdminTimelineRoute
   '/$slug/admin/todo': typeof SlugAdminTodoRoute
   '/$slug/gallery/me': typeof SlugGalleryMeRoute
@@ -288,19 +324,23 @@ export interface FileRouteTypes {
     | '/login'
     | '/$slug/admin'
     | '/$slug/gallery'
+    | '/$slug/guestbook'
     | '/$slug/location'
     | '/$slug/playlist'
     | '/$slug/rsvp'
+    | '/$slug/story'
     | '/$slug/timeline'
     | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/budget'
+    | '/$slug/admin/guestbook'
     | '/$slug/admin/invitation'
     | '/$slug/admin/photos'
     | '/$slug/admin/playlist'
     | '/$slug/admin/rsvp'
     | '/$slug/admin/seating'
     | '/$slug/admin/settings'
+    | '/$slug/admin/story'
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
     | '/$slug/gallery/me'
@@ -317,18 +357,22 @@ export interface FileRouteTypes {
     | '/features'
     | '/login'
     | '/$slug/gallery'
+    | '/$slug/guestbook'
     | '/$slug/location'
     | '/$slug/playlist'
     | '/$slug/rsvp'
+    | '/$slug/story'
     | '/$slug/timeline'
     | '/$slug'
     | '/$slug/admin/budget'
+    | '/$slug/admin/guestbook'
     | '/$slug/admin/invitation'
     | '/$slug/admin/photos'
     | '/$slug/admin/playlist'
     | '/$slug/admin/rsvp'
     | '/$slug/admin/seating'
     | '/$slug/admin/settings'
+    | '/$slug/admin/story'
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
     | '/$slug/gallery/me'
@@ -347,19 +391,23 @@ export interface FileRouteTypes {
     | '/login'
     | '/$slug/admin'
     | '/$slug/gallery'
+    | '/$slug/guestbook'
     | '/$slug/location'
     | '/$slug/playlist'
     | '/$slug/rsvp'
+    | '/$slug/story'
     | '/$slug/timeline'
     | '/admin/platform'
     | '/$slug/'
     | '/$slug/admin/budget'
+    | '/$slug/admin/guestbook'
     | '/$slug/admin/invitation'
     | '/$slug/admin/photos'
     | '/$slug/admin/playlist'
     | '/$slug/admin/rsvp'
     | '/$slug/admin/seating'
     | '/$slug/admin/settings'
+    | '/$slug/admin/story'
     | '/$slug/admin/timeline'
     | '/$slug/admin/todo'
     | '/$slug/gallery/me'
@@ -445,6 +493,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugTimelineRouteImport
       parentRoute: typeof SlugRoute
     }
+    '/$slug/story': {
+      id: '/$slug/story'
+      path: '/story'
+      fullPath: '/$slug/story'
+      preLoaderRoute: typeof SlugStoryRouteImport
+      parentRoute: typeof SlugRoute
+    }
     '/$slug/rsvp': {
       id: '/$slug/rsvp'
       path: '/rsvp'
@@ -464,6 +519,13 @@ declare module '@tanstack/react-router' {
       path: '/location'
       fullPath: '/$slug/location'
       preLoaderRoute: typeof SlugLocationRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/guestbook': {
+      id: '/$slug/guestbook'
+      path: '/guestbook'
+      fullPath: '/$slug/guestbook'
+      preLoaderRoute: typeof SlugGuestbookRouteImport
       parentRoute: typeof SlugRoute
     }
     '/$slug/gallery': {
@@ -536,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminTimelineRouteImport
       parentRoute: typeof SlugAdminRoute
     }
+    '/$slug/admin/story': {
+      id: '/$slug/admin/story'
+      path: '/story'
+      fullPath: '/$slug/admin/story'
+      preLoaderRoute: typeof SlugAdminStoryRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
     '/$slug/admin/settings': {
       id: '/$slug/admin/settings'
       path: '/settings'
@@ -578,6 +647,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminInvitationRouteImport
       parentRoute: typeof SlugAdminRoute
     }
+    '/$slug/admin/guestbook': {
+      id: '/$slug/admin/guestbook'
+      path: '/guestbook'
+      fullPath: '/$slug/admin/guestbook'
+      preLoaderRoute: typeof SlugAdminGuestbookRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
     '/$slug/admin/budget': {
       id: '/$slug/admin/budget'
       path: '/budget'
@@ -590,12 +666,14 @@ declare module '@tanstack/react-router' {
 
 interface SlugAdminRouteChildren {
   SlugAdminBudgetRoute: typeof SlugAdminBudgetRoute
+  SlugAdminGuestbookRoute: typeof SlugAdminGuestbookRoute
   SlugAdminInvitationRoute: typeof SlugAdminInvitationRoute
   SlugAdminPhotosRoute: typeof SlugAdminPhotosRoute
   SlugAdminPlaylistRoute: typeof SlugAdminPlaylistRoute
   SlugAdminRsvpRoute: typeof SlugAdminRsvpRoute
   SlugAdminSeatingRoute: typeof SlugAdminSeatingRoute
   SlugAdminSettingsRoute: typeof SlugAdminSettingsRoute
+  SlugAdminStoryRoute: typeof SlugAdminStoryRoute
   SlugAdminTimelineRoute: typeof SlugAdminTimelineRoute
   SlugAdminTodoRoute: typeof SlugAdminTodoRoute
   SlugAdminIndexRoute: typeof SlugAdminIndexRoute
@@ -603,12 +681,14 @@ interface SlugAdminRouteChildren {
 
 const SlugAdminRouteChildren: SlugAdminRouteChildren = {
   SlugAdminBudgetRoute: SlugAdminBudgetRoute,
+  SlugAdminGuestbookRoute: SlugAdminGuestbookRoute,
   SlugAdminInvitationRoute: SlugAdminInvitationRoute,
   SlugAdminPhotosRoute: SlugAdminPhotosRoute,
   SlugAdminPlaylistRoute: SlugAdminPlaylistRoute,
   SlugAdminRsvpRoute: SlugAdminRsvpRoute,
   SlugAdminSeatingRoute: SlugAdminSeatingRoute,
   SlugAdminSettingsRoute: SlugAdminSettingsRoute,
+  SlugAdminStoryRoute: SlugAdminStoryRoute,
   SlugAdminTimelineRoute: SlugAdminTimelineRoute,
   SlugAdminTodoRoute: SlugAdminTodoRoute,
   SlugAdminIndexRoute: SlugAdminIndexRoute,
@@ -633,9 +713,11 @@ const SlugGalleryRouteWithChildren = SlugGalleryRoute._addFileChildren(
 interface SlugRouteChildren {
   SlugAdminRoute: typeof SlugAdminRouteWithChildren
   SlugGalleryRoute: typeof SlugGalleryRouteWithChildren
+  SlugGuestbookRoute: typeof SlugGuestbookRoute
   SlugLocationRoute: typeof SlugLocationRoute
   SlugPlaylistRoute: typeof SlugPlaylistRoute
   SlugRsvpRoute: typeof SlugRsvpRoute
+  SlugStoryRoute: typeof SlugStoryRoute
   SlugTimelineRoute: typeof SlugTimelineRoute
   SlugIndexRoute: typeof SlugIndexRoute
   SlugInviteCodeRoute: typeof SlugInviteCodeRoute
@@ -644,9 +726,11 @@ interface SlugRouteChildren {
 const SlugRouteChildren: SlugRouteChildren = {
   SlugAdminRoute: SlugAdminRouteWithChildren,
   SlugGalleryRoute: SlugGalleryRouteWithChildren,
+  SlugGuestbookRoute: SlugGuestbookRoute,
   SlugLocationRoute: SlugLocationRoute,
   SlugPlaylistRoute: SlugPlaylistRoute,
   SlugRsvpRoute: SlugRsvpRoute,
+  SlugStoryRoute: SlugStoryRoute,
   SlugTimelineRoute: SlugTimelineRoute,
   SlugIndexRoute: SlugIndexRoute,
   SlugInviteCodeRoute: SlugInviteCodeRoute,

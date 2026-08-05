@@ -9,6 +9,8 @@ import {
   ListTodo,
   Wallet,
   Music,
+  BookHeart,
+  MessageCircleHeart,
   Settings as SettingsIcon,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
@@ -31,9 +33,11 @@ const tabs = [
   { to: "/$slug/admin/budget" as const, label: "Budget", icon: Wallet, exact: false },
   { to: "/$slug/admin/seating" as const, label: "Seating", icon: Armchair, exact: false },
   { to: "/$slug/admin/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false },
+  { to: "/$slug/admin/story" as const, label: "Story", icon: BookHeart, exact: false },
   { to: "/$slug/admin/invitation" as const, label: "Invitation", icon: Mail, exact: false },
   { to: "/$slug/admin/playlist" as const, label: "Playlist", icon: Music, exact: false },
   { to: "/$slug/admin/photos" as const, label: "Photos", icon: ImageIcon, exact: false },
+  { to: "/$slug/admin/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false },
   { to: "/$slug/admin/settings" as const, label: "Settings", icon: SettingsIcon, exact: false },
 ];
 
