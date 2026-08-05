@@ -79,9 +79,11 @@ function RootComponent() {
     installSupabaseAuthFetch();
   }, []);
   return (
-    <AuthProvider>
-      <Outlet />
-      <Toaster />
-    </AuthProvider>
+    <ThemeProvider themeId={DEFAULT_THEME_ID}>
+      <AuthProvider>
+        <Outlet />
+        <Toaster />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
