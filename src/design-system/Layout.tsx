@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import floralColumn from "@/assets/floral-column.png.asset.json";
 import { useTheme } from "@/theme/ThemeProvider";
+
 import {
   DecorParticles,
   DecorSideComposition,
@@ -46,11 +48,33 @@ export function PageCanvas({
     >
       {decor && (
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+          {/* Painted floral columns hugging both margins */}
+          <div className="hidden lg:block">
+            <img
+              src={floralColumn.url}
+              alt=""
+              loading="lazy"
+              width={640}
+              height={1920}
+              className="absolute left-0 top-0 h-full w-[clamp(11rem,20vw,20rem)] object-cover object-right decor-fade-x"
+              style={{ opacity: intensity * 0.9 }}
+            />
+            <img
+              src={floralColumn.url}
+              alt=""
+              loading="lazy"
+              width={640}
+              height={1920}
+              className="absolute right-0 top-0 h-full w-[clamp(11rem,20vw,20rem)] -scale-x-100 object-cover object-right decor-fade-x"
+              style={{ opacity: intensity * 0.9 }}
+            />
+          </div>
           {/* Painted margins — hidden on small screens, replaced by soft washes */}
           <div className="hidden lg:block decor-fade-x">
-            <DecorSideComposition placement="side-left" intensity={intensity} motifs={theme.decor.sides} />
-            <DecorSideComposition placement="side-right" intensity={intensity} motifs={theme.decor.sides} />
+            <DecorSideComposition placement="side-left" intensity={intensity * 0.5} motifs={theme.decor.sides} />
+            <DecorSideComposition placement="side-right" intensity={intensity * 0.5} motifs={theme.decor.sides} />
           </div>
+
           {/* Mobile keeps the atmosphere: repositioned washes instead of removal */}
           <div className="lg:hidden">
             <WatercolorWash
