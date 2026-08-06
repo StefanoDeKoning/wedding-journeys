@@ -219,54 +219,6 @@ export type Database = {
           },
         ]
       }
-      guestbook_messages: {
-        Row: {
-          author_name: string
-          created_at: string
-          guest_id: string | null
-          id: string
-          message: string
-          status: Database["public"]["Enums"]["guestbook_status"]
-          updated_at: string
-          wedding_id: string
-        }
-        Insert: {
-          author_name: string
-          created_at?: string
-          guest_id?: string | null
-          id?: string
-          message: string
-          status?: Database["public"]["Enums"]["guestbook_status"]
-          updated_at?: string
-          wedding_id: string
-        }
-        Update: {
-          author_name?: string
-          created_at?: string
-          guest_id?: string | null
-          id?: string
-          message?: string
-          status?: Database["public"]["Enums"]["guestbook_status"]
-          updated_at?: string
-          wedding_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "guestbook_messages_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "guestbook_messages_wedding_id_fkey"
-            columns: ["wedding_id"]
-            isOneToOne: false
-            referencedRelation: "weddings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       photos: {
         Row: {
           caption: string | null
@@ -515,53 +467,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "seating_tables_wedding_id_fkey"
-            columns: ["wedding_id"]
-            isOneToOne: false
-            referencedRelation: "weddings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      story_chapters: {
-        Row: {
-          body: string
-          chapter_label: string | null
-          created_at: string
-          event_date: string | null
-          id: string
-          illustration_motif: string | null
-          position: number
-          title: string
-          updated_at: string
-          wedding_id: string
-        }
-        Insert: {
-          body: string
-          chapter_label?: string | null
-          created_at?: string
-          event_date?: string | null
-          id?: string
-          illustration_motif?: string | null
-          position?: number
-          title: string
-          updated_at?: string
-          wedding_id: string
-        }
-        Update: {
-          body?: string
-          chapter_label?: string | null
-          created_at?: string
-          event_date?: string | null
-          id?: string
-          illustration_motif?: string | null
-          position?: number
-          title?: string
-          updated_at?: string
-          wedding_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "story_chapters_wedding_id_fkey"
             columns: ["wedding_id"]
             isOneToOne: false
             referencedRelation: "weddings"
@@ -945,7 +850,6 @@ export type Database = {
       age_type: "adult" | "child"
       app_role: "platform_owner"
       guest_type: "day" | "evening" | "full_day"
-      guestbook_status: "visible" | "hidden"
       photo_status: "pending" | "approved" | "hidden"
       rsvp_attendance: "day" | "evening" | "both"
       rsvp_status: "yes" | "no" | "maybe"
@@ -1083,7 +987,6 @@ export const Constants = {
     Enums: {
       age_type: ["adult", "child"],
       app_role: ["platform_owner"],
-      guestbook_status: ["visible", "hidden"],
       guest_type: ["day", "evening", "full_day"],
       photo_status: ["pending", "approved", "hidden"],
       rsvp_attendance: ["day", "evening", "both"],
