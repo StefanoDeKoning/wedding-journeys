@@ -156,6 +156,51 @@ export type Database = {
           },
         ]
       }
+      guestbook_messages: {
+        Row: {
+          author_name: string
+          created_at: string
+          guest_id: string | null
+          id: string
+          message: string
+          status: string
+          wedding_id: string
+        }
+        Insert: {
+          author_name: string
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          message: string
+          status?: string
+          wedding_id: string
+        }
+        Update: {
+          author_name?: string
+          created_at?: string
+          guest_id?: string | null
+          id?: string
+          message?: string
+          status?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guestbook_messages_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guestbook_messages_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests: {
         Row: {
           age_type: Database["public"]["Enums"]["age_type"]
@@ -467,6 +512,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "seating_tables_wedding_id_fkey"
+            columns: ["wedding_id"]
+            isOneToOne: false
+            referencedRelation: "weddings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_chapters: {
+        Row: {
+          body: string
+          chapter_label: string | null
+          created_at: string
+          event_date: string | null
+          id: string
+          illustration_motif: string | null
+          position: number
+          title: string
+          updated_at: string
+          wedding_id: string
+        }
+        Insert: {
+          body?: string
+          chapter_label?: string | null
+          created_at?: string
+          event_date?: string | null
+          id?: string
+          illustration_motif?: string | null
+          position?: number
+          title: string
+          updated_at?: string
+          wedding_id: string
+        }
+        Update: {
+          body?: string
+          chapter_label?: string | null
+          created_at?: string
+          event_date?: string | null
+          id?: string
+          illustration_motif?: string | null
+          position?: number
+          title?: string
+          updated_at?: string
+          wedding_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_chapters_wedding_id_fkey"
             columns: ["wedding_id"]
             isOneToOne: false
             referencedRelation: "weddings"
