@@ -1,18 +1,18 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
+import { WeddingProvider } from "@/wedding/WeddingContext";
 import { WeddingShell } from "@/wedding/WeddingShell";
 import { SiteShell } from "@/components/SiteShell";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
-import { PageCanvas, Section, FormPanel, ThemedButton } from "@/design-system";
+import { PageCanvas, Section, FormPanel, ThemedButton, ThemedInput } from "@/design-system";
 
 export const Route = createFileRoute("/$slug")({
   head: ({ params }) => ({
@@ -45,9 +45,11 @@ function WeddingLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-wash-page">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
+      <PageCanvas decor={false}>
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </div>
+      </PageCanvas>
     );
   }
 
@@ -83,6 +85,9 @@ function WeddingLayout() {
                 The couple is still finishing their site. You'll be able to view it once
                 they publish.
               </p>
+              <ThemedButton asChild variant="ghost" size="md" className="mt-6">
+                <Link to="/">Back to OurJourney</Link>
+              </ThemedButton>
             </div>
           </Section>
         </PageCanvas>
@@ -91,14 +96,16 @@ function WeddingLayout() {
   }
 
   return (
-    <WeddingShell
-      slug={slug}
-      title={wedding.wedding_name ?? slug}
-      guestFirstName={guest?.first_name}
-      isAdmin={isAdmin}
-    >
-      <Outlet />
-    </WeddingShell>
+    <WeddingProvider value={{ wedding, guest, isAdmin, refresh }}>
+      <WeddingShell
+        slug={slug}
+        title={wedding.wedding_name ?? slug}
+        guestFirstName={guest?.first_name}
+        isAdmin={isAdmin}
+      >
+        <Outlet />
+      </WeddingShell>
+    </WeddingProvider>
   );
 }
 
@@ -113,6 +120,9 @@ function NotFoundForGuest({ slug }: { slug: string }) {
               The address <span className="font-mono">/{slug}</span> doesn't lead anywhere
               yet. Double-check the link from your invitation.
             </p>
+            <ThemedButton asChild variant="ghost" size="md" className="mt-6">
+              <Link to="/">Back to OurJourney</Link>
+            </ThemedButton>
           </div>
         </Section>
       </PageCanvas>
@@ -195,11 +205,11 @@ function GuestLoginGate({
           </div>
 
           <FormPanel>
-            <form onSubmit={handleSubmit} noValidate className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-gutter">
+              <div className="grid grid-cols-2 gap-gutter">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="firstName">First name</Label>
-                  <Input
+                  <ThemedInput
                     id="firstName"
                     name="firstName"
                     placeholder="Sophie"
@@ -210,9 +220,9 @@ function GuestLoginGate({
                     <p className="type-caption text-destructive">{errors.firstName}</p>
                   )}
                 </div>
-                <div className="space-y-1.5">
+                <div className="flex flex-col gap-2">
                   <Label htmlFor="lastName">Last name</Label>
-                  <Input
+                  <ThemedInput
                     id="lastName"
                     name="lastName"
                     placeholder="Laurent"
@@ -225,9 +235,9 @@ function GuestLoginGate({
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="invitationCode">Invitation code</Label>
-                <Input
+                <ThemedInput
                   id="invitationCode"
                   name="invitationCode"
                   placeholder="ROSE-2026"

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Crown } from "lucide-react";
 import { Logo } from "./Logo";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/auth/AuthProvider";
+import { ThemedButton } from "@/design-system";
 
 const nav = [
   { to: "/" as const, label: "Home" },
@@ -11,42 +11,41 @@ const nav = [
   { to: "/create" as const, label: "Create" },
 ];
 
+const NAV_LINK =
+  "type-nav text-foreground/75 hover:text-primary focus-ring-elegant transition-colors duration-[var(--ds-dur-fast)] ease-[var(--ease-soft)]";
+
 export function SiteHeader() {
   const { isPlatformOwner } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
-      <div className="mx-auto max-w-7xl px-6 h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-paper">
+      <div className="mx-auto max-w-7xl px-gutter h-20 flex items-center justify-between">
         <Logo />
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-stack">
           {nav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="text-sm tracking-wide text-foreground/75 hover:text-primary transition-colors"
-              activeProps={{ className: "text-primary" }}
+              className={NAV_LINK}
+              activeProps={{ className: "type-nav text-primary" }}
               activeOptions={{ exact: true }}
             >
               {n.label}
             </Link>
           ))}
           {isPlatformOwner && (
-            <Link
-              to="/admin/platform"
-              className="text-sm tracking-wide text-foreground/75 hover:text-primary transition-colors flex items-center gap-1"
-              activeProps={{ className: "text-primary" }}
-            >
-              <Crown className="w-3.5 h-3.5" /> Platform
+            <Link to="/admin/platform" className={`${NAV_LINK} flex items-center gap-1`} activeProps={{ className: "type-nav text-primary flex items-center gap-1" }}>
+              <Crown aria-hidden="true" className="w-3.5 h-3.5" /> Platform
             </Link>
           )}
         </nav>
         <div className="flex items-center gap-3">
-          <Link to="/login" className="text-sm text-foreground/75 hover:text-primary transition-colors">
+          <Link to="/login" className={NAV_LINK}>
             Login
           </Link>
-          <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-5">
+          <ThemedButton asChild size="sm">
             <Link to="/create">Start your story</Link>
-          </Button>
+          </ThemedButton>
         </div>
       </div>
     </header>

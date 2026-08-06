@@ -1,18 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, MapPin, Heart, ListChecks, Clock } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
 import { WishlistSection } from "@/wedding/WishlistSection";
 import { safeHttpUrl } from "@/lib/safeUrl";
 import {
   PageCanvas,
+  Container,
   Section,
   SectionHeader,
   ThemedCard,
   ThemedButton,
   Badge,
   Divider,
+  Hero,
 } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/")({
@@ -45,9 +47,7 @@ function formatTime(iso: string | null) {
 
 function InvitationPage() {
   const { slug } = Route.useParams();
-  const { wedding, guest } = useWedding(slug);
-
-  if (!wedding) return null;
+  const { wedding, guest } = useWeddingContext();
 
   const isEvening = guest?.guest_type === "evening";
   const target = isEvening
@@ -71,43 +71,42 @@ function InvitationPage() {
   return (
     <PageCanvas density="lavish">
       {/* Hero — the visual centerpiece: names, date, venue, countdown */}
-      <Section size="hero" width="content">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">together with their families</p>
-
-          <h1 className="type-hero animate-ds-reveal" style={{ animationDelay: "80ms" }}>
-            {wedding.bride_name}
-            <span className="type-script mx-4 align-baseline">&</span>
-            {wedding.groom_name}
-          </h1>
-
-          <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 type-body text-muted-foreground animate-ds-reveal"
-            style={{ animationDelay: "180ms" }}
-          >
-            {wedding.wedding_date && (
-              <span className="flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-primary" />
-                {formatLongDate(wedding.wedding_date)}
+      <Container width="content">
+        <Hero
+          script="together with their families"
+          title={
+            <>
+              {wedding.bride_name}
+              <span className="type-script mx-4 align-baseline">&</span>
+              {wedding.groom_name}
+            </>
+          }
+          subtitle={
+            (wedding.wedding_date || wedding.location_name) && (
+              <span className="flex flex-col items-center justify-center gap-stack sm:flex-row sm:gap-block">
+                {wedding.wedding_date && (
+                  <span className="flex items-center gap-2">
+                    <CalendarDays aria-hidden="true" className="w-4 h-4 text-primary" />
+                    {formatLongDate(wedding.wedding_date)}
+                  </span>
+                )}
+                {wedding.location_name && (
+                  <span className="flex items-center gap-2">
+                    <MapPin aria-hidden="true" className="w-4 h-4 text-primary" />
+                    {wedding.location_name}
+                  </span>
+                )}
               </span>
-            )}
-            {wedding.location_name && (
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                {wedding.location_name}
-              </span>
-            )}
-          </div>
-
-          <Divider className="w-full max-w-sm" />
-
-          {target && (
-            <div className="animate-ds-reveal" style={{ animationDelay: "280ms" }}>
-              <Countdown target={target} label={countdownLabel} />
+            )
+          }
+          extra={
+            <div className="flex flex-col items-center gap-stack">
+              <Divider className="w-full max-w-sm" />
+              {target && <Countdown target={target} label={countdownLabel} />}
             </div>
-          )}
-        </div>
-      </Section>
+          }
+        />
+      </Container>
 
       {/* Envelope — the signature moment */}
       <Section size="regular" width="prose">
@@ -140,22 +139,24 @@ function InvitationPage() {
           align="center"
         />
 
-        <div className="mt-block grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="mt-block grid gap-stack lg:grid-cols-2 lg:gap-block">
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-left">
             <Badge tone="primary">
-              <CalendarDays className="w-3 h-3" /> When
+              <CalendarDays aria-hidden="true" className="w-3 h-3" /> When
             </Badge>
-            <p className="type-card-title mt-4">{formatLongDate(wedding.wedding_date)}</p>
+            <p className="type-card-title mt-4">
+              {wedding.wedding_date ? formatLongDate(wedding.wedding_date) : "Date to be announced"}
+            </p>
             <div className="mt-4 space-y-2 type-body text-muted-foreground">
               {wedding.ceremony_at && (
                 <p className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary shrink-0" />
+                  <Clock aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
                   Ceremony at {formatTime(wedding.ceremony_at)}
                 </p>
               )}
               {wedding.reception_at && (
                 <p className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary shrink-0" />
+                  <Clock aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
                   Reception from {formatTime(wedding.reception_at)}
                 </p>
               )}
@@ -169,9 +170,9 @@ function InvitationPage() {
 
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-right lg:mt-12">
             <Badge tone="leaf">
-              <MapPin className="w-3 h-3" /> Where
+              <MapPin aria-hidden="true" className="w-3 h-3" /> Where
             </Badge>
-            <p className="type-card-title mt-4">{wedding.location_name}</p>
+            <p className="type-card-title mt-4">{wedding.location_name || "Venue to be announced"}</p>
             {wedding.location_address && (
               <p className="mt-3 type-body text-muted-foreground whitespace-pre-line">
                 {wedding.location_address}
@@ -182,7 +183,7 @@ function InvitationPage() {
                 href={mapsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-5 inline-flex items-center gap-1.5 type-label !normal-case !tracking-normal text-primary hover-gild"
+                className="type-nav mt-5 inline-flex items-center gap-1.5 text-primary hover-gild focus-ring-elegant"
               >
                 Open in Google Maps →
               </a>
@@ -190,7 +191,7 @@ function InvitationPage() {
           </ThemedCard>
         </div>
 
-        <div className="mt-block flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="mt-block flex flex-col sm:flex-row gap-gutter justify-center">
           <ThemedButton asChild size="lg">
             <Link to="/$slug/rsvp" params={{ slug }}>
               <ListChecks className="w-4 h-4" /> Reply with your wishes

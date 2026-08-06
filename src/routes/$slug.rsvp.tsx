@@ -7,20 +7,22 @@ import {
   Loader2,
   Pencil,
 } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
-import { Textarea } from "@/components/ui/textarea";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { DIETARY_OPTIONS, dietaryLabel, type DietaryValue } from "@/wedding/dietary";
 import {
   PageCanvas,
+  Container,
   Section,
   FormPanel,
   ThemedCard,
   ThemedButton,
+  ThemedInput,
+  ThemedTextarea,
+  ThemedCheckbox,
+  Hero,
 } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/rsvp")({
@@ -60,32 +62,31 @@ function attendanceOptionsFor(gt: GuestType): { value: Attendance; label: string
 }
 
 function RsvpPage() {
-  const { slug } = Route.useParams();
-  const { wedding, guest } = useWedding(slug);
-
-  if (!wedding) return null;
+  const { wedding, guest } = useWeddingContext();
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="prose">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">your reply</p>
-          <h1 className="type-hero animate-ds-reveal">Will you join us?</h1>
-          {wedding.rsvp_deadline && (
-            <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-              Please respond by{" "}
-              <span className="text-foreground font-medium">
-                {new Date(wedding.rsvp_deadline).toLocaleDateString(undefined, {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </span>
-              .
-            </p>
-          )}
-        </div>
-      </Section>
+      <Container width="prose">
+        <Hero
+          script="your reply"
+          title="Will you join us?"
+          subtitle={
+            wedding.rsvp_deadline && (
+              <>
+                Please respond by{" "}
+                <span className="text-foreground font-medium">
+                  {new Date(wedding.rsvp_deadline).toLocaleDateString(undefined, {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+                .
+              </>
+            )
+          }
+        />
+      </Container>
 
       <Section size="compact" width="prose">
         {guest ? (
@@ -98,9 +99,11 @@ function RsvpPage() {
             rsvpDeadline={wedding.rsvp_deadline}
           />
         ) : (
-          <p className="text-center type-body text-muted-foreground">
-            Sign in with your invitation code to reply.
-          </p>
+          <ThemedCard className="mx-auto max-w-prose text-center">
+            <p className="type-body text-muted-foreground">
+              Sign in with your invitation code to reply.
+            </p>
+          </ThemedCard>
         )}
       </Section>
     </PageCanvas>
@@ -263,12 +266,14 @@ function GuestRsvpForm({
     );
   }
 
+  const locked = deadlinePassed || submitting;
+
   return (
     <FormPanel>
-      <form onSubmit={handleSubmit} className="space-y-7">
+      <form onSubmit={handleSubmit} className="space-y-stack">
         {deadlinePassed && (
           <div className="flex items-start gap-3 rounded-card border border-destructive/30 bg-destructive/5 p-4">
-            <AlertTriangle className="w-5 h-5 text-destructive shrink-0" />
+            <AlertTriangle aria-hidden="true" className="w-5 h-5 text-destructive shrink-0" />
             <div className="type-body">
               <p className="font-medium">RSVP deadline has passed</p>
               <p className="text-muted-foreground mt-1">
@@ -278,9 +283,9 @@ function GuestRsvpForm({
           </div>
         )}
 
-        <fieldset disabled={deadlinePassed} className="space-y-3">
+        <fieldset disabled={locked} className="space-y-3">
           <legend className="type-card-title mb-1">My answer</legend>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="My answer">
             {(
               [
                 { v: "yes", label: "Joyfully yes", Icon: CheckCircle2 },
@@ -292,6 +297,8 @@ function GuestRsvpForm({
                 <button
                   key={v}
                   type="button"
+                  role="radio"
+                  aria-checked={active}
                   onClick={() => setAnswer(v)}
                   className={`rounded-card p-4 text-center transition-all focus-ring-elegant ${
                     active
@@ -299,8 +306,8 @@ function GuestRsvpForm({
                       : "border-paper hover:border-primary/40"
                   }`}
                 >
-                  <Icon className="w-6 h-6 mx-auto" />
-                  <span className="block mt-2 type-label !normal-case !tracking-normal">{label}</span>
+                  <Icon aria-hidden="true" className="w-6 h-6 mx-auto" />
+                  <span className="type-nav mt-2 block">{label}</span>
                 </button>
               );
             })}
@@ -308,15 +315,17 @@ function GuestRsvpForm({
         </fieldset>
 
         {answer === "yes" && attendanceOptions.length > 1 && (
-          <fieldset disabled={deadlinePassed} className="space-y-3">
-            <Label>Which part of the day?</Label>
-            <div className="grid grid-cols-3 gap-3">
+          <fieldset disabled={locked} className="space-y-3">
+            <legend className="type-card-title mb-1">Which part of the day?</legend>
+            <div className="grid grid-cols-3 gap-3" role="radiogroup" aria-label="Which part of the day">
               {attendanceOptions.map((opt) => {
                 const active = attendance === opt.value;
                 return (
                   <button
                     key={opt.value}
                     type="button"
+                    role="radio"
+                    aria-checked={active}
                     onClick={() => setAttendance(opt.value)}
                     className={`rounded-card p-3 type-body transition-all focus-ring-elegant ${
                       active
@@ -333,9 +342,9 @@ function GuestRsvpForm({
         )}
 
         {plusOneAllowed && answer === "yes" && (
-          <fieldset disabled={deadlinePassed} className="space-y-3">
-            <Label>Will you bring a guest?</Label>
-            <div className="grid grid-cols-2 gap-3">
+          <fieldset disabled={locked} className="space-y-3">
+            <legend className="type-card-title mb-1">Will you bring a guest?</legend>
+            <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Will you bring a guest">
               {(
                 [
                   { v: true, label: "Yes, +1" },
@@ -347,6 +356,8 @@ function GuestRsvpForm({
                   <button
                     key={String(v)}
                     type="button"
+                    role="radio"
+                    aria-checked={active}
                     onClick={() => setBringingGuest(v)}
                     className={`rounded-card p-3 text-center transition-all type-body focus-ring-elegant ${
                       active
@@ -360,7 +371,7 @@ function GuestRsvpForm({
               })}
             </div>
             {bringingGuest && (
-              <Input
+              <ThemedInput
                 id="plusOne"
                 value={plusOne}
                 onChange={(e) => setPlusOne(e.target.value)}
@@ -371,8 +382,8 @@ function GuestRsvpForm({
           </fieldset>
         )}
 
-        <fieldset disabled={deadlinePassed} className="space-y-3">
-          <Label>Dietary restrictions</Label>
+        <fieldset disabled={locked} className="space-y-3">
+          <legend className="type-card-title mb-1">Dietary restrictions</legend>
           <div className="grid sm:grid-cols-2 gap-2">
             {DIETARY_OPTIONS.map((opt) => {
               const checked = tags.includes(opt.value);
@@ -383,13 +394,13 @@ function GuestRsvpForm({
                     checked ? "border-gilded bg-primary/5" : "hover:border-primary/40"
                   }`}
                 >
-                  <Checkbox checked={checked} onCheckedChange={() => toggleTag(opt.value)} />
+                  <ThemedCheckbox checked={checked} onCheckedChange={() => toggleTag(opt.value)} />
                   <span className="type-body">{opt.label}</span>
                 </label>
               );
             })}
           </div>
-          <Input
+          <ThemedInput
             value={dietaryOther}
             onChange={(e) => setDietaryOther(e.target.value)}
             placeholder="Other (e.g. specific allergies)"
@@ -397,9 +408,9 @@ function GuestRsvpForm({
           />
         </fieldset>
 
-        <fieldset disabled={deadlinePassed} className="space-y-2">
+        <fieldset disabled={locked} className="space-y-2">
           <Label htmlFor="comments">Additional comments</Label>
-          <Textarea
+          <ThemedTextarea
             id="comments"
             value={comments}
             onChange={(e) => setComments(e.target.value)}
@@ -414,6 +425,7 @@ function GuestRsvpForm({
             <ThemedButton
               type="button"
               variant="secondary"
+              disabled={submitting}
               onClick={() => {
                 setEditing(false);
                 setAnswer(existing.status);
@@ -429,6 +441,7 @@ function GuestRsvpForm({
             </ThemedButton>
           )}
           <ThemedButton type="submit" size="lg" disabled={submitting || deadlinePassed} className="flex-1">
+            {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
             {submitting ? "Sending…" : existing ? "Update my reply" : "Send my reply"}
           </ThemedButton>
         </div>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { LucideIcon } from "lucide-react";
 import { SiteShell } from "@/components/SiteShell";
-import { Button } from "@/components/ui/button";
 import {
   Globe,
   Smartphone,
@@ -37,7 +37,16 @@ import {
   HardDrive,
   History,
 } from "lucide-react";
-import { WatercolorBlot, RoseVine, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
+import {
+  PageCanvas,
+  Container,
+  Section,
+  Hero,
+  FeatureCard,
+  ThemedCard,
+  ThemedButton,
+  Badge,
+} from "@/design-system";
 
 export const Route = createFileRoute("/features")({
   head: () => ({
@@ -61,7 +70,7 @@ export const Route = createFileRoute("/features")({
   component: FeaturesPage,
 });
 
-type Feature = { icon: any; t: string; d: string; soon?: boolean };
+type Feature = { icon: LucideIcon; t: string; d: string; soon?: boolean };
 type Category = { title: string; tagline: string; items: Feature[] };
 
 const categories: Category[] = [
@@ -133,9 +142,7 @@ const categories: Category[] = [
   {
     title: "Photography",
     tagline: "A gallery that grows with the night.",
-    items: [
-      { icon: Camera, t: "Guest photo uploads", d: "Guests add their moments to your gallery." },
-    ],
+    items: [{ icon: Camera, t: "Guest photo uploads", d: "Guests add their moments to your gallery." }],
   },
   {
     title: "Timeline",
@@ -148,16 +155,12 @@ const categories: Category[] = [
   {
     title: "Seating",
     tagline: "The room, before the room.",
-    items: [
-      { icon: Table2, t: "Table layout", d: "Visual seating with conflict hints." },
-    ],
+    items: [{ icon: Table2, t: "Table layout", d: "Visual seating with conflict hints." }],
   },
   {
     title: "Wishlist",
     tagline: "Gentle wishes, no pressure.",
-    items: [
-      { icon: Gift, t: "Gift wishlist", d: "Curated wishes for your guests.", soon: true },
-    ],
+    items: [{ icon: Gift, t: "Gift wishlist", d: "Curated wishes for your guests.", soon: true }],
   },
   {
     title: "Admin tools",
@@ -172,87 +175,77 @@ const categories: Category[] = [
   },
 ];
 
+const roles = [
+  { t: "Platform Owner", d: "Oversees the platform — onboarding, billing, support." },
+  { t: "Primary Admin", d: "The couple. Full control over their wedding." },
+  { t: "Secondary Admin", d: "A trusted helper — planner, sibling, maid of honor." },
+];
+
 function FeaturesPage() {
   return (
     <SiteShell>
-      <div className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-          <WatercolorBlot color="rose" size="xl" className="absolute -top-20 -right-20 opacity-30 rose-glow" />
-          <WatercolorBlot color="sage" size="xl" className="absolute top-1/3 -left-24 opacity-25 rose-glow" style={{ animationDelay: "2s" }} />
-          <FloatingPetals count={10} />
-        </div>
+      <PageCanvas density="regular">
+        <Container width="prose">
+          <Hero
+            script="tout ce qu'il faut"
+            title="Every detail, lovingly handled."
+            subtitle="OurJourney is a complete wedding platform. One private home for everything from invitations to the after-party playlist."
+          />
+        </Container>
 
-        <section className="relative z-10 mx-auto max-w-4xl px-6 pt-20 pb-16 text-center">
-          <p className="font-script text-3xl md:text-4xl text-primary">tout ce qu'il faut</p>
-          <h1 className="mt-4 text-5xl md:text-6xl text-balance">Every detail, lovingly handled.</h1>
-          <p className="mt-6 text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
-            OurJourney is a complete wedding platform. One private home for everything from
-            invitations to the after-party playlist.
-          </p>
-        </section>
-
-        <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 space-y-20">
+        <Section size="spacious" width="wide" className="space-y-section">
           {categories.map((cat, idx) => (
             <div key={cat.title}>
-              <div className="flex items-end justify-between mb-8 gap-4 flex-wrap">
+              <div className="flex items-end justify-between mb-block gap-4 flex-wrap">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{String(idx + 1).padStart(2, "0")}</p>
-                  <h2 className="text-3xl md:text-4xl">{cat.title}</h2>
-                  <p className="text-muted-foreground mt-1">{cat.tagline}</p>
+                  <p className="type-label">{String(idx + 1).padStart(2, "0")}</p>
+                  <h2 className="type-section-title mt-1">{cat.title}</h2>
+                  <p className="type-body text-muted-foreground mt-1">{cat.tagline}</p>
                 </div>
-                <div className="h-px flex-1 bg-border hidden md:block" />
+                <div className="h-px flex-1 max-w-40 hidden md:block bg-linear-to-r from-primary/35 to-transparent" />
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
                 {cat.items.map((f) => (
-                  <article
+                  <FeatureCard
                     key={f.t}
-                    className="card-romantic p-6 hover:border-primary/40 hover:shadow-soft hover:-translate-y-1 transition-all duration-500"
+                    icon={<f.icon aria-hidden="true" className="w-5 h-5" />}
+                    title={
+                      <span className="flex items-center justify-between gap-2">
+                        {f.t}
+                        {f.soon && <Badge tone="gold">Soon</Badge>}
+                      </span>
+                    }
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="h-11 w-11 rounded-full bg-gradient-warm text-primary-foreground flex items-center justify-center shadow-warm">
-                        <f.icon className="w-5 h-5" />
-                      </div>
-                      {f.soon && (
-                        <span className="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full bg-primary/10 text-primary">
-                          Coming soon
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="text-lg">{f.t}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{f.d}</p>
-                  </article>
+                    {f.d}
+                  </FeatureCard>
                 ))}
               </div>
             </div>
           ))}
-        </section>
+        </Section>
 
-        <section className="relative z-10 mx-auto max-w-5xl px-6 pb-28">
-          <div className="card-romantic p-10 md:p-14 bg-gradient-dream text-center">
-            <p className="font-script text-2xl text-primary">three roles, perfectly cast</p>
-            <h2 className="mt-3 text-3xl md:text-4xl">Built for couples and their people.</h2>
-            <div className="grid md:grid-cols-3 gap-6 mt-10 text-left">
-              {[
-                { t: "Platform Owner", d: "Oversees the platform — onboarding, billing, support." },
-                { t: "Primary Admin", d: "The couple. Full control over their wedding." },
-                { t: "Secondary Admin", d: "A trusted helper — planner, sibling, maid of honor." },
-              ].map((r) => (
-                <div key={r.t} className="card-romantic p-6">
-                  <h3 className="text-lg">{r.t}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{r.d}</p>
-                </div>
+        <Section size="spacious" width="content">
+          <ThemedCard variant="framed" ornament className="p-block md:p-section text-center">
+            <p className="type-script">three roles, perfectly cast</p>
+            <h2 className="type-section-title mt-3">Built for couples and their people.</h2>
+            <div className="grid md:grid-cols-3 gap-gutter mt-block text-left">
+              {roles.map((r) => (
+                <ThemedCard key={r.t} variant="veil">
+                  <h3 className="type-card-title">{r.t}</h3>
+                  <p className="type-body text-muted-foreground mt-1">{r.d}</p>
+                </ThemedCard>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground mt-8">
+            <p className="type-body text-muted-foreground mt-block">
               Guests don't need an account — they sign in with their name and invitation code, or open
               their personal link.
             </p>
-            <Button asChild size="lg" className="mt-8 rounded-full bg-primary hover:bg-primary/90 px-8">
+            <ThemedButton asChild size="lg" className="mt-8">
               <Link to="/create">Create your wedding</Link>
-            </Button>
-          </div>
-        </section>
-      </div>
+            </ThemedButton>
+          </ThemedCard>
+        </Section>
+      </PageCanvas>
     </SiteShell>
   );
 }

@@ -2,13 +2,23 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/SiteShell";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
+import {
+  PageCanvas,
+  Container,
+  Section,
+  Hero,
+  FormPanel,
+  ThemedButton,
+  ThemedInput,
+  SlugInput,
+} from "@/design-system";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -54,6 +64,7 @@ function LoginPage() {
   const [tab, setTab] = useState<"admin" | "guest">("admin");
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [weddingSlug, setWeddingSlug] = useState("");
   const navigate = useNavigate();
   const { refresh } = useAuth();
 
@@ -186,176 +197,214 @@ function LoginPage() {
     }
   };
 
+  const TAB_BASE =
+    "py-4 type-nav text-center transition-colors duration-[var(--ds-dur-fast)] focus-ring-elegant";
+
   return (
     <SiteShell>
-      <section className="mx-auto max-w-md px-6 pt-20 pb-28">
-        <div className="text-center mb-10">
-          <p className="font-script text-3xl text-primary">welcome back</p>
-          <h1 className="mt-3 text-4xl">Sign in</h1>
-        </div>
+      <PageCanvas density="quiet">
+        <Container width="prose">
+          <Hero script="welcome back" title="Sign in" />
+        </Container>
 
-        <div className="rounded-[1.75rem] border border-border bg-card shadow-soft overflow-hidden">
-          <div className="grid grid-cols-2 text-sm">
-            <button
-              type="button"
-              onClick={() => {
-                setTab("admin");
-                setErrors({});
-              }}
-              className={`py-4 transition-colors ${
-                tab === "admin"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted/40 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Couple / Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setTab("guest");
-                setErrors({});
-              }}
-              className={`py-4 transition-colors ${
-                tab === "guest"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted/40 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Guest
-            </button>
-          </div>
-
-          {tab === "admin" ? (
-            <form className="p-8 space-y-5" onSubmit={handleAdmin} noValidate>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="hello@example.com"
-                  aria-invalid={!!errors.email}
-                />
-                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  aria-invalid={!!errors.password}
-                />
-                {errors.password && (
-                  <p className="text-xs text-destructive">{errors.password}</p>
+        <Section size="compact" width="prose">
+          <FormPanel className="!max-w-md !p-0 overflow-hidden">
+            <div className="grid grid-cols-2" role="tablist" aria-label="Sign in as">
+              <button
+                type="button"
+                role="tab"
+                id="tab-admin"
+                aria-selected={tab === "admin"}
+                aria-controls="panel-admin"
+                onClick={() => {
+                  setTab("admin");
+                  setErrors({});
+                }}
+                className={cn(
+                  TAB_BASE,
+                  tab === "admin"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/40 text-muted-foreground hover:text-foreground",
                 )}
-              </div>
-
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-full bg-primary hover:bg-primary/90 h-11"
               >
-                {submitting ? "Signing in…" : "Sign in"}
-              </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                Platform Owner setup?{" "}
-                <Link to="/admin/platform/claim" className="text-primary hover:underline">
-                  Bootstrap the first owner
-                </Link>
-                .
-              </p>
-            </form>
-          ) : (
-            <form className="p-8 space-y-5" onSubmit={handleGuest} noValidate>
-              <div className="space-y-2">
-                <Label htmlFor="weddingSlug">Wedding URL</Label>
-                <div className="flex items-center rounded-md border border-input bg-transparent overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-                  <span className="px-3 py-2 text-sm text-muted-foreground bg-muted/40 border-r border-input">
-                    ourjourney.com/
-                  </span>
-                  <input
+                Couple / Admin
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="tab-guest"
+                aria-selected={tab === "guest"}
+                aria-controls="panel-guest"
+                onClick={() => {
+                  setTab("guest");
+                  setErrors({});
+                }}
+                className={cn(
+                  TAB_BASE,
+                  tab === "guest"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/40 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Guest
+              </button>
+            </div>
+
+            {tab === "admin" ? (
+              <form
+                id="panel-admin"
+                role="tabpanel"
+                aria-labelledby="tab-admin"
+                className="p-block space-y-gutter"
+                onSubmit={handleAdmin}
+                noValidate
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <ThemedInput
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="hello@example.com"
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? "email-error" : undefined}
+                  />
+                  {errors.email && (
+                    <p id="email-error" role="alert" className="type-caption text-destructive">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <ThemedInput
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    aria-invalid={!!errors.password}
+                    aria-describedby={errors.password ? "password-error" : undefined}
+                  />
+                  {errors.password && (
+                    <p id="password-error" role="alert" className="type-caption text-destructive">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+
+                <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
+                  {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
+                  {submitting ? "Signing in…" : "Sign in"}
+                </ThemedButton>
+                <p className="text-center type-caption">
+                  Platform Owner setup?{" "}
+                  <Link to="/admin/platform/claim" className="text-primary hover-gild focus-ring-elegant">
+                    Bootstrap the first owner
+                  </Link>
+                  .
+                </p>
+              </form>
+            ) : (
+              <form
+                id="panel-guest"
+                role="tabpanel"
+                aria-labelledby="tab-guest"
+                className="p-block space-y-gutter"
+                onSubmit={handleGuest}
+                noValidate
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="weddingSlug">Wedding URL</Label>
+                  <SlugInput
                     id="weddingSlug"
                     name="weddingSlug"
+                    value={weddingSlug}
+                    onChange={setWeddingSlug}
                     placeholder="jan-sophie"
                     autoCapitalize="off"
                     autoCorrect="off"
                     spellCheck={false}
-                    className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none"
                     aria-invalid={!!errors.weddingSlug}
+                    aria-describedby={errors.weddingSlug ? "slug-error" : undefined}
                   />
-                </div>
-                {errors.weddingSlug && (
-                  <p className="text-xs text-destructive">{errors.weddingSlug}</p>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First name</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Sophie"
-                    autoComplete="given-name"
-                    aria-invalid={!!errors.firstName}
-                  />
-                  {errors.firstName && (
-                    <p className="text-xs text-destructive">{errors.firstName}</p>
+                  {errors.weddingSlug && (
+                    <p id="slug-error" role="alert" className="type-caption text-destructive">
+                      {errors.weddingSlug}
+                    </p>
                   )}
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First name</Label>
+                    <ThemedInput
+                      id="firstName"
+                      name="firstName"
+                      placeholder="Sophie"
+                      autoComplete="given-name"
+                      aria-invalid={!!errors.firstName}
+                      aria-describedby={errors.firstName ? "firstName-error" : undefined}
+                    />
+                    {errors.firstName && (
+                      <p id="firstName-error" role="alert" className="type-caption text-destructive">
+                        {errors.firstName}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last name</Label>
+                    <ThemedInput
+                      id="lastName"
+                      name="lastName"
+                      placeholder="Laurent"
+                      autoComplete="family-name"
+                      aria-invalid={!!errors.lastName}
+                      aria-describedby={errors.lastName ? "lastName-error" : undefined}
+                    />
+                    {errors.lastName && (
+                      <p id="lastName-error" role="alert" className="type-caption text-destructive">
+                        {errors.lastName}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last name</Label>
-                  <Input
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Laurent"
-                    autoComplete="family-name"
-                    aria-invalid={!!errors.lastName}
+                  <Label htmlFor="invitationCode">Invitation code</Label>
+                  <ThemedInput
+                    id="invitationCode"
+                    name="invitationCode"
+                    placeholder="ROSE-2026"
+                    className="uppercase tracking-widest"
+                    aria-invalid={!!errors.invitationCode}
+                    aria-describedby={errors.invitationCode ? "code-error" : undefined}
                   />
-                  {errors.lastName && (
-                    <p className="text-xs text-destructive">{errors.lastName}</p>
+                  {errors.invitationCode && (
+                    <p id="code-error" role="alert" className="type-caption text-destructive">
+                      {errors.invitationCode}
+                    </p>
                   )}
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="invitationCode">Invitation code</Label>
-                <Input
-                  id="invitationCode"
-                  name="invitationCode"
-                  placeholder="ROSE-2026"
-                  className="uppercase tracking-widest"
-                  aria-invalid={!!errors.invitationCode}
-                />
-                {errors.invitationCode && (
-                  <p className="text-xs text-destructive">{errors.invitationCode}</p>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                No account needed — just your name and the code from your invite.
-              </p>
+                <p className="type-caption">
+                  No account needed — just your name and the code from your invite.
+                </p>
 
-              <Button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-full bg-primary hover:bg-primary/90 h-11"
-              >
-                {submitting ? "Checking…" : "Enter wedding"}
-              </Button>
-            </form>
-          )}
-        </div>
+                <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
+                  {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
+                  {submitting ? "Checking…" : "Enter wedding"}
+                </ThemedButton>
+              </form>
+            )}
+          </FormPanel>
 
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          New here?{" "}
-          <Link to="/create" className="text-primary hover:underline">
-            Create your wedding
-          </Link>
-        </p>
-      </section>
+          <p className="text-center type-body text-muted-foreground mt-6">
+            New here?{" "}
+            <Link to="/create" className="text-primary hover-gild focus-ring-elegant">
+              Create your wedding
+            </Link>
+          </p>
+        </Section>
+      </PageCanvas>
     </SiteShell>
   );
 }

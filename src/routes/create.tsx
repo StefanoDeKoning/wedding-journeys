@@ -4,10 +4,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { Check, Loader2, X, Sparkles } from "lucide-react";
 import { SiteShell } from "@/components/SiteShell";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/auth/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,6 +12,17 @@ import {
   createWeddingWithAccount,
   suggestSlugs,
 } from "@/auth/wedding.functions";
+import {
+  PageCanvas,
+  Container,
+  Section,
+  Hero,
+  FormPanel,
+  ThemedButton,
+  ThemedInput,
+  ThemedTextarea,
+  SlugInput,
+} from "@/design-system";
 
 export const Route = createFileRoute("/create")({
   head: () => ({
@@ -76,7 +84,7 @@ const signupSchema = z.object({
 type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
 function CreatePage() {
-  const { user, refresh, loading } = useAuth();
+  const { user, refresh, loading, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [weddingName, setWeddingName] = useState("");
@@ -106,14 +114,6 @@ function CreatePage() {
     const derived = slugify([brideName, groomName].filter(Boolean).join("-"));
     setSlug(derived);
   }, [brideName, groomName, slugTouched]);
-
-  // Auto-derive wedding name
-  useEffect(() => {
-    if (weddingName) return;
-    if (brideName && groomName) {
-      // intentionally not setting state to avoid loop; we only seed placeholder
-    }
-  }, [brideName, groomName, weddingName]);
 
   // Debounced slug availability check
   useEffect(() => {
@@ -254,56 +254,79 @@ function CreatePage() {
     }
   };
 
+  if (!loading && user) {
+    return (
+      <SiteShell>
+        <PageCanvas density="quiet">
+          <Section size="hero" width="prose">
+            <FormPanel
+              title="You're already signed in"
+              description="Creating a wedding needs a fresh account for now. Sign out first, or head back if you meant to visit your dashboard."
+            >
+              <div className="flex flex-wrap gap-3 justify-center">
+                <ThemedButton size="lg" onClick={() => void signOut()}>
+                  Sign out
+                </ThemedButton>
+                <ThemedButton asChild variant="gilded" size="lg">
+                  <Link to="/">Back home</Link>
+                </ThemedButton>
+              </div>
+            </FormPanel>
+          </Section>
+        </PageCanvas>
+      </SiteShell>
+    );
+  }
+
   return (
     <SiteShell>
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-sunset" aria-hidden />
-        <div className="relative mx-auto max-w-3xl px-6 pt-20 pb-16 text-center">
-          <p className="font-script text-3xl text-primary">begin</p>
-          <h1 className="mt-4 text-5xl md:text-6xl text-balance">Create your wedding home.</h1>
-          <p className="mt-6 text-lg text-muted-foreground text-pretty">
-            Your site starts in <span className="font-medium text-foreground">draft mode</span> —
-            only you can see it until you're ready to share. Refine everything afterwards.
-          </p>
-        </div>
-      </section>
+      <PageCanvas density="regular">
+        <Container width="prose">
+          <Hero
+            script="begin"
+            title="Create your wedding home."
+            subtitle={
+              <>
+                Your site starts in <span className="font-medium text-foreground">draft mode</span> —
+                only you can see it until you're ready to share. Refine everything afterwards.
+              </>
+            }
+          />
+        </Container>
 
-      <section className="mx-auto max-w-2xl px-6 -mt-6 pb-28">
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="rounded-[2rem] border border-border bg-card p-8 md:p-10 shadow-soft space-y-8"
-        >
+        <Section size="compact" width="prose">
+        <FormPanel>
+        <form onSubmit={handleSubmit} noValidate className="space-y-block">
           {/* Couple */}
           <fieldset className="space-y-5">
-            <legend className="font-display text-xl">The couple</legend>
+            <legend className="type-card-title">The couple</legend>
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <Label htmlFor="brideName">Bride name</Label>
-                <Input
+                <ThemedInput
                   id="brideName"
                   value={brideName}
                   onChange={(e) => setBrideName(e.target.value)}
                   placeholder="Sophie"
                   aria-invalid={!!errors.brideName}
                 />
-                {errors.brideName && <p className="text-xs text-destructive">{errors.brideName}</p>}
+                {errors.brideName && <p className="type-caption text-destructive">{errors.brideName}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="groomName">Groom name</Label>
-                <Input
+                <ThemedInput
                   id="groomName"
                   value={groomName}
                   onChange={(e) => setGroomName(e.target.value)}
                   placeholder="Jan"
                   aria-invalid={!!errors.groomName}
                 />
-                {errors.groomName && <p className="text-xs text-destructive">{errors.groomName}</p>}
+                {errors.groomName && <p className="type-caption text-destructive">{errors.groomName}</p>}
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="weddingName">Wedding name</Label>
-              <Input
+              <ThemedInput
                 id="weddingName"
                 value={weddingName}
                 onChange={(e) => setWeddingName(e.target.value)}
@@ -311,12 +334,12 @@ function CreatePage() {
                 aria-invalid={!!errors.weddingName}
               />
               {errors.weddingName && (
-                <p className="text-xs text-destructive">{errors.weddingName}</p>
+                <p className="type-caption text-destructive">{errors.weddingName}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="weddingDate">Wedding date</Label>
-              <Input
+              <ThemedInput
                 id="weddingDate"
                 type="date"
                 value={weddingDate}
@@ -324,17 +347,17 @@ function CreatePage() {
                 aria-invalid={!!errors.weddingDate}
               />
               {errors.weddingDate && (
-                <p className="text-xs text-destructive">{errors.weddingDate}</p>
+                <p className="type-caption text-destructive">{errors.weddingDate}</p>
               )}
             </div>
           </fieldset>
 
           {/* Location */}
           <fieldset className="space-y-5">
-            <legend className="font-display text-xl">The venue</legend>
+            <legend className="type-card-title">The venue</legend>
             <div className="space-y-2">
               <Label htmlFor="locationName">Location name</Label>
-              <Input
+              <ThemedInput
                 id="locationName"
                 value={locationName}
                 onChange={(e) => setLocationName(e.target.value)}
@@ -343,7 +366,7 @@ function CreatePage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="locationAddress">Address</Label>
-              <Textarea
+              <ThemedTextarea
                 id="locationAddress"
                 value={locationAddress}
                 onChange={(e) => setLocationAddress(e.target.value)}
@@ -353,7 +376,7 @@ function CreatePage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="mapsUrl">Google Maps link</Label>
-              <Input
+              <ThemedInput
                 id="mapsUrl"
                 type="url"
                 value={mapsUrl}
@@ -361,105 +384,103 @@ function CreatePage() {
                 placeholder="https://maps.app.goo.gl/…"
                 aria-invalid={!!errors.mapsUrl}
               />
-              {errors.mapsUrl && <p className="text-xs text-destructive">{errors.mapsUrl}</p>}
+              {errors.mapsUrl && <p className="type-caption text-destructive">{errors.mapsUrl}</p>}
             </div>
           </fieldset>
 
           {/* Slug */}
           <fieldset className="space-y-3">
-            <legend className="font-display text-xl">Your wedding URL</legend>
+            <legend className="type-card-title">Your wedding URL</legend>
             <Label htmlFor="slug" className="sr-only">
               Wedding slug
             </Label>
-            <div
-              className={`flex items-center rounded-md border bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring ${
+            <SlugInput
+              id="slug"
+              value={slug}
+              onChange={(v) => {
+                setSlugTouched(true);
+                setSlug(slugify(v));
+              }}
+              placeholder="jan-sophie"
+              spellCheck={false}
+              autoCapitalize="off"
+              autoCorrect="off"
+              inputClassName="font-display italic text-primary"
+              tone={
                 slugStatus === "taken" || slugStatus === "invalid"
-                  ? "border-destructive/60"
+                  ? "error"
                   : slugStatus === "available"
-                    ? "border-primary/60"
-                    : "border-input"
-              }`}
-            >
-              <span className="px-3 py-2.5 text-sm text-muted-foreground bg-muted/40 border-r border-input">
-                ourjourney.com/
-              </span>
-              <input
-                id="slug"
-                value={slug}
-                onChange={(e) => {
-                  setSlugTouched(true);
-                  setSlug(slugify(e.target.value));
-                }}
-                placeholder="jan-sophie"
-                spellCheck={false}
-                autoCapitalize="off"
-                autoCorrect="off"
-                className="flex-1 bg-transparent px-3 py-2.5 text-sm font-display italic text-primary focus:outline-none"
-              />
-              <div className="px-3 text-muted-foreground" aria-live="polite">
-                {slugStatus === "checking" && <Loader2 className="h-4 w-4 animate-spin" />}
-                {slugStatus === "available" && <Check className="h-4 w-4 text-primary" />}
-                {(slugStatus === "taken" || slugStatus === "invalid") && (
-                  <X className="h-4 w-4 text-destructive" />
-                )}
-              </div>
-            </div>
+                    ? "success"
+                    : "default"
+              }
+              aria-invalid={slugStatus === "taken" || slugStatus === "invalid"}
+              aria-describedby="slug-status"
+              status={
+                <>
+                  {slugStatus === "checking" && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}
+                  {slugStatus === "available" && <Check aria-hidden="true" className="h-4 w-4 text-primary" />}
+                  {(slugStatus === "taken" || slugStatus === "invalid") && (
+                    <X aria-hidden="true" className="h-4 w-4 text-destructive" />
+                  )}
+                </>
+              }
+            />
 
-            {slugStatus === "available" && (
-              <p className="text-xs text-primary">Available — this URL is yours.</p>
-            )}
-            {slugStatus === "invalid" && (
-              <p className="text-xs text-destructive">
-                Use 3–60 lowercase letters, numbers and dashes. No spaces.
-              </p>
-            )}
-            {slugStatus === "taken" && (
-              <div className="rounded-lg bg-muted/40 border border-border p-4 space-y-3">
-                <p className="text-sm">
+            <div id="slug-status">
+              {slugStatus === "available" && (
+                <p className="type-caption text-primary">Available — this URL is yours.</p>
+              )}
+              {slugStatus === "invalid" && (
+                <p className="type-caption text-destructive">
+                  Use 3–60 lowercase letters, numbers and dashes. No spaces.
+                </p>
+              )}
+              {slugStatus === "taken" && (
+                <p className="type-caption text-destructive">
                   <span className="font-medium">{slug}</span> is already taken.
                 </p>
-                {suggestions.length > 0 && (
-                  <div>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-2">
-                      <Sparkles className="h-3 w-3" /> Try one of these
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {suggestions.map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => {
-                            setSlugTouched(true);
-                            setSlug(s);
-                          }}
-                          className="text-xs px-3 py-1.5 rounded-full bg-background border border-border hover:border-primary hover:text-primary transition-colors"
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              )}
+            </div>
+            {slugStatus === "taken" && suggestions.length > 0 && (
+              <div>
+                <p className="type-caption flex items-center gap-1.5 mb-2">
+                  <Sparkles aria-hidden="true" className="h-3 w-3" /> Try one of these
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => {
+                        setSlugTouched(true);
+                        setSlug(s);
+                      }}
+                      className="type-caption min-h-9 px-3 py-1.5 rounded-full bg-background border-paper hover:border-primary hover:text-primary transition-colors duration-[var(--ds-dur-fast)] focus-ring-elegant"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
-            {errors.slug && <p className="text-xs text-destructive">{errors.slug}</p>}
-            <p className="text-xs text-muted-foreground">
+            {errors.slug && <p className="type-caption text-destructive">{errors.slug}</p>}
+            <p className="type-caption">
               Lowercase letters, numbers and dashes. You can change this later.
             </p>
           </fieldset>
 
           {/* RSVP */}
           <fieldset className="space-y-3">
-            <legend className="font-display text-xl">RSVP deadline</legend>
+            <legend className="type-card-title">RSVP deadline</legend>
             <div className="space-y-2">
               <Label htmlFor="rsvpDeadline">Last day guests can respond</Label>
-              <Input
+              <ThemedInput
                 id="rsvpDeadline"
                 type="date"
                 value={rsvpDeadline}
                 onChange={(e) => setRsvpDeadline(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="type-caption">
                 After this date, guests can't change their answer. Optional — you can set it later.
               </p>
             </div>
@@ -467,12 +488,12 @@ function CreatePage() {
 
           {/* Account */}
           {!loading && !user && (
-            <fieldset className="space-y-5 border-t border-border pt-8">
-              <legend className="font-display text-xl">Your admin account</legend>
+            <fieldset className="space-y-5 border-t border-paper pt-8">
+              <legend className="type-card-title">Your admin account</legend>
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input
+                  <ThemedInput
                     id="email"
                     type="email"
                     autoComplete="email"
@@ -481,11 +502,11 @@ function CreatePage() {
                     placeholder="hello@example.com"
                     aria-invalid={!!errors.email}
                   />
-                  {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                  {errors.email && <p className="type-caption text-destructive">{errors.email}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input
+                  <ThemedInput
                     id="password"
                     type="password"
                     autoComplete="new-password"
@@ -495,13 +516,13 @@ function CreatePage() {
                     aria-invalid={!!errors.password}
                   />
                   {errors.password && (
-                    <p className="text-xs text-destructive">{errors.password}</p>
+                    <p className="type-caption text-destructive">{errors.password}</p>
                   )}
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="type-caption">
                 Already have an account?{" "}
-                <Link to="/login" className="text-primary hover:underline">
+                <Link to="/login" className="text-primary hover-gild focus-ring-elegant">
                   Sign in instead
                 </Link>
                 .
@@ -509,20 +530,28 @@ function CreatePage() {
             </fieldset>
           )}
 
-          <Button
-            type="submit"
-            size="lg"
-            disabled={submitting || slugStatus === "checking"}
-            className="w-full rounded-full bg-primary hover:bg-primary/90 h-12 shadow-warm"
-          >
-            {submitting ? "Creating…" : "Reserve our journey"}
-          </Button>
+          <div className="space-y-2">
+            <ThemedButton
+              type="submit"
+              size="lg"
+              disabled={submitting || slugStatus === "checking"}
+              className="w-full"
+            >
+              {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
+              {submitting ? "Creating…" : slugStatus === "checking" ? "Checking your URL…" : "Reserve our journey"}
+            </ThemedButton>
+            {slugStatus === "checking" && (
+              <p className="type-caption text-center">Just a moment while we confirm your URL is free.</p>
+            )}
+          </div>
 
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="type-caption text-center">
             We'll set up your wedding website, admin dashboard and guest login in one go.
           </p>
         </form>
-      </section>
+        </FormPanel>
+        </Section>
+      </PageCanvas>
     </SiteShell>
   );
 }

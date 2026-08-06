@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Camera, Loader2, Trash2 } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { signPhotoUrls } from "@/lib/photoUrl";
-import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
+import { PhotoTile } from "@/wedding/PhotoTile";
+import {
+  PageCanvas,
+  Container,
+  Section,
+  ThemedCard,
+  ThemedButton,
+  Hero,
+  EmptyState,
+  ConfirmDialog,
+} from "@/design-system";
 
 export const Route = createFileRoute("/$slug/gallery/me")({
   head: () => ({
@@ -27,13 +37,14 @@ interface Photo {
 
 function MyPhotosPage() {
   const { slug } = Route.useParams();
-  const { wedding, guest } = useWedding(slug);
+  const { wedding, guest } = useWeddingContext();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; path: string } | null>(null);
 
   const load = async () => {
-    if (!wedding || !guest) return;
+    if (!guest) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("photos")
@@ -49,12 +60,11 @@ function MyPhotosPage() {
   };
 
   useEffect(() => {
-    if (wedding && guest) void load();
+    if (guest) void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wedding?.id, guest?.id]);
+  }, [wedding.id, guest?.id]);
 
   const remove = async (id: string, path: string) => {
-    if (!confirm("Delete this photo permanently?")) return;
     await supabase.storage.from("wedding-photos").remove([path]);
     const { error } = await supabase.from("photos").delete().eq("id", id);
     if (error) {
@@ -64,8 +74,6 @@ function MyPhotosPage() {
     toast.success("Deleted.");
     void load();
   };
-
-  if (!wedding) return null;
 
   if (!guest) {
     return (
@@ -79,7 +87,7 @@ function MyPhotosPage() {
             </p>
             <ThemedButton asChild variant="secondary" className="mt-6">
               <Link to="/$slug/gallery" params={{ slug }}>
-                <ArrowLeft className="w-4 h-4" /> Back to gallery
+                <ArrowLeft aria-hidden="true" className="w-4 h-4" /> Back to gallery
               </Link>
             </ThemedButton>
           </ThemedCard>
@@ -90,23 +98,23 @@ function MyPhotosPage() {
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="wide">
+      <Section size="compact" width="wide">
         <Link
           to="/$slug/gallery"
           params={{ slug }}
-          className="type-caption inline-flex items-center hover-gild"
+          className="type-caption inline-flex items-center hover-gild focus-ring-elegant"
         >
-          <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to gallery
+          <ArrowLeft aria-hidden="true" className="w-3.5 h-3.5 mr-1" /> Back to gallery
         </Link>
-
-        <div className="mt-stack flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">your moments</p>
-          <h1 className="type-hero animate-ds-reveal">{guest.first_name}'s photos</h1>
-          <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-            Everything you've uploaded — visible only to you and the couple.
-          </p>
-        </div>
       </Section>
+
+      <Container width="wide">
+        <Hero
+          script="your moments"
+          title={`${guest.first_name}'s photos`}
+          subtitle="Everything you've uploaded — visible only to you and the couple."
+        />
+      </Container>
 
       <Section size="spacious" width="wide">
         {loading ? (
@@ -114,49 +122,43 @@ function MyPhotosPage() {
             <Loader2 className="w-5 h-5 animate-spin mx-auto" />
           </div>
         ) : photos.length === 0 ? (
-          <div className="text-center py-block rounded-card border-2 border-dashed border-primary/20">
-            <Camera className="w-8 h-8 mx-auto text-muted-foreground opacity-40" />
-            <p className="mt-3 type-body text-muted-foreground">
-              You haven't uploaded any photos yet.
-            </p>
-            <ThemedButton asChild className="mt-6">
-              <Link to="/$slug/gallery" params={{ slug }}>
-                Upload your first photo
-              </Link>
-            </ThemedButton>
-          </div>
+          <EmptyState
+            motif="gold-leaf"
+            title="You haven't uploaded any photos yet"
+            description="Share a moment from the day — it'll appear here."
+            action={
+              <ThemedButton asChild>
+                <Link to="/$slug/gallery" params={{ slug }}>
+                  Upload your first photo
+                </Link>
+              </ThemedButton>
+            }
+          />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {photos.map((p) => (
-              <figure
+              <PhotoTile
                 key={p.id}
-                className="group relative aspect-square overflow-hidden rounded-card border-paper shadow-elev-2 hover-lift bg-muted"
-              >
-                <img
-                  src={urls[p.storage_path] ?? ""}
-                  alt={p.caption ?? "Your photo"}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover transition-transform duration-700 ease-[var(--ease-paper)] group-hover:scale-[1.04]"
-                />
-                {p.status !== "approved" && (
-                  <div className="absolute top-2 left-2 type-caption px-2 py-0.5 rounded-full bg-background/90 backdrop-blur border-paper">
-                    {p.status}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => remove(p.id, p.storage_path)}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity focus-ring-elegant"
-                  aria-label="Delete"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </figure>
+                photo={p}
+                url={urls[p.storage_path] ?? ""}
+                canDelete
+                onDelete={() => setPendingDelete({ id: p.id, path: p.storage_path })}
+              />
             ))}
           </div>
         )}
       </Section>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+        title="Delete this photo?"
+        description="This removes it permanently — it can't be undone."
+        onConfirm={() => {
+          if (pendingDelete) void remove(pendingDelete.id, pendingDelete.path);
+          setPendingDelete(null);
+        }}
+      />
     </PageCanvas>
   );
 }

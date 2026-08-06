@@ -39,7 +39,13 @@ export function EnvelopeLetter({
 
   useEffect(() => {
     if (stage !== "opening") return;
-    const id = setTimeout(() => setStage("open"), 900);
+    // Under reduced motion the CSS flap-opening animation collapses to ~0ms;
+    // without this check the letter would still wait the full 900ms behind a
+    // visually-frozen (already-open-looking) flap.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const id = setTimeout(() => setStage("open"), prefersReducedMotion ? 0 : 900);
     return () => clearTimeout(id);
   }, [stage]);
 
@@ -62,7 +68,7 @@ export function EnvelopeLetter({
           <button
             type="button"
             onClick={() => stage === "closed" && setStage("opening")}
-            aria-label="Open invitation"
+            aria-label={`Open invitation for ${recipientFirstName} ${recipientLastName}`}
             className="group relative focus-ring-elegant"
           >
             {/* Envelope */}
@@ -78,7 +84,7 @@ export function EnvelopeLetter({
               />
 
               <div
-                className="envelope-paper relative rounded-lg overflow-hidden border-paper"
+                className="envelope-paper relative rounded-paper overflow-hidden border-paper"
                 style={{
                   width: "min(420px, 84vw)",
                   height: "min(272px, 54vw)",
@@ -148,7 +154,7 @@ export function EnvelopeLetter({
               </div>
             </div>
 
-            <span className="block mt-8 type-caption group-hover:text-primary transition-colors">
+            <span className="block mt-8 type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
               tap to break the seal
             </span>
           </button>
@@ -158,7 +164,7 @@ export function EnvelopeLetter({
       {opened && (
         <div className="flex justify-center">
           <article
-            className="parchment letter-rise texture-paper relative max-w-2xl w-full px-8 sm:px-12 md:px-16 py-14 md:py-20 rounded-sm"
+            className="parchment letter-rise texture-paper relative max-w-2xl w-full px-8 sm:px-12 md:px-16 py-14 md:py-20 rounded-card"
             style={{
               transform: "rotate(-0.4deg)",
             }}

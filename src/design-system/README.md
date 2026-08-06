@@ -159,8 +159,10 @@ muted palette drawn only from `--ds-decor*` tokens. Never flat icons, clipart,
 cartoon shapes or hard outlines.
 
 Motifs: `rose`, `peony`, `leaf`, `olive-branch`, `eucalyptus`, `vine`,
-`flourish`, `gold-leaf`. Compositions: `WatercolorWash`, `DecorCorner`,
-`DecorSideComposition`, `DecorParticles`.
+`flourish`, `gold-leaf`, plus figurative motifs for milestone/celebration
+moments — `castle`, `ceremony-arch`, `toast`, `cake`, `dinner`, `bouquet`,
+`music-note`, `dancing`, `pizza`, `fireworks`, `sunset`. Compositions:
+`WatercolorWash`, `DecorCorner`, `DecorSideComposition`, `DecorParticles`.
 
 ## Deliverables checklist
 

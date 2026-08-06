@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/SiteShell";
-import { Button } from "@/components/ui/button";
 import {
   MailOpen,
   CalendarClock,
@@ -13,7 +12,16 @@ import {
 } from "lucide-react";
 import demoCouple from "@/assets/demo-couple.jpg";
 import featureInvites from "@/assets/feature-invites.jpg";
-import { WatercolorBlot, FloatingPetals, FloralDivider } from "@/wedding/FloralDecorations";
+import {
+  PageCanvas,
+  Container,
+  Section,
+  SectionHeader,
+  Hero,
+  FeatureCard,
+  InfoCard,
+  ThemedButton,
+} from "@/design-system";
 
 const DEMO_SLUG = "jan-sophie";
 const DEMO_NAMES = "Jan & Sophie";
@@ -75,6 +83,7 @@ const sections = [
   },
 ];
 
+// Illustrative sample data — not this demo wedding's live figures.
 const highlights = [
   { label: "Guests invited", value: "128" },
   { label: "RSVPs received", value: "96" },
@@ -85,95 +94,83 @@ const highlights = [
 function DemoPage() {
   return (
     <SiteShell>
-      <div className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-          <WatercolorBlot color="rose" size="xl" className="absolute -top-20 -right-20 opacity-30 rose-glow" />
-          <WatercolorBlot color="sage" size="xl" className="absolute bottom-1/3 -left-24 opacity-25 rose-glow" style={{ animationDelay: "2s" }} />
-          <FloatingPetals count={10} />
-        </div>
-
-        {/* Hero */}
-        <section className="relative z-10 mx-auto max-w-7xl px-6 pt-20 pb-16 grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <p className="font-script text-3xl text-primary">welcome to</p>
-            <h1 className="text-5xl md:text-6xl text-balance">
-              <span className="italic text-primary">{DEMO_NAMES}</span>
-            </h1>
-            <p className="text-sm text-muted-foreground font-display italic">
-              ourjourney.com/{DEMO_SLUG}
-            </p>
-            <p className="text-lg text-muted-foreground text-pretty">
-              Step inside a fully-built OurJourney wedding. Everything a real couple and their guests
-              see and use — invitations, RSVP, timeline, gallery, and more.
-            </p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Button asChild size="lg" className="rounded-full bg-primary hover:bg-primary/90 px-8">
-                <Link to="/$slug" params={{ slug: DEMO_SLUG }}>
-                  Enter demo wedding <ExternalLink className="w-4 h-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 px-8">
-                <Link to="/features">See all features</Link>
-              </Button>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-6 bg-gradient-warm opacity-20 blur-3xl rounded-[3rem]" aria-hidden />
-            <div className="relative rounded-[2.5rem] overflow-hidden shadow-warm border border-border/60">
-              <img
-                src={demoCouple}
-                alt={`${DEMO_NAMES} — demo wedding couple`}
-                width={1280}
-                height={960}
-                className="w-full h-auto"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Highlights strip */}
-        <section className="relative z-10 mx-auto max-w-7xl px-6 pb-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {highlights.map((h) => (
-              <div key={h.label} className="card-romantic p-6 text-center">
-                <p className="font-display text-4xl text-primary">{h.value}</p>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mt-1">{h.label}</p>
+      <PageCanvas density="regular">
+        <Container width="wide">
+          <Hero
+            align="split"
+            script="welcome to"
+            title={<span className="italic text-primary">{DEMO_NAMES}</span>}
+            subtitle={
+              <>
+                <span className="block font-display italic text-sm text-muted-foreground mb-2">
+                  ourjourney.com/{DEMO_SLUG}
+                </span>
+                Step inside a fully-built OurJourney wedding. Everything a real couple and their
+                guests see and use — invitations, RSVP, timeline, gallery, and more.
+              </>
+            }
+            actions={
+              <>
+                <ThemedButton asChild size="lg">
+                  <Link to="/$slug" params={{ slug: DEMO_SLUG }}>
+                    Enter demo wedding <ExternalLink aria-hidden="true" className="w-4 h-4" />
+                  </Link>
+                </ThemedButton>
+                <ThemedButton asChild variant="gilded" size="lg">
+                  <Link to="/features">See all features</Link>
+                </ThemedButton>
+              </>
+            }
+            media={
+              <div className="overflow-hidden rounded-frame border-paper shadow-elev-4">
+                <img
+                  src={demoCouple}
+                  alt={`${DEMO_NAMES} — demo wedding couple`}
+                  width={1280}
+                  height={960}
+                  className="w-full h-auto"
+                />
               </div>
+            }
+          />
+        </Container>
+
+        {/* Illustrative highlights strip */}
+        <Section size="compact" width="wide">
+          <p className="type-caption text-center italic mb-4">Illustrative sample data</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+            {highlights.map((h) => (
+              <InfoCard key={h.label} label={h.label} value={h.value} />
             ))}
           </div>
-        </section>
+        </Section>
 
         {/* Sections grid */}
-        <section className="relative z-10 mx-auto max-w-7xl px-6 pb-20">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="divider-script text-xs uppercase tracking-[0.3em]">Explore the wedding</p>
-            <h2 className="mt-6 text-4xl md:text-5xl text-balance">Every corner, open to visit.</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <Section size="spacious" width="wide">
+          <SectionHeader eyebrow="explore the wedding" title="Every corner, open to visit." />
+          <div className="mt-block grid sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
             {sections.map((s) => (
-              <Link
-                key={s.t}
-                to={s.to}
-                params={{ slug: DEMO_SLUG }}
-                className="group card-romantic p-6 hover:border-primary/40 hover:shadow-soft hover:-translate-y-1 transition-all duration-500"
-              >
-                <div className="h-11 w-11 rounded-full bg-gradient-warm text-primary-foreground flex items-center justify-center mb-4 shadow-warm">
-                  <s.icon className="w-5 h-5" />
-                </div>
-                <h3 className="text-xl flex items-center gap-2">
-                  {s.t}
-                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                </h3>
-                <p className="text-sm text-muted-foreground mt-2">{s.d}</p>
+              <Link key={s.t} to={s.to} params={{ slug: DEMO_SLUG }} className="focus-ring-elegant block rounded-card">
+                <FeatureCard
+                  icon={<s.icon aria-hidden="true" className="w-5 h-5" />}
+                  title={
+                    <span className="flex items-center gap-2">
+                      {s.t}
+                      <ExternalLink aria-hidden="true" className="w-3.5 h-3.5 text-muted-foreground" />
+                    </span>
+                  }
+                >
+                  {s.d}
+                </FeatureCard>
               </Link>
             ))}
           </div>
-        </section>
+        </Section>
 
         {/* Behind the scenes */}
-        <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div className="rounded-[2.5rem] overflow-hidden shadow-soft border border-border">
+        <Section size="spacious" width="wide">
+          <div className="grid lg:grid-cols-2 gap-block items-center">
+            <div className="overflow-hidden rounded-frame border-paper shadow-elev-3">
               <img
                 src={featureInvites}
                 alt="Behind the scenes admin dashboard"
@@ -183,37 +180,46 @@ function DemoPage() {
                 loading="lazy"
               />
             </div>
-            <div className="space-y-5">
-              <p className="font-script text-3xl text-primary">behind the scenes</p>
-              <h2 className="text-4xl md:text-5xl text-balance">
-                Every guest, every euro, every song.
-              </h2>
-              <p className="text-lg text-muted-foreground">
+            <div className="flex flex-col gap-gutter">
+              <p className="type-script">behind the scenes</p>
+              <h2 className="type-section-title">Every guest, every euro, every song.</h2>
+              <p className="type-body-lg text-muted-foreground">
                 The demo wedding also ships with a fully populated admin — RSVP dashboard, budget
                 planner, timeline editor, guest list and gallery moderation. Create your own wedding
                 to explore it end to end.
               </p>
-              <ul className="space-y-2 text-sm">
-                <li className="flex gap-2"><Gift className="w-4 h-4 text-primary mt-0.5" /> Wishlist previews (coming soon)</li>
-                <li className="flex gap-2"><Music2 className="w-4 h-4 text-primary mt-0.5" /> Guest playlist suggestions</li>
-                <li className="flex gap-2"><Camera className="w-4 h-4 text-primary mt-0.5" /> Guest photo uploads</li>
+              <ul className="flex flex-col gap-2">
+                <li className="flex gap-2 type-body">
+                  <Gift aria-hidden="true" className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Wishlist previews
+                  (coming soon)
+                </li>
+                <li className="flex gap-2 type-body">
+                  <Music2 aria-hidden="true" className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Guest playlist
+                  suggestions
+                </li>
+                <li className="flex gap-2 type-body">
+                  <Camera aria-hidden="true" className="w-4 h-4 text-primary mt-0.5 shrink-0" /> Guest photo
+                  uploads
+                </li>
               </ul>
-              <Button asChild size="lg" className="mt-4 rounded-full bg-primary hover:bg-primary/90 px-8">
+              <ThemedButton asChild size="lg" className="mt-2 self-start">
                 <Link to="/create">Create your own wedding</Link>
-              </Button>
+              </ThemedButton>
             </div>
           </div>
-        </section>
+        </Section>
 
         {/* CTA */}
-        <section className="relative z-10 mx-auto max-w-4xl px-6 pb-28 text-center">
-          <p className="divider-script text-xs uppercase tracking-[0.3em]">your turn</p>
-          <h2 className="mt-6 text-4xl text-balance">Ready to write your own?</h2>
-          <Button asChild size="lg" className="mt-8 rounded-full bg-primary hover:bg-primary/90 px-8">
-            <Link to="/create">Create your wedding</Link>
-          </Button>
-        </section>
-      </div>
+        <Section size="spacious" width="prose">
+          <div className="text-center">
+            <p className="type-label">your turn</p>
+            <h2 className="type-section-title mt-4">Ready to write your own?</h2>
+            <ThemedButton asChild size="lg" className="mt-8">
+              <Link to="/create">Create your wedding</Link>
+            </ThemedButton>
+          </div>
+        </Section>
+      </PageCanvas>
     </SiteShell>
   );
 }

@@ -1,16 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { MapPin, Loader2 } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { illustrationFor } from "@/wedding/timelineCategories";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
 import {
   PageCanvas,
+  Container,
   Section,
   ThemedCard,
   Badge,
   Divider,
+  Hero,
+  EmptyState,
 } from "@/design-system";
 import { DecorMotifArt } from "@/design-system/decor/Illustrations";
 
@@ -36,8 +39,7 @@ interface TEvent {
 }
 
 function TimelinePage() {
-  const { slug } = Route.useParams();
-  const { wedding, guest } = useWedding(slug);
+  const { wedding, guest } = useWeddingContext();
   const [events, setEvents] = useState<TEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState<Date>(() => new Date());
@@ -48,7 +50,6 @@ function TimelinePage() {
   }, []);
 
   useEffect(() => {
-    if (!wedding) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
@@ -66,7 +67,7 @@ function TimelinePage() {
     return () => {
       cancelled = true;
     };
-  }, [wedding?.id]);
+  }, [wedding.id]);
 
   const isEvening = guest?.guest_type === "evening";
   const visibleEvents = useMemo(
@@ -76,7 +77,7 @@ function TimelinePage() {
 
   // Determine the index of the "next" upcoming event today (only if wedding day)
   const nextIdx = useMemo(() => {
-    if (!wedding?.wedding_date) return -1;
+    if (!wedding.wedding_date) return -1;
     const today = new Date();
     const wDate = new Date(wedding.wedding_date);
     if (
@@ -92,23 +93,20 @@ function TimelinePage() {
       evDate.setHours(h, m, 0, 0);
       return evDate.getTime() >= now.getTime();
     });
-  }, [visibleEvents, wedding?.wedding_date, now]);
-
-  if (!wedding) return null;
+  }, [visibleEvents, wedding.wedding_date, now]);
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="prose">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">how the day unfolds</p>
-          <h1 className="type-hero animate-ds-reveal">Wedding timeline</h1>
-          {isEvening && (
-            <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-              You're invited from the evening onwards — but you're welcome to arrive a little earlier.
-            </p>
-          )}
-        </div>
-      </Section>
+      <Container width="prose">
+        <Hero
+          script="how the day unfolds"
+          title="Wedding timeline"
+          subtitle={
+            isEvening &&
+            "You're invited from the evening onwards — but you're welcome to arrive a little earlier."
+          }
+        />
+      </Container>
 
       {loading ? (
         <Section size="compact">
@@ -118,9 +116,11 @@ function TimelinePage() {
         </Section>
       ) : visibleEvents.length === 0 ? (
         <Section size="compact">
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            The schedule is being prepared. Check back soon.
-          </div>
+          <EmptyState
+            motif="olive-branch"
+            title="The schedule is being prepared"
+            description="Check back soon — the day's timeline will appear here."
+          />
         </Section>
       ) : (
         <Section size="spacious" width="wide">
@@ -164,7 +164,7 @@ function TimelineChapter({
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] lg:items-start lg:gap-x-6">
       <span
         className={`relative z-10 mx-auto mb-4 flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full surface-veil border-gilded shadow-elev-2 lg:col-start-2 lg:row-start-1 lg:mb-0 ${
-          isNext ? "shadow-elev-4 ring-2 ring-primary/40" : ""
+          isNext ? "shadow-elev-4" : ""
         }`}
       >
         <DecorMotifArt motif={motif} size="sm" intensity={0.95} />
@@ -188,7 +188,7 @@ function TimelineChapter({
         {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
         {e.location && (
           <p className="type-caption mt-3 inline-flex items-center gap-1">
-            <MapPin className="w-3 h-3" /> {e.location}
+            <MapPin aria-hidden="true" className="w-3 h-3" /> {e.location}
           </p>
         )}
       </ThemedCard>

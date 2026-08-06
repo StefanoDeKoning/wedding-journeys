@@ -4,6 +4,9 @@
 @source "../src";
 
 @custom-variant dark (&:is(.dark *));
+/* Pointer-fine devices only — lets touch keep overlay controls always visible
+ * while mouse/trackpad users still get a hover-reveal moment. */
+@custom-variant can-hover (@media (hover: hover) and (pointer: fine));
 
 /*
  * OurJourney — Dreamy Watercolor Wedding Aesthetic
@@ -56,6 +59,7 @@
   --color-champagne: var(--ds-champagne);
   --color-olive: var(--ds-olive);
   --color-mist: var(--ds-mist);
+  --color-primary-strong: var(--ds-primary-strong);
   --color-decor: var(--ds-decor);
   --color-decor-soft: var(--ds-decor-soft);
   --color-decor-leaf: var(--ds-decor-leaf);
@@ -83,29 +87,6 @@
 
 
 :root {
-  --radius: 0.75rem;
-
-  /* Semantic */
-  --background: var(--warm-cream);
-  --foreground: var(--ink);
-  --card: oklch(0.985 0.008 80);
-  --card-foreground: var(--ink);
-  --popover: oklch(0.985 0.008 80);
-  --popover-foreground: var(--ink);
-  --primary: var(--terracotta);
-  --primary-foreground: oklch(0.98 0.01 75);
-  --secondary: var(--dusty-rose);
-  --secondary-foreground: oklch(0.98 0.01 75);
-  --muted: oklch(0.93 0.012 70);
-  --muted-foreground: oklch(0.48 0.025 50);
-  --accent: var(--gold);
-  --accent-foreground: var(--ink);
-  --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: oklch(0.98 0.01 75);
-  --border: oklch(0.90 0.016 70);
-  --input: oklch(0.92 0.015 70);
-  --ring: var(--terracotta);
-
   /* Gradients & shadows */
   --gradient-warm: linear-gradient(135deg, var(--terracotta) 0%, var(--dusty-rose) 100%);
   --gradient-sunset: linear-gradient(180deg, color-mix(in oklab, var(--peach) 60%, var(--cream)) 0%, var(--cream) 100%);
@@ -237,25 +218,25 @@
   0%, 100% { opacity: 0.2; transform: translateY(0) scale(0.8); }
   50% { opacity: 0.8; transform: translateY(-12px) scale(1.2); }
 }
-.sparkle-float { animation: sparkle-float 4s ease-in-out infinite; }
+.sparkle-float { animation: sparkle-float var(--ds-dur-shimmer) var(--ds-ease-soft) infinite; }
 
 @keyframes petal-float {
   0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.35; }
   50% { transform: translateY(-18px) rotate(12deg); opacity: 0.6; }
 }
-.petal-float { animation: petal-float 7s ease-in-out infinite; }
+.petal-float { animation: petal-float var(--ds-dur-ambient) var(--ds-ease-soft) infinite; }
 
 @keyframes rose-glow {
   0%, 100% { opacity: 0.35; transform: scale(1); }
   50% { opacity: 0.55; transform: scale(1.04); }
 }
-.rose-glow { animation: rose-glow 6s ease-in-out infinite; }
+.rose-glow { animation: rose-glow 6s var(--ds-ease-soft) infinite; }
 
 @keyframes gentle-breathe {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
-.gentle-breathe { animation: gentle-breathe 5s ease-in-out infinite; }
+.gentle-breathe { animation: gentle-breathe 5s var(--ds-ease-soft) infinite; }
 
 /* ============ Wedding Invitation: Envelope, Wax Seal, Parchment ============ */
 /* Token values now live in the theme-scoped block below (see "DESIGN SYSTEM —
@@ -350,14 +331,14 @@
   0%, 100% { transform: translateY(0) rotate(-1deg); }
   50% { transform: translateY(-8px) rotate(1deg); }
 }
-.envelope-float { animation: envelope-float 4s ease-in-out infinite; }
+.envelope-float { animation: envelope-float 4s var(--ds-ease-soft) infinite; }
 
 /* Envelope opening */
 @keyframes flap-open {
   from { transform: rotateX(0deg); }
   to { transform: rotateX(180deg); }
 }
-.flap-opening { animation: flap-open 0.9s var(--transition-base) forwards; }
+.flap-opening { animation: flap-open var(--ds-dur-slow) var(--transition-base) forwards; }
 
 /* Letter slide-out */
 @keyframes letter-rise {
@@ -372,14 +353,14 @@
   0%, 100% { transform: scale(1); filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--ds-wax-primary-dark) 45%, transparent)); }
   50% { transform: scale(1.04); filter: drop-shadow(0 12px 22px color-mix(in oklab, var(--ds-wax-primary-dark) 60%, transparent)); }
 }
-.wax-pulse { animation: wax-pulse 2.6s ease-in-out infinite; }
+.wax-pulse { animation: wax-pulse 2.6s var(--ds-ease-soft) infinite; }
 
 /* Wax shatter on click */
 @keyframes wax-break {
   0% { transform: scale(1) rotate(0deg); opacity: 1; }
   100% { transform: scale(1.6) rotate(20deg); opacity: 0; }
 }
-.wax-break { animation: wax-break 0.5s ease-out forwards; }
+.wax-break { animation: wax-break 0.5s var(--ds-ease-soft) forwards; }
 
 /* =====================================================================
  * DESIGN SYSTEM — token layer
@@ -422,6 +403,9 @@
   --ds-terracotta: oklch(0.65 0.10 40);
   --ds-ink: oklch(0.32 0.025 50);
   --ds-mist: oklch(0.94 0.014 70);
+  /* Darkened terracotta for small text sitting on a primary/N% tint (Badge,
+   * tags) — --ds-terracotta alone fails AA at label size on a light tint. */
+  --ds-primary-strong: color-mix(in oklab, var(--ds-terracotta) 78%, var(--ds-ink) 22%);
 
   /* Legacy brand tokens (pre-dating the --ds-* layer). Kept as real,
    * theme-scoped entries — rather than deleted — so the gradients, shadows,
@@ -487,6 +471,7 @@
   --ds-dur-base: 450ms;
   --ds-dur-slow: 900ms;
   --ds-dur-ambient: 7s;
+  --ds-dur-shimmer: 4s;
   /* Max translateY applied by useParallax(); themes may widen/narrow the effect. */
   --ds-parallax-shift: 32px;
 
@@ -507,10 +492,22 @@
   /* Semantic remap — existing shadcn/app components inherit the theme */
   --background: var(--ds-cream);
   --foreground: var(--ds-ink);
+  --card: var(--ds-ivory);
+  --card-foreground: var(--ds-ink);
+  --popover: var(--ds-ivory);
+  --popover-foreground: var(--ds-ink);
   --primary: var(--ds-terracotta);
+  --primary-foreground: var(--ds-ivory);
   --secondary: var(--ds-dusty-rose);
-  --accent: var(--ds-gold);
+  --secondary-foreground: var(--ds-ivory);
   --muted: var(--ds-mist);
+  --muted-foreground: oklch(0.48 0.025 50);
+  --accent: var(--ds-gold);
+  --accent-foreground: var(--ds-ink);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: var(--ds-ivory);
+  --border: oklch(0.9 0.016 70);
+  --input: oklch(0.92 0.015 70);
   --radius: var(--ds-radius-paper);
   --ring: var(--ds-terracotta);
 }
@@ -585,7 +582,9 @@
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: var(--ds-tracking-label);
-  color: color-mix(in oklab, var(--foreground) 62%, transparent);
+  /* 74% (not a lighter, more "delicate" mix) keeps this readable at 11px per
+   * WCAG AA — it's used for eyebrows/labels/tags across every page. */
+  color: color-mix(in oklab, var(--foreground) 74%, transparent);
 }
 
 @utility type-nav {
@@ -725,7 +724,7 @@
 @utility animate-ds-paper { animation: ds-paper-lift var(--ds-dur-slow) var(--ds-ease-paper) both; }
 @utility animate-ds-float { animation: ds-float var(--ds-dur-ambient) var(--ds-ease-soft) infinite; }
 @utility animate-ds-drift { animation: ds-drift linear infinite; }
-@utility animate-ds-shimmer { animation: ds-shimmer 4s var(--ds-ease-soft) infinite; }
+@utility animate-ds-shimmer { animation: ds-shimmer var(--ds-dur-shimmer) var(--ds-ease-soft) infinite; }
 
 @utility hover-lift {
   transition:

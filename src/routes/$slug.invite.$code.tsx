@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { SiteShell } from "@/components/SiteShell";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLoginByCode } from "@/auth/guest.functions";
+import { WaxSeal } from "@/wedding/WaxSeal";
+import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/invite/$code")({
   head: () => ({
@@ -65,25 +66,30 @@ function InvitePage() {
 
   return (
     <SiteShell>
-      <section className="mx-auto max-w-md px-6 pt-24 pb-28 text-center">
-        {status === "loading" ? (
-          <>
-            <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-            <p className="mt-6 text-muted-foreground">Opening your invitation…</p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl mb-3">Invitation not valid</h1>
-            <p className="text-muted-foreground mb-8">{errorMsg}</p>
-            <Button
-              onClick={() => navigate({ to: "/login" })}
-              className="rounded-full bg-primary hover:bg-primary/90 h-11 px-8"
-            >
-              Sign in manually
-            </Button>
-          </>
-        )}
-      </section>
+      <PageCanvas density="quiet">
+        <Section size="hero" width="prose">
+          {status === "loading" ? (
+            <div className="mx-auto flex max-w-sm flex-col items-center gap-4 text-center">
+              <div className="wax-pulse">
+                <WaxSeal size={80} />
+              </div>
+              <p className="type-script-sm">a moment, please</p>
+              <p className="type-body text-muted-foreground">Opening your invitation…</p>
+            </div>
+          ) : (
+            <ThemedCard variant="framed" className="mx-auto max-w-sm text-center" ornament>
+              <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-destructive/12 text-destructive">
+                <AlertTriangle aria-hidden="true" className="h-5 w-5" />
+              </span>
+              <h1 className="type-card-title mt-4">This invitation link isn't working</h1>
+              <p className="type-body mt-2 text-muted-foreground">{errorMsg}</p>
+              <ThemedButton onClick={() => navigate({ to: "/login" })} size="lg" className="mt-6">
+                Sign in manually
+              </ThemedButton>
+            </ThemedCard>
+          )}
+        </Section>
+      </PageCanvas>
     </SiteShell>
   );
 }

@@ -29,7 +29,11 @@ export function PageCanvas({
   const theme = useTheme();
   const intensity = density === "quiet" ? 0.4 : density === "lavish" ? 0.95 : 0.7;
   const particleCount =
-    density === "quiet" ? Math.round(theme.decor.particleCount / 2) : theme.decor.particleCount;
+    density === "quiet"
+      ? Math.round(theme.decor.particleCount / 2)
+      : density === "lavish"
+        ? Math.round(theme.decor.particleCount * 1.5)
+        : theme.decor.particleCount;
 
   return (
     <div

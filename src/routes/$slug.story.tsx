@@ -1,14 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PageCanvas,
+  Container,
   Section,
   ThemedCard,
   Divider,
   Badge,
+  Hero,
+  EmptyState,
 } from "@/design-system";
 import { DecorMotifArt } from "@/design-system/decor/Illustrations";
 import type { DecorMotif } from "@/theme/types";
@@ -42,13 +45,11 @@ function formatChapterDate(iso: string | null) {
 }
 
 function StoryPage() {
-  const { slug } = Route.useParams();
-  const { wedding } = useWedding(slug);
+  const { wedding } = useWeddingContext();
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!wedding) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
@@ -65,21 +66,17 @@ function StoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [wedding?.id]);
-
-  if (!wedding) return null;
+  }, [wedding.id]);
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="prose">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">before happily ever after</p>
-          <h1 className="type-hero animate-ds-reveal">Our story</h1>
-          <p className="type-body-lg text-muted-foreground max-w-prose animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-            Every love story is beautiful, but ours is our favourite.
-          </p>
-        </div>
-      </Section>
+      <Container width="prose">
+        <Hero
+          script="before happily ever after"
+          title="Our story"
+          subtitle="Every love story is beautiful, but ours is our favourite."
+        />
+      </Container>
 
       {loading ? (
         <Section size="compact">
@@ -89,9 +86,11 @@ function StoryPage() {
         </Section>
       ) : chapters.length === 0 ? (
         <Section size="compact">
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            The story is being written. Check back soon.
-          </div>
+          <EmptyState
+            motif="flourish"
+            title="The story is being written"
+            description="Check back soon — the couple is still adding chapters."
+          />
         </Section>
       ) : (
         <Section size="spacious" width="wide">
