@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ThemedCard } from "@/design-system";
 
 interface CountdownProps {
   /** ISO timestamp to count down to */
@@ -27,7 +28,11 @@ export function Countdown({ target, label }: CountdownProps) {
   }, [target]);
 
   if (t.done) {
-    return <p className="type-script text-center">today is the day</p>;
+    return (
+      <ThemedCard variant="framed" ornament className="mx-auto max-w-sm animate-ds-scale text-center">
+        <p className="type-script">today is the day</p>
+      </ThemedCard>
+    );
   }
 
   const items: { value: number; label: string }[] = [
@@ -40,11 +45,11 @@ export function Countdown({ target, label }: CountdownProps) {
   return (
     <div className="text-center">
       {label && <p className="type-script-sm mb-4">{label}</p>}
-      <div className="grid grid-cols-4 gap-3 md:gap-5 max-w-xl mx-auto">
+      <div className="grid grid-cols-4 gap-gutter max-w-xl mx-auto">
         {items.map((i) => (
           <div
             key={i.label}
-            className="surface-veil px-2 md:px-4 py-4 md:py-6 hover-lift"
+            className="surface-veil px-2 md:px-4 py-4 md:py-6"
           >
             <div
               className="type-card-title tabular-nums"

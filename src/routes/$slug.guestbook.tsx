@@ -1,17 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Trash2, MessageCircleHeart } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
-import { Textarea } from "@/components/ui/textarea";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PageCanvas,
+  Container,
   Section,
   SectionHeader,
   ThemedCard,
   ThemedButton,
+  ThemedTextarea,
   FormPanel,
+  Hero,
+  EmptyState,
+  ConfirmDialog,
 } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/guestbook")({
@@ -33,15 +37,14 @@ interface Message {
 }
 
 function GuestbookPage() {
-  const { slug } = Route.useParams();
-  const { wedding, guest, isAdmin } = useWedding(slug);
+  const { wedding, guest, isAdmin } = useWeddingContext();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const load = async () => {
-    if (!wedding) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("guestbook_messages")
@@ -54,11 +57,9 @@ function GuestbookPage() {
   };
 
   useEffect(() => {
-    if (wedding) void load();
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wedding?.id]);
-
-  if (!wedding) return null;
+  }, [wedding.id]);
 
   const post = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +89,6 @@ function GuestbookPage() {
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this message?")) return;
     const { error } = await supabase.from("guestbook_messages").delete().eq("id", id);
     if (error) {
       toast.error(error.message);
@@ -100,21 +100,19 @@ function GuestbookPage() {
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="prose">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">a wall of wishes</p>
-          <h1 className="type-hero animate-ds-reveal">Guestbook</h1>
-          <p className="type-body-lg text-muted-foreground max-w-prose animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-            Leave the couple a note, a memory, or your best wishes for the road ahead.
-          </p>
-        </div>
-      </Section>
+      <Container width="prose">
+        <Hero
+          script="a wall of wishes"
+          title="Guestbook"
+          subtitle="Leave the couple a note, a memory, or your best wishes for the road ahead."
+        />
+      </Container>
 
-      {guest && (
-        <Section size="compact" width="prose">
+      <Section size="compact" width="prose">
+        {guest ? (
           <FormPanel>
             <form onSubmit={post} className="space-y-gutter">
-              <Textarea
+              <ThemedTextarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Wishing you both a lifetime of love and laughter…"
@@ -127,8 +125,25 @@ function GuestbookPage() {
               </ThemedButton>
             </form>
           </FormPanel>
-        </Section>
-      )}
+        ) : (
+          <ThemedCard className="mx-auto max-w-prose text-center">
+            <p className="type-body text-muted-foreground">
+              Sign in with your invitation code to leave a message.
+            </p>
+          </ThemedCard>
+        )}
+      </Section>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+        title="Delete this message?"
+        description="This can't be undone."
+        onConfirm={() => {
+          if (pendingDeleteId) void remove(pendingDeleteId);
+          setPendingDeleteId(null);
+        }}
+      />
 
       <Section size="spacious" width="content">
         <SectionHeader
@@ -142,11 +157,13 @@ function GuestbookPage() {
               <Loader2 className="w-5 h-5 animate-spin mx-auto" />
             </div>
           ) : messages.length === 0 ? (
-            <div className="py-16 text-center text-sm text-muted-foreground">
-              Be the first to leave a message.
-            </div>
+            <EmptyState
+              motif="rose"
+              title="Be the first to leave a message"
+              description="Your note will appear here for the couple to treasure."
+            />
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid gap-gutter sm:grid-cols-2">
               {messages.map((m, i) => {
                 const mine = guest && m.guest_id === guest.id;
                 const canDelete = mine || isAdmin;
@@ -158,8 +175,8 @@ function GuestbookPage() {
                     className={i % 2 === 0 ? "animate-ds-reveal-left" : "animate-ds-reveal-right"}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary">
-                        <MessageCircleHeart className="w-4 h-4" />
+                      <span className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/12 text-primary">
+                        <MessageCircleHeart aria-hidden="true" className="w-5 h-5" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="type-body text-muted-foreground whitespace-pre-line">{m.message}</p>
@@ -171,11 +188,11 @@ function GuestbookPage() {
                       {canDelete && (
                         <button
                           type="button"
-                          onClick={() => remove(m.id)}
-                          className="text-muted-foreground hover:text-destructive focus-ring-elegant rounded-full p-1"
+                          onClick={() => setPendingDeleteId(m.id)}
+                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-destructive focus-ring-elegant"
                           aria-label="Delete message"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>

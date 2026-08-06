@@ -1,5 +1,8 @@
-import type { CSSProperties, ReactNode } from "react";
+import { forwardRef, type CSSProperties, type ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DecorMotifArt } from "./decor/Illustrations";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -13,7 +16,7 @@ type ButtonSize = "sm" | "md" | "lg";
 
 const BUTTON_BASE =
   "type-button inline-flex items-center justify-center gap-2 rounded-full uppercase " +
-  "transition-[transform,box-shadow,background-color,color,border-color] duration-200 " +
+  "transition-[transform,box-shadow,background-color,color,border-color] duration-[var(--ds-dur-fast)] " +
   "ease-[var(--ease-paper)] focus-ring-elegant disabled:pointer-events-none disabled:opacity-50 " +
   "hover:-translate-y-0.5 active:translate-y-0";
 
@@ -47,6 +50,110 @@ export function ThemedButton({
       className={cn(BUTTON_BASE, BUTTON_VARIANTS[variant], BUTTON_SIZES[size], className)}
       {...props}
     />
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Form controls                                                       */
+/* ------------------------------------------------------------------ */
+/* Public-page equivalents of the shadcn primitives in `components/ui` —
+ * those stay generic because admin routes depend on their current look;
+ * every guest-facing form should reach for these instead. */
+
+const FIELD_BASE =
+  "flex w-full rounded-card border-paper bg-transparent type-body text-foreground shadow-elev-1 " +
+  "transition-[border-color,box-shadow] duration-[var(--ds-dur-fast)] ease-[var(--ease-soft)] " +
+  "placeholder:text-muted-foreground focus-ring-elegant disabled:cursor-not-allowed disabled:opacity-50";
+
+export const ThemedInput = forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+  ({ className, type, ...props }, ref) => (
+    <input type={type} ref={ref} className={cn(FIELD_BASE, "h-11 px-4 py-2", className)} {...props} />
+  ),
+);
+ThemedInput.displayName = "ThemedInput";
+
+export const ThemedTextarea = forwardRef<HTMLTextAreaElement, React.ComponentProps<"textarea">>(
+  ({ className, ...props }, ref) => (
+    <textarea ref={ref} className={cn(FIELD_BASE, "min-h-28 px-4 py-3", className)} {...props} />
+  ),
+);
+ThemedTextarea.displayName = "ThemedTextarea";
+
+export const ThemedCheckbox = forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <CheckboxPrimitive.Root
+    ref={ref}
+    className={cn(
+      "peer grid h-5 w-5 shrink-0 place-content-center rounded-[0.3rem] border-paper shadow-elev-1 " +
+        "transition-colors duration-[var(--ds-dur-fast)] focus-ring-elegant disabled:cursor-not-allowed disabled:opacity-50 " +
+        "data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      className,
+    )}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator className="grid place-content-center text-current">
+      <Check className="h-3.5 w-3.5" />
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
+));
+ThemedCheckbox.displayName = "ThemedCheckbox";
+
+/** The `ourjourney.com/<slug>` prefix affordance shared by login + create. */
+export function SlugInput({
+  value,
+  onChange,
+  id,
+  placeholder,
+  tone = "default",
+  status,
+  className,
+  inputClassName,
+  ...props
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  id?: string;
+  placeholder?: string;
+  /** Border tone reflecting availability state. */
+  tone?: "default" | "success" | "error";
+  /** Optional trailing status icon (e.g. spinner/check/x), announced via aria-live. */
+  status?: ReactNode;
+  className?: string;
+  inputClassName?: string;
+} & Omit<React.ComponentProps<"input">, "value" | "onChange" | "id" | "placeholder" | "className">) {
+  const toneBorder =
+    tone === "success" ? "border border-primary/60" : tone === "error" ? "border border-destructive/60" : "border-paper";
+  return (
+    <div
+      className={cn(
+        "flex w-full items-stretch overflow-hidden rounded-card shadow-elev-1 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[color-mix(in_oklab,var(--ring)_70%,transparent)]",
+        toneBorder,
+        className,
+      )}
+    >
+      <span className="flex items-center border-r border-border bg-muted/60 px-3 type-caption whitespace-nowrap text-muted-foreground">
+        ourjourney.com/
+      </span>
+      <input
+        id={id}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={cn(
+          "h-11 w-full min-w-0 bg-transparent px-3 py-2 type-body text-foreground placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          inputClassName,
+        )}
+        {...props}
+      />
+      {status && (
+        <span className="flex items-center px-3 text-muted-foreground" aria-live="polite">
+          {status}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -109,7 +216,7 @@ export function FeatureCard({
   className,
 }: {
   icon?: ReactNode;
-  title: string;
+  title: ReactNode;
   children?: ReactNode;
   className?: string;
 }) {
@@ -190,16 +297,27 @@ export function MediaCard({
   src,
   alt,
   caption,
+  badge,
+  overlay,
+  onClick,
   className,
   ratio = "square",
 }: {
   src: string;
   alt: string;
   caption?: ReactNode;
+  /** Status chip pinned to the top-left of the image (e.g. a pending/hidden Badge). */
+  badge?: ReactNode;
+  /** Actions (e.g. delete) pinned top-right — always visible on touch, hover-revealed on pointer-fine devices. */
+  overlay?: ReactNode;
+  /** When provided, the whole image becomes a lightbox/zoom trigger. */
+  onClick?: () => void;
   className?: string;
   ratio?: "square" | "portrait" | "landscape";
 }) {
   const ratios = { square: "aspect-square", portrait: "aspect-[3/4]", landscape: "aspect-[4/3]" } as const;
+  const revealClass =
+    "opacity-100 can-hover:opacity-0 can-hover:group-hover:opacity-100 transition-opacity duration-[var(--ds-dur-fast)]";
   return (
     <figure className={cn("group relative overflow-hidden rounded-card border-paper shadow-elev-2", className)}>
       <img
@@ -208,12 +326,27 @@ export function MediaCard({
         loading="lazy"
         decoding="async"
         className={cn(
-          "w-full object-cover transition-transform duration-700 ease-[var(--ease-paper)] group-hover:scale-[1.04]",
+          "w-full object-cover transition-transform duration-[var(--ds-dur-slow)] ease-[var(--ease-paper)] group-hover:scale-[1.04]",
           ratios[ratio],
         )}
       />
+      {onClick && (
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label="View full photo"
+          className="absolute inset-0 cursor-zoom-in focus-ring-elegant"
+        />
+      )}
+      {badge && <div className="pointer-events-none absolute top-2 left-2">{badge}</div>}
+      {overlay && <div className={cn("absolute top-2 right-2", revealClass)}>{overlay}</div>}
       {caption && (
-        <figcaption className="absolute inset-x-0 bottom-0 bg-linear-to-t from-foreground/55 to-transparent p-3 type-caption text-background">
+        <figcaption
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-foreground/60 to-transparent p-3 type-caption text-background",
+            revealClass,
+          )}
+        >
           {caption}
         </figcaption>
       )}
@@ -226,6 +359,7 @@ export function WishCard({
   title,
   price,
   image,
+  imageAlt = "",
   children,
   action,
   className,
@@ -234,6 +368,8 @@ export function WishCard({
   title: ReactNode;
   price?: ReactNode;
   image?: string;
+  /** Alt text for the gift photo — often the identifying content, worth setting. */
+  imageAlt?: string;
   children?: ReactNode;
   action?: ReactNode;
   className?: string;
@@ -244,7 +380,7 @@ export function WishCard({
       {image && (
         <img
           src={image}
-          alt=""
+          alt={imageAlt}
           loading="lazy"
           decoding="async"
           className="h-40 w-full object-cover"
@@ -357,7 +493,7 @@ export function Badge({
   className?: string;
 }) {
   const tones = {
-    primary: "bg-primary/12 text-primary",
+    primary: "bg-primary/12 text-primary-strong",
     gold: "bg-accent/22 text-accent-foreground",
     leaf: "bg-sage/35 text-foreground",
     neutral: "bg-muted text-muted-foreground",
@@ -446,6 +582,90 @@ export function DecorativeWrapper({
   );
 }
 
+/**
+ * The "nothing here yet" moment — converges gallery/playlist/guestbook/
+ * story/timeline/wishlist/location's previously-inconsistent empty states.
+ */
+export function EmptyState({
+  motif = "leaf",
+  title,
+  description,
+  action,
+  className,
+}: {
+  motif?: Parameters<typeof DecorMotifArt>[0]["motif"];
+  title: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex flex-col items-center gap-3 py-block text-center", className)}>
+      <DecorMotifArt motif={motif} size="sm" intensity={0.55} className="opacity-90" />
+      <h3 className="type-card-title">{title}</h3>
+      {description && <p className="type-body max-w-prose text-muted-foreground">{description}</p>}
+      {action && <div className="mt-2">{action}</div>}
+    </div>
+  );
+}
+
+/**
+ * Themed replacement for native `confirm()` — a paper surface with
+ * `ThemedButton` actions, used for every destructive guest action.
+ */
+export function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = "Delete",
+  cancelLabel = "Cancel",
+  onConfirm,
+  destructive = true,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: ReactNode;
+  description?: ReactNode;
+  confirmLabel?: ReactNode;
+  cancelLabel?: ReactNode;
+  onConfirm: () => void;
+  destructive?: boolean;
+}) {
+  return (
+    <AlertDialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <AlertDialogPrimitive.Portal>
+        <AlertDialogPrimitive.Overlay className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-[2px] animate-ds-fade" />
+        <AlertDialogPrimitive.Content className="surface-paper animate-ds-scale fixed top-1/2 left-1/2 z-50 w-[min(26rem,90vw)] -translate-x-1/2 -translate-y-1/2 p-block shadow-elev-4">
+          <AlertDialogPrimitive.Title className="type-card-title">{title}</AlertDialogPrimitive.Title>
+          {description && (
+            <AlertDialogPrimitive.Description className="type-body mt-2 text-muted-foreground">
+              {description}
+            </AlertDialogPrimitive.Description>
+          )}
+          <div className="mt-stack flex justify-end gap-3">
+            <AlertDialogPrimitive.Cancel asChild>
+              <ThemedButton variant="ghost" size="sm">
+                {cancelLabel}
+              </ThemedButton>
+            </AlertDialogPrimitive.Cancel>
+            <AlertDialogPrimitive.Action asChild>
+              <ThemedButton
+                variant="primary"
+                size="sm"
+                onClick={onConfirm}
+                className={destructive ? "bg-destructive text-destructive-foreground" : undefined}
+              >
+                {confirmLabel}
+              </ThemedButton>
+            </AlertDialogPrimitive.Action>
+          </div>
+        </AlertDialogPrimitive.Content>
+      </AlertDialogPrimitive.Portal>
+    </AlertDialogPrimitive.Root>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
 /* ------------------------------------------------------------------ */
@@ -454,6 +674,7 @@ export function Hero({
   script,
   title,
   subtitle,
+  extra,
   actions,
   media,
   align = "center",
@@ -462,6 +683,8 @@ export function Hero({
   script?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
+  /** Extra content between the subtitle and actions — a countdown, a date badge. */
+  extra?: ReactNode;
   actions?: ReactNode;
   media?: ReactNode;
   align?: "center" | "split";
@@ -483,6 +706,11 @@ export function Hero({
         >
           {subtitle}
         </p>
+      )}
+      {extra && (
+        <div className="animate-ds-reveal" style={{ animationDelay: "170ms" }}>
+          {extra}
+        </div>
       )}
       {actions && (
         <div

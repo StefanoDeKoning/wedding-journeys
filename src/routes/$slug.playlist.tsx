@@ -8,20 +8,24 @@ import {
   Loader2,
   Trophy,
 } from "lucide-react";
-import { useWedding } from "@/wedding/useWedding";
-import { Input } from "@/components/ui/input";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { safeHttpUrl } from "@/lib/safeUrl";
 import {
   PageCanvas,
+  Container,
   Section,
   SectionHeader,
   FormPanel,
   ThemedCard,
   ThemedButton,
+  ThemedInput,
   Badge,
+  Hero,
+  EmptyState,
+  ConfirmDialog,
 } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/playlist")({
@@ -46,18 +50,16 @@ interface Song {
 }
 
 function PlaylistPage() {
-  const { slug } = Route.useParams();
-  const { wedding, guest, isAdmin } = useWedding(slug);
-  void isAdmin;
+  const { wedding, guest, isAdmin } = useWeddingContext();
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [spotify, setSpotify] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const load = async () => {
-    if (!wedding) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("playlist_songs")
@@ -72,9 +74,9 @@ function PlaylistPage() {
   };
 
   useEffect(() => {
-    if (wedding) void load();
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wedding?.id]);
+  }, [wedding.id]);
 
   const myCount = useMemo(
     () => (guest ? songs.filter((s) => s.guest_id === guest.id).length : 0),
@@ -90,8 +92,6 @@ function PlaylistPage() {
         .filter((s) => s.vote_count > 0),
     [songs],
   );
-
-  if (!wedding) return null;
 
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,16 +144,18 @@ function PlaylistPage() {
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="prose">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">help us fill the floor</p>
-          <h1 className="type-hero animate-ds-reveal">Playlist requests</h1>
-          <p className="type-body text-muted-foreground animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-            Drop up to <span className="text-foreground font-medium">3 songs</span> you'd
-            love to hear. The couple curates the final list.
-          </p>
-        </div>
-      </Section>
+      <Container width="prose">
+        <Hero
+          script="help us fill the floor"
+          title="Playlist requests"
+          subtitle={
+            <>
+              Drop up to <span className="text-foreground font-medium">3 songs</span> you'd love
+              to hear. The couple curates the final list.
+            </>
+          }
+        />
+      </Container>
 
       {top.length > 0 && (
         <Section size="compact" width="prose">
@@ -192,7 +194,7 @@ function PlaylistPage() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="title">Song title</Label>
-                  <Input
+                  <ThemedInput
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -203,7 +205,7 @@ function PlaylistPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="artist">Artist</Label>
-                  <Input
+                  <ThemedInput
                     id="artist"
                     value={artist}
                     onChange={(e) => setArtist(e.target.value)}
@@ -215,7 +217,7 @@ function PlaylistPage() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="spotify">Spotify link (optional)</Label>
-                <Input
+                <ThemedInput
                   id="spotify"
                   value={spotify}
                   onChange={(e) => setSpotify(e.target.value)}
@@ -225,7 +227,7 @@ function PlaylistPage() {
                 />
               </div>
               <ThemedButton type="submit" size="lg" disabled={submitting || remaining <= 0} className="w-full">
-                <Plus className="w-4 h-4" /> Suggest this song
+                <Plus aria-hidden="true" className="w-4 h-4" /> Suggest this song
               </ThemedButton>
             </form>
           </FormPanel>
@@ -240,54 +242,64 @@ function PlaylistPage() {
               <Loader2 className="w-5 h-5 animate-spin mx-auto" />
             </div>
           ) : songs.length === 0 ? (
-            <div className="text-center py-12 type-body text-muted-foreground rounded-card border-2 border-dashed border-primary/20">
-              No songs yet — be the first!
-            </div>
+            <EmptyState motif="music-note" title="No songs yet" description="Be the first to request one!" />
           ) : (
             <ul className="space-y-3">
               {songs.map((s) => {
                 const mine = guest && s.guest_id === guest.id;
                 const canDelete = mine || isAdmin;
                 return (
-                  <ThemedCard key={s.id} className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Music className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{s.title}</p>
-                      <p className="type-caption truncate">
-                        {s.artist} · suggested by {s.submitted_by_name}
-                        {mine && " · you"}
-                      </p>
-                    </div>
-                    {safeHttpUrl(s.spotify_url) && (
-                      <a
-                        href={safeHttpUrl(s.spotify_url)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-muted-foreground hover:text-primary focus-ring-elegant rounded-full p-1"
-                        aria-label="Open in Spotify"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
-                    {canDelete && (
-                      <button
-                        type="button"
-                        onClick={() => remove(s.id)}
-                        className="text-muted-foreground hover:text-destructive focus-ring-elegant rounded-full p-1"
-                        aria-label="Remove"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </ThemedCard>
+                  <li key={s.id}>
+                    <ThemedCard className="flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-full bg-primary/12 flex items-center justify-center text-primary shrink-0">
+                        <Music aria-hidden="true" className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{s.title}</p>
+                        <p className="type-caption truncate">
+                          {s.artist} · suggested by {s.submitted_by_name}
+                          {mine && " · you"}
+                        </p>
+                      </div>
+                      {safeHttpUrl(s.spotify_url) && (
+                        <a
+                          href={safeHttpUrl(s.spotify_url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-muted-foreground hover:text-primary focus-ring-elegant rounded-full p-1"
+                          aria-label="Open in Spotify"
+                        >
+                          <ExternalLink aria-hidden="true" className="w-4 h-4" />
+                        </a>
+                      )}
+                      {canDelete && (
+                        <button
+                          type="button"
+                          onClick={() => setPendingDeleteId(s.id)}
+                          className="text-muted-foreground hover:text-destructive focus-ring-elegant rounded-full p-1"
+                          aria-label="Remove"
+                        >
+                          <Trash2 aria-hidden="true" className="w-4 h-4" />
+                        </button>
+                      )}
+                    </ThemedCard>
+                  </li>
                 );
               })}
             </ul>
           )}
         </div>
       </Section>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+        title="Remove this song request?"
+        onConfirm={() => {
+          if (pendingDeleteId) void remove(pendingDeleteId);
+          setPendingDeleteId(null);
+        }}
+      />
     </PageCanvas>
   );
 }

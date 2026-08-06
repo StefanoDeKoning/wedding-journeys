@@ -148,6 +148,7 @@ function LeafPaint({
   y,
   rotate,
   scale = 1,
+  variant = "pointed",
 }: {
   fill: string;
   intensity: number;
@@ -155,16 +156,64 @@ function LeafPaint({
   y: number;
   rotate: number;
   scale?: number;
+  /** "pointed" (default, olive/vine/gold-leaf family) or "round" (eucalyptus). */
+  variant?: "pointed" | "round";
 }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(${rotate}) scale(${scale})`}>
-      <path
-        d="M0,0C16,-6,34,-2,44,10C32,22,12,24,0,14C-4,10,-4,4,0,0Z"
-        fill={fill}
-        fillOpacity={intensity * 0.6}
-        style={{ filter: "blur(1.5px)" }}
-      />
-      <path d="M2,7C14,5,28,7,40,11" fill="none" stroke={fill} strokeOpacity={intensity * 0.5} strokeWidth="1" />
+      {variant === "round" ? (
+        <>
+          <ellipse
+            cx="18"
+            cy="6"
+            rx="18"
+            ry="13"
+            fill={fill}
+            fillOpacity={intensity * 0.5}
+            style={{ filter: "blur(2px)" }}
+          />
+          <path d="M2,6C10,2,26,2,34,6" fill="none" stroke={fill} strokeOpacity={intensity * 0.5} strokeWidth="1" />
+        </>
+      ) : (
+        <>
+          <path
+            d="M0,0C16,-6,34,-2,44,10C32,22,12,24,0,14C-4,10,-4,4,0,0Z"
+            fill={fill}
+            fillOpacity={intensity * 0.6}
+            style={{ filter: "blur(1.5px)" }}
+          />
+          <path d="M2,7C14,5,28,7,40,11" fill="none" stroke={fill} strokeOpacity={intensity * 0.5} strokeWidth="1" />
+        </>
+      )}
+    </g>
+  );
+}
+
+/** Layered watercolour peony — fuller, rounder radial bloom than the rose's spiral. */
+function PeonyPaint({ fill, soft, intensity }: { fill: string; soft: string; intensity: number }) {
+  const petals = [0, 60, 120, 180, 240, 300];
+  return (
+    <g>
+      <circle cx="100" cy="100" r="66" fill={soft} fillOpacity={intensity * 0.4} style={{ filter: "blur(16px)" }} />
+      {petals.map((angle, i) => {
+        const cx = 100 + 26 * Math.cos((angle * Math.PI) / 180);
+        const cy = 100 + 26 * Math.sin((angle * Math.PI) / 180);
+        return (
+          <ellipse
+            key={angle}
+            cx={cx}
+            cy={cy}
+            rx="30"
+            ry="22"
+            fill={fill}
+            fillOpacity={intensity * (0.42 + (i % 2) * 0.1)}
+            transform={`rotate(${angle} ${cx} ${cy})`}
+            style={i % 2 === 0 ? { filter: "blur(2px)" } : undefined}
+          />
+        );
+      })}
+      <circle cx="100" cy="100" r="16" fill={fill} fillOpacity={intensity * 0.85} />
+      <circle cx="100" cy="100" r="7" fill={fill} fillOpacity={intensity} />
     </g>
   );
 }
@@ -190,10 +239,17 @@ export function DecorMotifArt({
   const body = (() => {
     switch (motif) {
       case "rose":
-      case "peony":
         return (
           <>
             <RosePaint fill={fill} soft={soft} intensity={intensity} />
+            <LeafPaint fill={leaf} intensity={intensity} x={132} y={128} rotate={25} />
+            <LeafPaint fill={leaf} intensity={intensity} x={46} y={132} rotate={155} scale={0.8} />
+          </>
+        );
+      case "peony":
+        return (
+          <>
+            <PeonyPaint fill={fill} soft={soft} intensity={intensity} />
             <LeafPaint fill={leaf} intensity={intensity} x={132} y={128} rotate={25} />
             <LeafPaint fill={leaf} intensity={intensity} x={46} y={132} rotate={155} scale={0.8} />
           </>
@@ -202,12 +258,16 @@ export function DecorMotifArt({
         return (
           <>
             <path
-              d="M40,160C60,110,100,70,160,44C150,104,116,150,60,168C50,170,42,166,40,160Z"
-              fill={leaf}
-              fillOpacity={intensity * 0.55}
-              style={{ filter: "blur(2px)" }}
+              d="M40,166C52,120,84,80,150,44"
+              fill="none"
+              stroke={leaf}
+              strokeOpacity={intensity * 0.55}
+              strokeWidth="1.6"
+              strokeLinecap="round"
             />
-            <path d="M52,160C80,124,116,90,158,48" fill="none" stroke={leaf} strokeOpacity={intensity * 0.6} strokeWidth="1.4" />
+            <LeafPaint fill={leaf} intensity={intensity} x={54} y={140} rotate={-35} scale={1.5} />
+            <LeafPaint fill={leaf} intensity={intensity * 0.9} x={92} y={100} rotate={-15} scale={1.3} />
+            <LeafPaint fill={leaf} intensity={intensity * 0.85} x={128} y={64} rotate={-30} scale={1.1} />
           </>
         );
       case "olive-branch":
@@ -251,16 +311,24 @@ export function DecorMotifArt({
               const y = 178 - t * 144;
               return (
                 <g key={i}>
-                  <ellipse
-                    cx={x + 14}
-                    cy={y - 6}
-                    rx="15"
-                    ry="12"
+                  <LeafPaint
                     fill={leaf}
-                    fillOpacity={intensity * 0.45}
-                    style={{ filter: "blur(2px)" }}
+                    intensity={intensity}
+                    x={x + 6}
+                    y={y - 10}
+                    rotate={-30 + i * 6}
+                    scale={0.75}
+                    variant="round"
                   />
-                  <ellipse cx={x - 12} cy={y + 8} rx="13" ry="10" fill={leaf} fillOpacity={intensity * 0.36} />
+                  <LeafPaint
+                    fill={leaf}
+                    intensity={intensity * 0.85}
+                    x={x - 10}
+                    y={y + 10}
+                    rotate={150 + i * 6}
+                    scale={0.62}
+                    variant="round"
+                  />
                 </g>
               );
             })}
@@ -486,6 +554,15 @@ export function DecorMotifArt({
       default:
         return (
           <>
+            <ellipse
+              cx="100"
+              cy="100"
+              rx="72"
+              ry="30"
+              fill={soft}
+              fillOpacity={intensity * 0.28}
+              style={{ filter: "blur(12px)" }}
+            />
             <path
               d="M20,100C50,70,74,132,100,100C126,68,150,130,180,100"
               fill="none"

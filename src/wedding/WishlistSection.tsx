@@ -48,19 +48,20 @@ export function WishlistSection({ weddingId }: { weddingId: string }) {
         description="Your presence is the greatest gift. If you'd still like to spoil us, here are a few ideas."
       />
 
-      <div className="mt-block grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-block grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item, i) => (
           <WishCard
             key={item.id}
             title={item.title}
             price={item.price_text}
             image={item.image_url ?? undefined}
+            imageAlt={item.title}
             className="animate-ds-reveal"
             action={
               safeHttpUrl(item.external_url) && (
                 <ThemedButton asChild variant="gilded" size="sm">
                   <a href={safeHttpUrl(item.external_url)!} target="_blank" rel="noreferrer noopener">
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
                     View gift
                   </a>
                 </ThemedButton>
@@ -70,8 +71,8 @@ export function WishlistSection({ weddingId }: { weddingId: string }) {
           >
             {item.description && <p className="whitespace-pre-line">{item.description}</p>}
             {!item.image_url && (
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/12 text-primary">
-                <Gift className="w-5 h-5" />
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-primary">
+                <Gift aria-hidden="true" className="w-5 h-5" />
               </span>
             )}
           </WishCard>

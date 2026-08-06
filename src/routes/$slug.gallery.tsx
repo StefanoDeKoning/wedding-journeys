@@ -1,22 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Camera,
-  Upload,
-  Loader2,
-  QrCode,
-  EyeOff,
-  Trash2,
-  Clock,
-  User,
-  ExternalLink,
-} from "lucide-react";
+import { Upload, Loader2, QrCode, User, ExternalLink } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useWedding } from "@/wedding/useWedding";
-import { Input } from "@/components/ui/input";
+import { useWeddingContext } from "@/wedding/WeddingContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { signPhotoUrls } from "@/lib/photoUrl";
+import { PhotoTile, type GalleryPhoto } from "@/wedding/PhotoTile";
 import {
   Dialog,
   DialogContent,
@@ -26,10 +16,15 @@ import {
 } from "@/components/ui/dialog";
 import {
   PageCanvas,
+  Container,
   Section,
   SectionHeader,
   FormPanel,
   ThemedButton,
+  ThemedInput,
+  Hero,
+  EmptyState,
+  ConfirmDialog,
 } from "@/design-system";
 
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
@@ -57,7 +52,7 @@ interface Photo {
 
 function GalleryPage() {
   const { slug } = Route.useParams();
-  const { wedding, guest } = useWedding(slug);
+  const { wedding, guest } = useWeddingContext();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
@@ -65,9 +60,10 @@ function GalleryPage() {
   const [caption, setCaption] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const [qrOpen, setQrOpen] = useState(false);
+  const [viewId, setViewId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; path: string } | null>(null);
 
   const load = async () => {
-    if (!wedding) return;
     setLoading(true);
     const { data, error } = await supabase
       .from("photos")
@@ -84,13 +80,12 @@ function GalleryPage() {
   };
 
   useEffect(() => {
-    if (wedding) void load();
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wedding?.id]);
+  }, [wedding.id]);
 
   // Upload window: from ceremony start until +48h after reception (or ceremony)
   const uploadWindow = useMemo(() => {
-    if (!wedding) return { open: false, label: "Loading…" };
     const now = Date.now();
     const start = wedding.ceremony_at ? new Date(wedding.ceremony_at).getTime() : null;
     const endRef = wedding.reception_at ?? wedding.ceremony_at;
@@ -106,14 +101,14 @@ function GalleryPage() {
         open: true,
         label: "The 48-hour upload window has passed — late uploads still welcome.",
       };
-    return { open: true, label: "Uploads are open right now — share away! ✨" };
-  }, [wedding]);
+    return { open: true, label: "Uploads are open right now — share away!" };
+  }, [wedding.ceremony_at, wedding.reception_at]);
 
   const visiblePhotos = useMemo(() => {
     return photos.filter((p) => p.status === "approved" || p.guest_id === guest?.id);
   }, [photos, guest?.id]);
 
-  if (!wedding) return null;
+  const viewPhoto = viewId ? (visiblePhotos.find((p) => p.id === viewId) ?? null) : null;
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -183,7 +178,6 @@ function GalleryPage() {
   };
 
   const remove = async (id: string, path: string) => {
-    if (!confirm("Delete this photo permanently?")) return;
     const { error: stErr } = await supabase.storage
       .from("wedding-photos")
       .remove([path]);
@@ -207,26 +201,22 @@ function GalleryPage() {
 
   return (
     <PageCanvas density="regular">
-      <Section size="hero" width="prose">
-        <div className="flex flex-col items-center gap-stack text-center">
-          <p className="type-script animate-ds-fade">the day in pictures</p>
-          <h1 className="type-hero animate-ds-reveal">Gallery</h1>
-          <p className="type-body-lg text-muted-foreground max-w-md animate-ds-reveal" style={{ animationDelay: "120ms" }}>
-            Share your photos with us — every angle, every smile.
-          </p>
-          {uploadWindow.label && (
-            <p className="type-caption italic animate-ds-reveal" style={{ animationDelay: "200ms" }}>
-              {uploadWindow.label}
-            </p>
-          )}
-        </div>
-      </Section>
+      <Container width="prose">
+        <Hero
+          script="the day in pictures"
+          title="Gallery"
+          subtitle="Share your photos with us — every angle, every smile."
+          extra={
+            uploadWindow.label && <p className="type-caption text-center italic">{uploadWindow.label}</p>
+          }
+        />
+      </Container>
 
       <Section size="compact" width="content">
         <FormPanel>
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
             <div className="flex-1 space-y-2">
-              <Input
+              <ThemedInput
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 placeholder="Add an optional caption…"
@@ -290,16 +280,11 @@ function GalleryPage() {
               <Loader2 className="w-5 h-5 animate-spin mx-auto" />
             </div>
           ) : visiblePhotos.length === 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-card border-2 border-dashed border-primary/20 flex items-center justify-center text-muted-foreground"
-                >
-                  <Camera className="w-7 h-7 opacity-40" />
-                </div>
-              ))}
-            </div>
+            <EmptyState
+              motif="gold-leaf"
+              title="No photos yet"
+              description="Be the first to share a moment from the day."
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {visiblePhotos.map((p) => (
@@ -307,8 +292,9 @@ function GalleryPage() {
                   key={p.id}
                   photo={p}
                   url={urls[p.storage_path] ?? ""}
-                  isMine={!!(guest && p.guest_id === guest.id)}
-                  onDelete={() => remove(p.id, p.storage_path)}
+                  canDelete={!!(guest && p.guest_id === guest.id)}
+                  onView={() => setViewId(p.id)}
+                  onDelete={() => setPendingDelete({ id: p.id, path: p.storage_path })}
                 />
               ))}
             </div>
@@ -327,6 +313,7 @@ function GalleryPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
+            {/* White background kept literal (not a token) — required for QR scan contrast regardless of theme. */}
             <div className="p-4 rounded-card bg-white">
               <QRCodeSVG value={uploadUrl} size={220} level="M" />
             </div>
@@ -334,70 +321,49 @@ function GalleryPage() {
               href={uploadUrl}
               target="_blank"
               rel="noreferrer"
-              className="type-caption text-primary hover-gild inline-flex items-center gap-1"
+              className="type-caption text-primary hover-gild focus-ring-elegant inline-flex items-center gap-1"
             >
               {uploadUrl}
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink aria-hidden="true" className="w-3 h-3" />
             </a>
           </div>
         </DialogContent>
       </Dialog>
-    </PageCanvas>
-  );
-}
 
-function PhotoTile({
-  photo,
-  url,
-  isMine,
-  onDelete,
-}: {
-  photo: Photo;
-  url: string;
-  isMine: boolean;
-  onDelete: () => void;
-}) {
-  return (
-    <figure
-      className={`group relative aspect-square overflow-hidden rounded-card border-paper shadow-elev-2 hover-lift bg-muted ${
-        photo.status === "hidden" ? "opacity-50" : ""
-      }`}
-    >
-      <img
-        src={url}
-        alt={photo.caption ?? `Photo by ${photo.uploader_name}`}
-        loading="lazy"
-        decoding="async"
-        className="w-full h-full object-cover transition-transform duration-700 ease-[var(--ease-paper)] group-hover:scale-[1.04]"
-      />
-      {photo.status !== "approved" && (
-        <div className="absolute top-2 left-2 type-caption px-2 py-0.5 rounded-full bg-background/90 backdrop-blur border-paper flex items-center gap-1">
-          {photo.status === "pending" ? (
-            <Clock className="w-2.5 h-2.5" />
-          ) : (
-            <EyeOff className="w-2.5 h-2.5" />
+      {/* Lightbox */}
+      <Dialog open={!!viewPhoto} onOpenChange={(open) => !open && setViewId(null)}>
+        <DialogContent className="max-w-3xl p-2 sm:p-2">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{viewPhoto?.caption ?? "Photo"}</DialogTitle>
+            <DialogDescription>Full-size photo</DialogDescription>
+          </DialogHeader>
+          {viewPhoto && (
+            <figure>
+              <img
+                src={urls[viewPhoto.storage_path] ?? ""}
+                alt={viewPhoto.caption ?? `Photo by ${viewPhoto.uploader_name}`}
+                className="max-h-[75vh] w-full rounded-card object-contain"
+              />
+              {viewPhoto.caption && (
+                <figcaption className="type-caption mt-2 text-center text-muted-foreground">
+                  {viewPhoto.caption} — {viewPhoto.uploader_name}
+                </figcaption>
+              )}
+            </figure>
           )}
-          {photo.status}
-        </div>
-      )}
-      <figcaption className="absolute inset-x-0 bottom-0 p-2 bg-linear-to-t from-foreground/70 to-transparent type-caption text-background opacity-0 group-hover:opacity-100 transition-opacity">
-        <p className="truncate">
-          {photo.caption ?? `By ${photo.uploader_name}`}
-        </p>
-      </figcaption>
-      {isMine && (
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            type="button"
-            onClick={onDelete}
-            className="p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground focus-ring-elegant"
-            aria-label="Delete"
-            title="Delete"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-    </figure>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+        title="Delete this photo?"
+        description="This removes it permanently — it can't be undone."
+        onConfirm={() => {
+          if (pendingDelete) void remove(pendingDelete.id, pendingDelete.path);
+          setPendingDelete(null);
+        }}
+      />
+    </PageCanvas>
   );
 }

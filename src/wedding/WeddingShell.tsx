@@ -14,6 +14,14 @@ import {
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { ThemedButton } from "@/design-system";
+import { cn } from "@/lib/utils";
+
+const TAB_BASE =
+  "type-nav flex min-h-11 items-center gap-2 rounded-full whitespace-nowrap px-4 py-2 border border-transparent " +
+  "transition-[color,background-color,border-color,transform] duration-[var(--ds-dur-fast)] ease-[var(--ease-soft)] " +
+  "focus-ring-elegant";
+const TAB_INACTIVE = "text-muted-foreground hover:text-primary hover:bg-primary/8 hover:-translate-y-0.5";
+const TAB_ACTIVE = "text-primary bg-primary/10 border-gilded shadow-elev-1";
 
 const tabs = [
   { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true },
@@ -58,8 +66,8 @@ export function WeddingHeader({
             )}
             {isAdmin && (
               <ThemedButton asChild variant="gilded" size="sm">
-                <Link to="/$slug/admin" params={{ slug }}>
-                  <Settings className="w-3.5 h-3.5" />
+                <Link to="/$slug/admin" params={{ slug }} aria-label="Admin">
+                  <Settings aria-hidden="true" className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Admin</span>
                 </Link>
               </ThemedButton>
@@ -67,12 +75,13 @@ export function WeddingHeader({
             <ThemedButton
               variant="ghost"
               size="sm"
+              aria-label="Sign out"
               onClick={async () => {
                 await signOut();
                 window.location.href = `/${slug}`;
               }}
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut aria-hidden="true" className="w-4 h-4" />
               <span className="hidden sm:inline">Sign out</span>
             </ThemedButton>
           </div>
@@ -88,13 +97,10 @@ export function WeddingHeader({
                 to={t.to}
                 params={{ slug }}
                 activeOptions={{ exact: t.exact }}
-                className="type-nav flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-muted-foreground border border-transparent transition-[color,background-color,border-color,transform] duration-300 ease-[var(--ds-ease-soft)] hover:text-primary hover:bg-primary/8 hover:-translate-y-0.5 focus-ring-elegant"
-                activeProps={{
-                  className:
-                    "type-nav flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-primary bg-primary/10 border-gilded shadow-elev-1 focus-ring-elegant",
-                }}
+                className={cn(TAB_BASE, TAB_INACTIVE)}
+                activeProps={{ className: cn(TAB_BASE, TAB_ACTIVE) }}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon aria-hidden="true" className="w-3.5 h-3.5" />
                 {t.label}
               </Link>
             );

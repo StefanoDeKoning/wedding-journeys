@@ -10,6 +10,10 @@ export { useParallax } from "./hooks";
 export {
   ThemedButton,
   ThemedCard,
+  ThemedInput,
+  ThemedTextarea,
+  ThemedCheckbox,
+  SlugInput,
   FeatureCard,
   InfoCard,
   TimelineCard,
@@ -22,6 +26,8 @@ export {
   Tag,
   IllustrationFrame,
   DecorativeWrapper,
+  EmptyState,
+  ConfirmDialog,
   Hero,
 } from "./components";
 export {
