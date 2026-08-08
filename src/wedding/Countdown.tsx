@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { ThemedCard } from "@/design-system";
+import { cn } from "@/lib/utils";
 
 interface CountdownProps {
   /** ISO timestamp to count down to */
   target: string;
   /** Optional label shown above the digits */
   label?: string;
+  /** Compact layout for tight spaces (e.g. tucked under an invitation title). */
+  compact?: boolean;
 }
 
 function diff(target: Date) {
@@ -17,7 +20,7 @@ function diff(target: Date) {
   return { days, hours, minutes, seconds, done: ms === 0 };
 }
 
-export function Countdown({ target, label }: CountdownProps) {
+export function Countdown({ target, label, compact }: CountdownProps) {
   const date = new Date(target);
   const [t, setT] = useState(() => diff(date));
 
@@ -44,23 +47,30 @@ export function Countdown({ target, label }: CountdownProps) {
 
   return (
     <div className="text-center">
-      {label && <p className="type-script-sm mb-4">{label}</p>}
-      <div className="grid grid-cols-4 gap-gutter max-w-xl mx-auto">
+      {label && <p className={cn("type-script-sm", compact ? "mb-2" : "mb-4")}>{label}</p>}
+      <div className={cn("grid grid-cols-4 gap-gutter max-w-xl mx-auto", compact && "max-w-sm")}>
         {items.map((i) => (
           <div
             key={i.label}
-            className="surface-veil px-2 md:px-4 py-4 md:py-6"
+            className={cn(
+              "surface-veil px-2 md:px-4",
+              compact ? "py-2 md:py-3" : "py-4 md:py-6",
+            )}
           >
             <div
-              className="type-card-title tabular-nums"
+              className={cn(
+                "tabular-nums",
+                compact ? "type-section-title" : "type-card-title",
+              )}
               aria-label={`${i.value} ${i.label}`}
             >
               {String(i.value).padStart(2, "0")}
             </div>
-            <div className="type-label mt-1">{i.label}</div>
+            <div className={cn("type-label", compact ? "mt-0" : "mt-1")}>{i.label}</div>
           </div>
         ))}
       </div>
     </div>
   );
 }
+
