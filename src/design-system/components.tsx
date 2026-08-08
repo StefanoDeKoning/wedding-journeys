@@ -678,6 +678,7 @@ export function Hero({
   actions,
   media,
   align = "center",
+  compact = false,
   className,
 }: {
   script?: ReactNode;
@@ -688,12 +689,15 @@ export function Hero({
   actions?: ReactNode;
   media?: ReactNode;
   align?: "center" | "split";
+  /** Compact spacing for pages where the hero sits immediately above another focal element (e.g. the envelope). */
+  compact?: boolean;
   className?: string;
 }) {
   const content = (
     <div
       className={cn(
-        "flex flex-col gap-stack",
+        "flex flex-col",
+        compact ? "gap-4" : "gap-stack",
         align === "center" ? "items-center text-center" : "items-start text-left",
       )}
     >
@@ -724,7 +728,7 @@ export function Hero({
   );
 
   return (
-    <header className={cn("relative py-hero", className)}>
+    <header className={cn(compact ? "py-block" : "py-hero", className)}>
       {align === "split" ? (
         <div className="grid items-center gap-block lg:grid-cols-2">
           {content}
@@ -739,3 +743,4 @@ export function Hero({
     </header>
   );
 }
+
