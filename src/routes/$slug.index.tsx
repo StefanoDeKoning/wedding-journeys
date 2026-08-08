@@ -73,6 +73,7 @@ function InvitationPage() {
       {/* Hero — the visual centerpiece: names, date, venue, countdown */}
       <Container width="content">
         <Hero
+          className="pb-stack"
           script="together with their families"
           title={
             <>
@@ -109,7 +110,7 @@ function InvitationPage() {
       </Container>
 
       {/* Envelope — the signature moment */}
-      <Section size="regular" width="prose">
+      <Section size="regular" width="prose" className="pt-0">
         <div className="animate-ds-scale" style={{ animationDelay: "120ms" }}>
           <EnvelopeLetter
             recipientFirstName={recipientFirst}
