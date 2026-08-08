@@ -73,7 +73,7 @@ function InvitationPage() {
       {/* Hero — the visual centerpiece: names, date, venue, countdown */}
       <Container width="content">
         <Hero
-          className="pb-stack"
+          className="pb-4"
           script="together with their families"
           title={
             <>
@@ -84,7 +84,7 @@ function InvitationPage() {
           }
           subtitle={
             (wedding.wedding_date || wedding.location_name) && (
-              <span className="flex flex-col items-center justify-center gap-stack sm:flex-row sm:gap-block">
+              <span className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-block">
                 {wedding.wedding_date && (
                   <span className="flex items-center gap-2">
                     <CalendarDays aria-hidden="true" className="w-4 h-4 text-primary" />
@@ -101,9 +101,9 @@ function InvitationPage() {
             )
           }
           extra={
-            <div className="flex flex-col items-center gap-stack">
+            <div className="flex flex-col items-center gap-4">
               <Divider className="w-full max-w-sm" />
-              {target && <Countdown target={target} label={countdownLabel} />}
+              {target && <Countdown target={target} label={countdownLabel} compact />}
             </div>
           }
         />
