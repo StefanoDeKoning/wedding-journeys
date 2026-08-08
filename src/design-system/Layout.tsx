@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import floralColumn from "@/assets/floral-column.png.asset.json";
+import floralColumn from "@/assets/floral-column-gold.png.asset.json";
 import { useTheme } from "@/theme/ThemeProvider";
 
 import {
