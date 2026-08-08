@@ -73,7 +73,7 @@ function InvitationPage() {
       {/* Hero — the visual centerpiece: names, date, venue, countdown */}
       <Container width="content">
         <Hero
-          className="pb-4"
+          compact
           script="together with their families"
           title={
             <>
