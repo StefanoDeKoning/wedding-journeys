@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ThemedCard } from "@/design-system";
+import { cn } from "@/lib/utils";
 
 interface CountdownProps {
   /** ISO timestamp to count down to */
