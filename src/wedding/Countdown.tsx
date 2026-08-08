@@ -6,6 +6,8 @@ interface CountdownProps {
   target: string;
   /** Optional label shown above the digits */
   label?: string;
+  /** Compact layout for tight spaces (e.g. tucked under an invitation title). */
+  compact?: boolean;
 }
 
 function diff(target: Date) {
