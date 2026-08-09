@@ -4,87 +4,53 @@ export type WaxSealMotif = "rose" | "initials" | "monogram" | "custom";
 
 interface WaxSealProps {
   size?: number;
-  /** Which crest is embossed into the wax. Defaults to the engraved rose. */
+  /** Which crest is embossed into the wax. Defaults to the engraved initials. */
   motif?: WaxSealMotif;
   /** Used when motif="initials" or "monogram" — e.g. "S & J". */
   initials?: string;
   /** Used when motif="custom" — any inline SVG content, drawn in the same
-   *  gold-warm gradient as the built-in crests, centered at (100,100). */
+   *  pressed-wax styling as the built-in crests, centered at (100,100). */
   children?: ReactNode;
 }
 
-/** Engraved rose in bloom — the signature crest, pressed into the wax. */
+/** Engraved rose in bloom — pressed into the wax. */
 function RoseCrest() {
   return (
-    <g transform="translate(100 98)">
-      {/* Outer petals */}
+    <g transform="translate(100 100)" filter="url(#wax-emboss)">
       {[0, 72, 144, 216, 288].map((angle) => (
         <path
           key={angle}
           transform={`rotate(${angle})`}
-          d="M0,-6 C11,-14 17,-4 12,8 C8,17 -2,20 -8,12 C-14,4 -10,-8 0,-6 Z"
-          fill="url(#gold-warm)"
-          opacity="0.92"
+          d="M0,-8 C14,-18 22,-5 15,10 C10,21 -3,25 -10,15 C-18,5 -13,-10 0,-8 Z"
+          fill="var(--ds-wax-emboss, #8e2a20)"
         />
       ))}
-      {/* Engraved petal grooves (shadow lines pressed into the wax) */}
-      {[0, 72, 144, 216, 288].map((angle) => (
-        <path
-          key={`groove-${angle}`}
-          transform={`rotate(${angle})`}
-          d="M0,-4 C8,-9 11,-1 6,7"
-          fill="none"
-          stroke="var(--ds-wax-primary-dark)"
-          strokeWidth="0.9"
-          strokeLinecap="round"
-          opacity="0.45"
-        />
-      ))}
-      {/* Inner swirl bud */}
-      <circle r="9" fill="url(#gold-warm)" opacity="0.95" />
+      <circle r="11" fill="var(--ds-wax-emboss, #8e2a20)" />
       <path
-        d="M-5,0 C-5,-4 -1,-6 3,-4 C6,-2 6,2 2,4 C-2,6 -5,3 -5,0 Z"
+        d="M0,26 C0,38 0,48 0,58"
         fill="none"
-        stroke="var(--ds-wax-primary-dark)"
-        strokeWidth="0.8"
-        opacity="0.5"
-      />
-      {/* Shine highlight */}
-      <path
-        d="M-14,-20 C-10,-25 -3,-27 3,-24"
-        fill="none"
-        stroke="color-mix(in oklab, var(--ds-wax-gold) 60%, white)"
-        strokeWidth="1.2"
+        stroke="var(--ds-wax-emboss, #8e2a20)"
+        strokeWidth="2.4"
         strokeLinecap="round"
-        opacity="0.6"
       />
-      {/* Stem + leaves beneath the bloom */}
-      <path
-        d="M0,22 C0,34 0,44 0,52"
-        fill="none"
-        stroke="url(#gold-warm)"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        opacity="0.85"
-      />
-      <path d="M0,36 C-8,32 -13,36 -15,44 C-7,45 -2,42 0,36 Z" fill="url(#gold-warm)" opacity="0.8" />
-      <path d="M0,42 C8,38 13,42 15,50 C7,51 2,48 0,42 Z" fill="url(#gold-warm)" opacity="0.8" />
+      <path d="M0,40 C-9,36 -15,40 -17,49 C-8,50 -2,46 0,40 Z" fill="var(--ds-wax-emboss, #8e2a20)" />
+      <path d="M0,47 C9,43 15,47 17,56 C8,57 2,53 0,47 Z" fill="var(--ds-wax-emboss, #8e2a20)" />
     </g>
   );
 }
 
-/** Elegant embossed initials, e.g. "S & J". */
+/** Embossed script initials, e.g. "S & F". */
 function InitialsCrest({ text }: { text: string }) {
+  const long = text.replace(/\s/g, "").length > 4;
   return (
-    <g transform="translate(100 104)">
+    <g filter="url(#wax-emboss)">
       <text
-        x="0"
-        y="0"
+        x="100"
+        y="114"
         textAnchor="middle"
-        fontSize="34"
-        fill="url(#gold-warm)"
+        fontSize={long ? 44 : 56}
+        fill="var(--ds-wax-emboss, #8e2a20)"
         style={{ fontFamily: "var(--ds-font-script)" }}
-        opacity="0.95"
       >
         {text}
       </text>
@@ -92,37 +58,44 @@ function InitialsCrest({ text }: { text: string }) {
   );
 }
 
-/** Simple framed monogram — same crest, tighter tracking, small rule beneath. */
+/** Framed monogram — tighter tracking, small rule beneath. */
 function MonogramCrest({ text }: { text: string }) {
   return (
-    <g transform="translate(100 100)">
+    <g filter="url(#wax-emboss)">
       <text
-        x="0"
-        y="8"
+        x="100"
+        y="106"
         textAnchor="middle"
-        fontSize="26"
-        letterSpacing="2"
-        fill="url(#gold-warm)"
+        fontSize="34"
+        letterSpacing="3"
+        fill="var(--ds-wax-emboss, #8e2a20)"
         style={{ fontFamily: "var(--ds-font-display)" }}
-        opacity="0.95"
       >
         {text}
       </text>
-      <path d="M-20,20 L20,20" stroke="url(#gold-warm)" strokeWidth="1" opacity="0.6" />
+      <path d="M76,124 L124,124" stroke="var(--ds-wax-emboss, #8e2a20)" strokeWidth="2" />
     </g>
   );
 }
 
+/* Irregular poured-wax silhouette (slightly off-round, with soft lobes). */
+const WAX_BLOB = `M100 6
+  C132 6, 160 16, 176 38
+  C190 57, 197 82, 193 104
+  C189 127, 179 150, 161 168
+  C143 186, 121 195, 99 194
+  C77 193, 55 184, 39 166
+  C22 148, 10 124, 8 100
+  C6 76, 14 50, 30 32
+  C46 14, 70 6, 100 6 Z`;
+
 /**
- * Romantic wax seal: a soft warm-toned disc with an embossed crest,
- * delicate ring detailing, and a tiny banner. Rendered as inline SVG so
- * it scales crisply and matches the watercolor invitation aesthetic.
- *
- * The crest is swappable via `motif` so weddings can personalize their
- * seal (engraved rose by default, initials, a monogram, or fully custom
- * artwork) without changing the wax rendering itself.
+ * Realistic sealing wax: a poured, slightly irregular disc of deep wax with a
+ * pressed rim, embossed crest, glossy specular highlight, subtle grain, and a
+ * cast shadow — rendered as inline SVG so it scales crisply.
  */
-export function WaxSeal({ size = 96, motif = "rose", initials = "", children }: WaxSealProps) {
+export function WaxSeal({ size = 96, motif = "initials", initials = "", children }: WaxSealProps) {
+  const uid = `wax-${motif}`;
   return (
     <svg
       width={size}
@@ -130,84 +103,101 @@ export function WaxSeal({ size = 96, motif = "rose", initials = "", children }: 
       viewBox="0 0 200 200"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
+      style={{ overflow: "visible" }}
     >
       <defs>
-        <radialGradient id="wax-warm" cx="38%" cy="32%" r="72%">
-          <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-primary) 70%, white)" />
-          <stop offset="55%" stopColor="var(--ds-wax-primary)" />
-          <stop offset="100%" stopColor="var(--ds-wax-primary-dark)" />
+        {/* Body of the wax: warm lit top-left falling to a deep crimson edge */}
+        <radialGradient id={`${uid}-body`} cx="36%" cy="28%" r="82%">
+          <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-primary, #a8362a) 62%, #ffd9c9)" />
+          <stop offset="42%" stopColor="var(--ds-wax-primary, #a8362a)" />
+          <stop offset="78%" stopColor="var(--ds-wax-primary-dark, #75201a)" />
+          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 72%, black)" />
         </radialGradient>
-        <radialGradient id="waxRim-warm" cx="50%" cy="50%" r="50%">
-          <stop offset="82%" stopColor="transparent" />
-          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark) 85%, black)" />
+        {/* Pressed rim: darker ring right at the edge */}
+        <radialGradient id={`${uid}-rim`} cx="50%" cy="50%" r="50%">
+          <stop offset="70%" stopColor="transparent" />
+          <stop offset="92%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 55%, transparent)" />
+          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 85%, black)" />
         </radialGradient>
-        <linearGradient id="waxSheen-warm" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-primary) 55%, white)" stopOpacity="0.55" />
-          <stop offset="45%" stopColor="white" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="gold-warm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-gold) 70%, white)" />
-          <stop offset="100%" stopColor="var(--ds-wax-gold)" />
-        </linearGradient>
+        {/* Specular sheen, upper-left */}
+        <radialGradient id={`${uid}-sheen`} cx="34%" cy="26%" r="46%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.5" />
+          <stop offset="60%" stopColor="white" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </radialGradient>
+
+        {/* Wax grain — fine mottled surface */}
+        <filter id={`${uid}-grain`} x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" result="n" />
+          <feColorMatrix in="n" type="saturate" values="0" result="g" />
+          <feComponentTransfer in="g" result="g2">
+            <feFuncA type="table" tableValues="0 0.25" />
+          </feComponentTransfer>
+          <feComposite in="g2" in2="SourceAlpha" operator="in" />
+        </filter>
+
+        {/* Embossing: crest appears pressed into the wax */}
+        <filter id="wax-emboss" x="-25%" y="-25%" width="150%" height="150%">
+          <feOffset in="SourceAlpha" dx="0" dy="1.6" result="lo" />
+          <feGaussianBlur in="lo" stdDeviation="1.2" result="lob" />
+          <feFlood floodColor="rgba(0,0,0,0.55)" result="dark" />
+          <feComposite in="dark" in2="lob" operator="in" result="shadow" />
+          <feOffset in="SourceAlpha" dx="0" dy="-1.4" result="hi" />
+          <feGaussianBlur in="hi" stdDeviation="1.1" result="hib" />
+          <feFlood floodColor="rgba(255,222,200,0.6)" result="light" />
+          <feComposite in="light" in2="hib" operator="in" result="highlight" />
+          <feMerge>
+            <feMergeNode in="shadow" />
+            <feMergeNode in="highlight" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        {/* Soft cast shadow beneath the wax */}
+        <filter id={`${uid}-drop`} x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(60,15,10,0.45)" />
+        </filter>
+
+        <clipPath id={`${uid}-clip`}>
+          <path d={WAX_BLOB} />
+        </clipPath>
       </defs>
 
-      {/* Wax disc with organic irregular edge, poured slightly off-round */}
-      <path
-        d="M100 9
-           C 137 11, 175 31, 185 71
-           C 193 99, 183 135, 167 159
-           C 155 178, 130 191, 100 191
-           C 70 191, 45 178, 33 159
-           C 17 135, 7 99, 15 71
-           C 25 31, 63 11, 100 9 Z"
-        fill="url(#wax-warm)"
-      />
-      {/* Rim shading — depth toward the edge */}
-      <path
-        d="M100 9
-           C 137 11, 175 31, 185 71
-           C 193 99, 183 135, 167 159
-           C 155 178, 130 191, 100 191
-           C 70 191, 45 178, 33 159
-           C 17 135, 7 99, 15 71
-           C 25 31, 63 11, 100 9 Z"
-        fill="url(#waxRim-warm)"
-      />
-      {/* Glossy pour sheen, upper-left */}
-      <ellipse cx="76" cy="66" rx="46" ry="34" fill="url(#waxSheen-warm)" opacity="0.6" />
+      <g filter={`url(#${uid}-drop)`}>
+        <path d={WAX_BLOB} fill={`url(#${uid}-body)`} />
+        <path d={WAX_BLOB} fill={`url(#${uid}-rim)`} />
 
-      {/* Embossed inner ring */}
-      <circle cx="100" cy="100" r="76" fill="none" stroke="url(#gold-warm)" strokeWidth="1.1" opacity="0.55" />
-      <circle cx="100" cy="100" r="72" fill="none" stroke="var(--ds-wax-primary-dark)" strokeWidth="0.7" opacity="0.5" />
+        <g clipPath={`url(#${uid}-clip)`}>
+          {/* Pressed inner ring (the stamp shoulder) */}
+          <circle
+            cx="100"
+            cy="100"
+            r="74"
+            fill="none"
+            stroke="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 80%, black)"
+            strokeWidth="3"
+            opacity="0.45"
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="70"
+            fill="none"
+            stroke="color-mix(in oklab, var(--ds-wax-primary, #a8362a) 50%, white)"
+            strokeWidth="1.4"
+            opacity="0.3"
+          />
 
-      {/* Tiny dots around the rim */}
-      {Array.from({ length: 20 }).map((_, i) => {
-        const a = (i / 20) * Math.PI * 2 - Math.PI / 2;
-        const x = 100 + Math.cos(a) * 84;
-        const y = 100 + Math.sin(a) * 84;
-        return <circle key={i} cx={x} cy={y} r="1.1" fill="url(#gold-warm)" opacity="0.7" />;
-      })}
+          {/* Crest */}
+          {motif === "rose" && <RoseCrest />}
+          {motif === "initials" && <InitialsCrest text={initials || "&"} />}
+          {motif === "monogram" && <MonogramCrest text={initials || "&"} />}
+          {motif === "custom" && children}
 
-      {/* Crest */}
-      {motif === "rose" && <RoseCrest />}
-      {motif === "initials" && <InitialsCrest text={initials || "&"} />}
-      {motif === "monogram" && <MonogramCrest text={initials || "&"} />}
-      {motif === "custom" && children}
-
-      {/* Banner ribbon below */}
-      <g transform="translate(100 170)">
-        <path d="M -36 0 L 36 0 L 31 8 L -31 8 Z" fill="var(--ds-wax-primary-dark)" stroke="url(#gold-warm)" strokeWidth="0.7" />
-        <text
-          x="0"
-          y="6"
-          textAnchor="middle"
-          fontSize="5"
-          fill="url(#gold-warm)"
-          letterSpacing="1.4"
-          style={{ fontFamily: "var(--ds-font-display)" }}
-        >
-          OURJOURNEY
-        </text>
+          {/* Surface grain + gloss */}
+          <path d={WAX_BLOB} fill="#000" filter={`url(#${uid}-grain)`} opacity="0.35" />
+          <ellipse cx="72" cy="62" rx="52" ry="40" fill={`url(#${uid}-sheen)`} />
+        </g>
       </g>
     </svg>
   );
