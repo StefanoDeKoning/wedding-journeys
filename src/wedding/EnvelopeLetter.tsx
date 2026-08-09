@@ -204,7 +204,7 @@ export function EnvelopeLetter({
       {opened && (
         <div className="flex justify-center">
           <article
-            className="parchment letter-rise texture-paper relative max-w-2xl w-full px-8 sm:px-12 md:px-16 py-14 md:py-20 rounded-card"
+            className="parchment letter-rise texture-paper relative max-w-3xl w-full px-8 sm:px-14 md:px-20 py-16 md:py-24 rounded-card"
             style={{
               transform: "rotate(-0.4deg)",
             }}
