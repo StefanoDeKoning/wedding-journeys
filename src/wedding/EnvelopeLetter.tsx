@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { WaxSeal, type WaxSealMotif } from "./WaxSeal";
+import { WaxSeal, initialsFromCouple, type WaxSealMotif } from "./WaxSeal";
 import { renderInvitationText } from "./invitationTemplate";
 import { DecorCorner, Divider } from "@/design-system";
 import { cn } from "@/lib/utils";
@@ -37,16 +37,8 @@ export function EnvelopeLetter({
     recipientLastName,
   );
 
-  // "Billy & Sophie" → "B & S" so the wax seal always carries the couple's initials.
-  const derivedInitials =
-    sealInitials ??
-    coupleSignature
-      .split(/\s*(?:&|\+|and)\s*/i)
-      .map((part) => part.trim().charAt(0).toUpperCase())
-      .filter(Boolean)
-      .slice(0, 2)
-      .join(" & ");
-  const crestInitials = derivedInitials || "&";
+  // The wax seal always carries the couple's initials, e.g. "B & S".
+  const crestInitials = sealInitials || initialsFromCouple(coupleSignature);
 
 
   useEffect(() => {

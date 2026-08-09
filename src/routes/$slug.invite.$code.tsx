@@ -6,7 +6,7 @@ import { SiteShell } from "@/components/SiteShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLoginByCode } from "@/auth/guest.functions";
-import { WaxSeal } from "@/wedding/WaxSeal";
+import { WaxSeal, initialsFromCouple } from "@/wedding/WaxSeal";
 import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
 
 export const Route = createFileRoute("/$slug/invite/$code")({
