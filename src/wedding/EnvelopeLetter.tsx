@@ -231,9 +231,10 @@ export function EnvelopeLetter({
             </div>
 
             {/* Tiny re-seal */}
-            <div className="absolute -top-5 right-6 md:right-10 rotate-12">
-              <WaxSeal size={36} motif={sealMotif} initials={sealInitials} />
+            <div className="absolute -top-6 right-6 md:right-10 rotate-12">
+              <WaxSeal size={52} motif={sealMotif} initials={crestInitials} />
             </div>
+
           </article>
         </div>
       )}
