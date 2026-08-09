@@ -27,7 +27,7 @@ export function EnvelopeLetter({
   recipientLastName,
   invitationTemplate,
   coupleSignature,
-  sealMotif = "rose",
+  sealMotif = "initials",
   sealInitials,
 }: EnvelopeLetterProps) {
   const [stage, setStage] = useState<Stage>("closed");
@@ -36,6 +36,18 @@ export function EnvelopeLetter({
     recipientFirstName,
     recipientLastName,
   );
+
+  // "Billy & Sophie" → "B & S" so the wax seal always carries the couple's initials.
+  const derivedInitials =
+    sealInitials ??
+    coupleSignature
+      .split(/\s*(?:&|\+|and)\s*/i)
+      .map((part) => part.trim().charAt(0).toUpperCase())
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(" & ");
+  const crestInitials = derivedInitials || "&";
+
 
   useEffect(() => {
     if (stage !== "opening") return;
