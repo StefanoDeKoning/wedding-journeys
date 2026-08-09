@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
-import { WaxSeal } from "@/wedding/WaxSeal";
+import { WaxSeal, initialsFromCouple } from "@/wedding/WaxSeal";
 import { PageCanvas, Section, FormPanel, ThemedButton, ThemedInput } from "@/design-system";
 
 export const Route = createFileRoute("/$slug")({
@@ -194,7 +194,7 @@ function GuestLoginGate({
         <div className="mx-auto w-full max-w-md">
           <div className="text-center mb-8">
             <div className="inline-block wax-pulse">
-              <WaxSeal size={96} />
+              <WaxSeal size={104} initials={initialsFromCouple(weddingTitle)} />
             </div>
             <p className="type-script mt-4">welcome</p>
             <h1 className="type-hero mt-2">{weddingTitle}</h1>

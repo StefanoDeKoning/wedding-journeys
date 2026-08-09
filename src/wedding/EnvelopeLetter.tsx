@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { WaxSeal, type WaxSealMotif } from "./WaxSeal";
+import { WaxSeal, initialsFromCouple, type WaxSealMotif } from "./WaxSeal";
 import { renderInvitationText } from "./invitationTemplate";
 import { DecorCorner, Divider } from "@/design-system";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,7 @@ export function EnvelopeLetter({
   recipientLastName,
   invitationTemplate,
   coupleSignature,
-  sealMotif = "rose",
+  sealMotif = "initials",
   sealInitials,
 }: EnvelopeLetterProps) {
   const [stage, setStage] = useState<Stage>("closed");
@@ -36,6 +36,10 @@ export function EnvelopeLetter({
     recipientFirstName,
     recipientLastName,
   );
+
+  // The wax seal always carries the couple's initials, e.g. "B & S".
+  const crestInitials = sealInitials || initialsFromCouple(coupleSignature);
+
 
   useEffect(() => {
     if (stage !== "opening") return;
@@ -86,8 +90,8 @@ export function EnvelopeLetter({
               <div
                 className="envelope-paper relative rounded-paper overflow-hidden border-paper"
                 style={{
-                  width: "min(420px, 84vw)",
-                  height: "min(272px, 54vw)",
+                  width: "min(620px, 92vw)",
+                  aspectRatio: "620 / 400",
                 }}
               >
                 {/* Interior lining, revealed as the flap lifts */}
@@ -102,22 +106,57 @@ export function EnvelopeLetter({
 
                 {/* Body cross folds (subtle diagonals) */}
                 <div className="absolute inset-0 pointer-events-none">
-                  <svg viewBox="0 0 420 272" className="w-full h-full" preserveAspectRatio="none">
+                  <svg viewBox="0 0 620 400" className="w-full h-full" preserveAspectRatio="none">
                     <path
-                      d="M0,136 L210,254 L420,136"
+                      d="M0,200 L310,376 L620,200"
                       fill="none"
                       stroke="color-mix(in oklab, var(--ds-envelope-shadow) 20%, transparent)"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
                     <path
-                      d="M0,0 L210,136 L420,0"
+                      d="M0,0 L310,200 L620,0"
                       fill="none"
                       stroke="color-mix(in oklab, var(--ds-envelope-shadow) 13%, transparent)"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
-                    <rect x="1" y="1" width="418" height="270" fill="none" stroke="color-mix(in oklab, var(--ds-envelope-shadow) 10%, transparent)" strokeWidth="1" />
+                    <rect x="1" y="1" width="618" height="398" fill="none" stroke="color-mix(in oklab, var(--ds-envelope-shadow) 10%, transparent)" strokeWidth="1" />
                   </svg>
                 </div>
+
+                {/* Engraved gold leaf sprig, lower-left of the seal */}
+                <svg
+                  viewBox="0 0 130 70"
+                  aria-hidden
+                  className="absolute pointer-events-none"
+                  style={{ left: "11%", top: "56%", width: "27%", opacity: 0.75 }}
+                >
+                  <path
+                    d="M4,64 C34,58 74,40 122,6"
+                    fill="none"
+                    stroke="var(--ds-wax-gold, #c9a227)"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                  />
+                  {[0.12, 0.3, 0.48, 0.66, 0.82].map((t, i) => {
+                    const x = 4 + 118 * t;
+                    const y = 64 - 58 * (0.35 * t + 0.65 * t * t);
+                    const up = i % 2 === 0;
+                    return (
+                      <ellipse
+                        key={t}
+                        cx={x + 9}
+                        cy={y + (up ? -7 : 7)}
+                        rx="11"
+                        ry="4.4"
+                        transform={`rotate(${up ? -52 : 32} ${x + 9} ${y + (up ? -7 : 7)})`}
+                        fill="var(--ds-wax-gold, #c9a227)"
+                        fillOpacity="0.5"
+                        stroke="var(--ds-wax-gold, #c9a227)"
+                        strokeWidth="0.9"
+                      />
+                    );
+                  })}
+                </svg>
 
                 {/* Centered name plate */}
                 <div className="absolute inset-x-0 bottom-6 text-center px-6">
@@ -148,10 +187,11 @@ export function EnvelopeLetter({
                   stage === "closed" && "wax-pulse",
                   stage === "opening" && "wax-break",
                 )}
-                style={{ top: "42%" }}
+                style={{ top: "38%" }}
               >
-                <WaxSeal size={72} motif={sealMotif} initials={sealInitials} />
+                <WaxSeal size={120} motif={sealMotif} initials={crestInitials} />
               </div>
+
             </div>
 
             <span className="block mt-8 type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
@@ -164,7 +204,7 @@ export function EnvelopeLetter({
       {opened && (
         <div className="flex justify-center">
           <article
-            className="parchment letter-rise texture-paper relative max-w-2xl w-full px-8 sm:px-12 md:px-16 py-14 md:py-20 rounded-card"
+            className="parchment letter-rise texture-paper relative max-w-3xl w-full px-8 sm:px-14 md:px-20 py-16 md:py-24 rounded-card"
             style={{
               transform: "rotate(-0.4deg)",
             }}
@@ -191,9 +231,10 @@ export function EnvelopeLetter({
             </div>
 
             {/* Tiny re-seal */}
-            <div className="absolute -top-5 right-6 md:right-10 rotate-12">
-              <WaxSeal size={36} motif={sealMotif} initials={sealInitials} />
+            <div className="absolute -top-6 right-6 md:right-10 rotate-12">
+              <WaxSeal size={52} motif={sealMotif} initials={crestInitials} />
             </div>
+
           </article>
         </div>
       )}
