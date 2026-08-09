@@ -128,27 +128,30 @@ export function EnvelopeLetter({
                   viewBox="0 0 120 70"
                   aria-hidden
                   className="absolute pointer-events-none"
-                  style={{ left: "16%", top: "60%", width: "22%", opacity: 0.85 }}
+                  style={{ left: "12%", top: "58%", width: "26%", opacity: 0.9 }}
                 >
-                  <g
-                    fill="none"
-                    stroke="var(--ds-wax-gold, #c9a227)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  >
-                    <path d="M8,58 C36,50 72,32 110,10" />
-                    {[0, 1, 2, 3, 4, 5].map((i) => {
-                      const t = 0.12 + i * 0.15;
-                      const x = 8 + (102 * t);
-                      const y = 58 - (48 * t * t + 12 * t);
+                  <g stroke="var(--ds-wax-gold, #c9a227)" strokeLinecap="round">
+                    {/* Stem */}
+                    <path d="M6,62 C34,54 70,34 112,8" fill="none" strokeWidth="1.6" />
+                    {/* Leaves alternating along the stem */}
+                    {[0.1, 0.26, 0.42, 0.58, 0.74].map((t, i) => {
+                      const x = 6 + 106 * t;
+                      const y = 62 - (54 * t * (0.55 + 0.6 * t));
+                      const up = i % 2 === 0;
+                      const dy = up ? -1 : 1;
                       return (
-                        <g key={i}>
-                          <path d={`M${x},${y} C${x - 4},${y - 12} ${x + 8},${y - 14} ${x + 6},${y - 3}`} />
-                        </g>
+                        <path
+                          key={t}
+                          d={`M${x},${y} C${x + 4},${y + dy * 9} ${x + 15},${y + dy * 11} ${x + 19},${y + dy * 2} C${x + 13},${y - dy * 1} ${x + 6},${y + dy * 2} ${x},${y} Z`}
+                          fill="var(--ds-wax-gold, #c9a227)"
+                          fillOpacity="0.35"
+                          strokeWidth="1.1"
+                        />
                       );
                     })}
                   </g>
                 </svg>
+
 
                 {/* Centered name plate */}
                 <div className="absolute inset-x-0 bottom-6 text-center px-6">
