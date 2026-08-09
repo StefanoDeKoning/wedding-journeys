@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as EnvtestRouteImport } from './routes/envtest'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as SlugRouteImport } from './routes/$slug'
@@ -51,6 +52,11 @@ const LoginRoute = LoginRouteImport.update({
 const FeaturesRoute = FeaturesRouteImport.update({
   id: '/features',
   path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnvtestRoute = EnvtestRouteImport.update({
+  id: '/envtest',
+  path: '/envtest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoRoute = DemoRouteImport.update({
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/$slug': typeof SlugRouteWithChildren
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
+  '/envtest': typeof EnvtestRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/$slug/admin': typeof SlugAdminRouteWithChildren
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
+  '/envtest': typeof EnvtestRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/$slug': typeof SlugRouteWithChildren
   '/create': typeof CreateRoute
   '/demo': typeof DemoRoute
+  '/envtest': typeof EnvtestRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/$slug/admin': typeof SlugAdminRouteWithChildren
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/create'
     | '/demo'
+    | '/envtest'
     | '/features'
     | '/login'
     | '/$slug/admin'
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/'
     | '/create'
     | '/demo'
+    | '/envtest'
     | '/features'
     | '/login'
     | '/$slug/gallery'
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
     | '/$slug'
     | '/create'
     | '/demo'
+    | '/envtest'
     | '/features'
     | '/login'
     | '/$slug/admin'
@@ -423,6 +435,7 @@ export interface RootRouteChildren {
   SlugRoute: typeof SlugRouteWithChildren
   CreateRoute: typeof CreateRoute
   DemoRoute: typeof DemoRoute
+  EnvtestRoute: typeof EnvtestRoute
   FeaturesRoute: typeof FeaturesRoute
   LoginRoute: typeof LoginRoute
   AdminPlatformRoute: typeof AdminPlatformRouteWithChildren
@@ -442,6 +455,13 @@ declare module '@tanstack/react-router' {
       path: '/features'
       fullPath: '/features'
       preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/envtest': {
+      id: '/envtest'
+      path: '/envtest'
+      fullPath: '/envtest'
+      preLoaderRoute: typeof EnvtestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo': {
@@ -759,6 +779,7 @@ const rootRouteChildren: RootRouteChildren = {
   SlugRoute: SlugRouteWithChildren,
   CreateRoute: CreateRoute,
   DemoRoute: DemoRoute,
+  EnvtestRoute: EnvtestRoute,
   FeaturesRoute: FeaturesRoute,
   LoginRoute: LoginRoute,
   AdminPlatformRoute: AdminPlatformRouteWithChildren,
@@ -766,3 +787,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
