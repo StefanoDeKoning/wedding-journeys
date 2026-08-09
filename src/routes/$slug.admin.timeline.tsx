@@ -40,6 +40,11 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
+  TIMELINE_PICTURES,
+  resolveTimelinePicture,
+  type TimelinePicture,
+} from "@/wedding/timelineIllustrations";
+import {
   TIMELINE_CATEGORIES,
   categoryMeta,
   type TimelineCategory,
@@ -57,6 +62,7 @@ interface Event {
   description: string | null;
   location: string | null;
   category: TimelineCategory;
+  illustration: string | null;
   event_time: string;
   visibility: Visibility;
   position: number;
@@ -76,7 +82,7 @@ function AdminTimeline() {
     setLoading(true);
     const { data, error } = await supabase
       .from("timeline_events")
-      .select("id, title, description, location, category, event_time, visibility, position, is_visible")
+      .select("id, title, description, location, category, illustration, event_time, visibility, position, is_visible")
       .eq("wedding_id", wedding.id)
       .order("position")
       .order("event_time");
@@ -228,6 +234,7 @@ function SortableRow({
   };
   const meta = categoryMeta(event.category);
   const Icon = meta.Icon;
+  const picture = resolveTimelinePicture(event.illustration, event.category, event.title);
 
   return (
     <li
@@ -250,6 +257,18 @@ function SortableRow({
       >
         <Icon className="w-4 h-4" />
       </span>
+      {picture ? (
+        <img
+          src={picture.url}
+          alt={picture.alt}
+          loading="lazy"
+          width={944}
+          height={704}
+          className="h-10 w-12 shrink-0 object-contain"
+        />
+      ) : (
+        <span className="h-10 w-12 shrink-0" />
+      )}
       <span className="font-display text-lg text-primary tabular-nums w-16 shrink-0">
         {formatTime(event.event_time)}
       </span>
@@ -309,6 +328,9 @@ function EventDialog({
   const [category, setCategory] = useState<TimelineCategory>(event?.category ?? "custom");
   const [time, setTime] = useState(event ? formatTime(event.event_time) : "14:30");
   const [visibility, setVisibility] = useState<Visibility>(event?.visibility ?? "all");
+  const [illustration, setIllustration] = useState<TimelinePicture | "auto">(
+    (event?.illustration as TimelinePicture | null) ?? "auto",
+  );
   const [isVisible, setIsVisible] = useState(event?.is_visible ?? true);
   const [saving, setSaving] = useState(false);
 
@@ -327,6 +349,7 @@ function EventDialog({
       description: description.trim() || null,
       location: location.trim() || null,
       category,
+      illustration: illustration === "auto" ? null : illustration,
       event_time: `${time}:00`,
       visibility,
       is_visible: isVisible,
@@ -414,6 +437,40 @@ function EventDialog({
               rows={2}
               maxLength={500}
             />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Picture on the card</Label>
+            <div className="grid grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => setIllustration("auto")}
+                className={`flex h-16 items-center justify-center rounded-md border px-1 text-[10px] leading-tight text-muted-foreground ${
+                  illustration === "auto" ? "border-primary ring-1 ring-primary" : "border-input"
+                }`}
+              >
+                Automatic
+              </button>
+              {TIMELINE_PICTURES.map((p) => (
+                <button
+                  key={p.value}
+                  type="button"
+                  title={p.label}
+                  onClick={() => setIllustration(p.value)}
+                  className={`flex h-16 items-center justify-center rounded-md border p-1 ${
+                    illustration === p.value ? "border-primary ring-1 ring-primary" : "border-input"
+                  }`}
+                >
+                  <img
+                    src={p.url}
+                    alt={p.alt}
+                    loading="lazy"
+                    width={944}
+                    height={704}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </button>
+              ))}
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3 items-end">
             <div className="space-y-1.5">
