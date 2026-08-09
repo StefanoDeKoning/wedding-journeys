@@ -1,5 +1,16 @@
 import type { ReactNode } from "react";
 
+/** "Billy & Sophie" → "B & S" for the wax crest. */
+export function initialsFromCouple(signature: string | null | undefined): string {
+  if (!signature) return "&";
+  const parts = signature
+    .split(/\s*(?:&|\+|and)\s*/i)
+    .map((part) => part.trim().charAt(0).toUpperCase())
+    .filter(Boolean)
+    .slice(0, 2);
+  return parts.length ? parts.join(" & ") : "&";
+}
+
 export type WaxSealMotif = "rose" | "initials" | "monogram" | "custom";
 
 interface WaxSealProps {
@@ -22,19 +33,19 @@ function RoseCrest() {
           key={angle}
           transform={`rotate(${angle})`}
           d="M0,-8 C14,-18 22,-5 15,10 C10,21 -3,25 -10,15 C-18,5 -13,-10 0,-8 Z"
-          fill="var(--ds-wax-emboss, #8e2a20)"
+          fill="var(--ds-wax-crest)"
         />
       ))}
-      <circle r="11" fill="var(--ds-wax-emboss, #8e2a20)" />
+      <circle r="11" fill="var(--ds-wax-crest)" />
       <path
         d="M0,26 C0,38 0,48 0,58"
         fill="none"
-        stroke="var(--ds-wax-emboss, #8e2a20)"
+        stroke="var(--ds-wax-crest)"
         strokeWidth="2.4"
         strokeLinecap="round"
       />
-      <path d="M0,40 C-9,36 -15,40 -17,49 C-8,50 -2,46 0,40 Z" fill="var(--ds-wax-emboss, #8e2a20)" />
-      <path d="M0,47 C9,43 15,47 17,56 C8,57 2,53 0,47 Z" fill="var(--ds-wax-emboss, #8e2a20)" />
+      <path d="M0,40 C-9,36 -15,40 -17,49 C-8,50 -2,46 0,40 Z" fill="var(--ds-wax-crest)" />
+      <path d="M0,47 C9,43 15,47 17,56 C8,57 2,53 0,47 Z" fill="var(--ds-wax-crest)" />
     </g>
   );
 }
@@ -49,7 +60,7 @@ function InitialsCrest({ text }: { text: string }) {
         y="114"
         textAnchor="middle"
         fontSize={long ? 44 : 56}
-        fill="var(--ds-wax-emboss, #8e2a20)"
+        fill="var(--ds-wax-crest)"
         style={{ fontFamily: "var(--ds-font-script)" }}
       >
         {text}
@@ -68,12 +79,12 @@ function MonogramCrest({ text }: { text: string }) {
         textAnchor="middle"
         fontSize="34"
         letterSpacing="3"
-        fill="var(--ds-wax-emboss, #8e2a20)"
+        fill="var(--ds-wax-crest)"
         style={{ fontFamily: "var(--ds-font-display)" }}
       >
         {text}
       </text>
-      <path d="M76,124 L124,124" stroke="var(--ds-wax-emboss, #8e2a20)" strokeWidth="2" />
+      <path d="M76,124 L124,124" stroke="var(--ds-wax-crest)" strokeWidth="2" />
     </g>
   );
 }
@@ -103,7 +114,11 @@ export function WaxSeal({ size = 96, motif = "initials", initials = "", children
       viewBox="0 0 200 200"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
-      style={{ overflow: "visible" }}
+      style={{
+        overflow: "visible",
+        ["--ds-wax-crest" as string]:
+          "color-mix(in oklab, var(--ds-wax-primary, #a8362a) 55%, #ffe0cd)",
+      }}
     >
       <defs>
         {/* Body of the wax: warm lit top-left falling to a deep crimson edge */}
