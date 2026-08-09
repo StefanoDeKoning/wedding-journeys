@@ -4,6 +4,7 @@ import { MapPin, Loader2 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { illustrationFor } from "@/wedding/timelineCategories";
+import { resolveTimelinePicture } from "@/wedding/timelineIllustrations";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
 import {
   PageCanvas,
@@ -33,10 +34,12 @@ interface TEvent {
   description: string | null;
   location: string | null;
   category: string;
+  illustration: string | null;
   event_time: string;
   visibility: "all" | "day" | "evening";
   position: number;
 }
+
 
 function TimelinePage() {
   const { wedding, guest } = useWeddingContext();
@@ -55,7 +58,7 @@ function TimelinePage() {
       setLoading(true);
       const { data } = await supabase
         .from("timeline_events")
-        .select("id, title, description, location, category, event_time, visibility, position")
+        .select("id, title, description, location, category, illustration, event_time, visibility, position")
         .eq("wedding_id", wedding.id)
         .order("position")
         .order("event_time");
@@ -159,6 +162,7 @@ function TimelineChapter({
   isLeft: boolean;
 }) {
   const motif = illustrationFor(e.category, e.title);
+  const picture = resolveTimelinePicture(e.illustration, e.category, e.title);
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] lg:items-start lg:gap-x-6">
@@ -180,18 +184,35 @@ function TimelineChapter({
             : "lg:col-start-3 lg:row-start-1 animate-ds-reveal-right"
         }`}
       >
-        <div className="flex flex-wrap items-baseline gap-3">
-          <span className="type-card-title text-primary tabular-nums">{e.event_time.slice(0, 5)}</span>
-          <h3 className="type-card-title">{e.title}</h3>
-          {isNext && <Badge tone="primary">Up next</Badge>}
+        <div className="flex items-start gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <span className="type-card-title text-primary tabular-nums">
+                {e.event_time.slice(0, 5)}
+              </span>
+              <h3 className="type-card-title">{e.title}</h3>
+              {isNext && <Badge tone="primary">Up next</Badge>}
+            </div>
+            {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
+            {e.location && (
+              <p className="type-caption mt-3 inline-flex items-center gap-1">
+                <MapPin aria-hidden="true" className="w-3 h-3" /> {e.location}
+              </p>
+            )}
+          </div>
+          {picture && (
+            <img
+              src={picture.url}
+              alt={picture.alt}
+              loading="lazy"
+              width={944}
+              height={704}
+              className="h-20 w-24 shrink-0 self-center object-contain sm:h-24 sm:w-32"
+            />
+          )}
         </div>
-        {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
-        {e.location && (
-          <p className="type-caption mt-3 inline-flex items-center gap-1">
-            <MapPin aria-hidden="true" className="w-3 h-3" /> {e.location}
-          </p>
-        )}
       </ThemedCard>
     </div>
   );
 }
+

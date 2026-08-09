@@ -573,6 +573,7 @@ export type Database = {
           description: string | null
           event_time: string
           id: string
+          illustration: string | null
           is_visible: boolean
           location: string | null
           position: number
@@ -587,6 +588,7 @@ export type Database = {
           description?: string | null
           event_time: string
           id?: string
+          illustration?: string | null
           is_visible?: boolean
           location?: string | null
           position?: number
@@ -601,6 +603,7 @@ export type Database = {
           description?: string | null
           event_time?: string
           id?: string
+          illustration?: string | null
           is_visible?: boolean
           location?: string | null
           position?: number
