@@ -98,8 +98,8 @@ export function EnvelopeLetter({
               <div
                 className="envelope-paper relative rounded-paper overflow-hidden border-paper"
                 style={{
-                  width: "min(420px, 84vw)",
-                  height: "min(272px, 54vw)",
+                  width: "min(620px, 92vw)",
+                  aspectRatio: "620 / 400",
                 }}
               >
                 {/* Interior lining, revealed as the flap lifts */}
@@ -114,22 +114,49 @@ export function EnvelopeLetter({
 
                 {/* Body cross folds (subtle diagonals) */}
                 <div className="absolute inset-0 pointer-events-none">
-                  <svg viewBox="0 0 420 272" className="w-full h-full" preserveAspectRatio="none">
+                  <svg viewBox="0 0 620 400" className="w-full h-full" preserveAspectRatio="none">
                     <path
-                      d="M0,136 L210,254 L420,136"
+                      d="M0,200 L310,376 L620,200"
                       fill="none"
                       stroke="color-mix(in oklab, var(--ds-envelope-shadow) 20%, transparent)"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
                     <path
-                      d="M0,0 L210,136 L420,0"
+                      d="M0,0 L310,200 L620,0"
                       fill="none"
                       stroke="color-mix(in oklab, var(--ds-envelope-shadow) 13%, transparent)"
-                      strokeWidth="1"
+                      strokeWidth="1.2"
                     />
-                    <rect x="1" y="1" width="418" height="270" fill="none" stroke="color-mix(in oklab, var(--ds-envelope-shadow) 10%, transparent)" strokeWidth="1" />
+                    <rect x="1" y="1" width="618" height="398" fill="none" stroke="color-mix(in oklab, var(--ds-envelope-shadow) 10%, transparent)" strokeWidth="1" />
                   </svg>
                 </div>
+
+                {/* Engraved gold leaf sprig, lower-left of the seal */}
+                <svg
+                  viewBox="0 0 120 70"
+                  aria-hidden
+                  className="absolute pointer-events-none"
+                  style={{ left: "16%", top: "60%", width: "22%", opacity: 0.85 }}
+                >
+                  <g
+                    fill="none"
+                    stroke="var(--ds-wax-gold, #c9a227)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M8,58 C36,50 72,32 110,10" />
+                    {[0, 1, 2, 3, 4, 5].map((i) => {
+                      const t = 0.12 + i * 0.15;
+                      const x = 8 + (102 * t);
+                      const y = 58 - (48 * t * t + 12 * t);
+                      return (
+                        <g key={i}>
+                          <path d={`M${x},${y} C${x - 4},${y - 12} ${x + 8},${y - 14} ${x + 6},${y - 3}`} />
+                        </g>
+                      );
+                    })}
+                  </g>
+                </svg>
 
                 {/* Centered name plate */}
                 <div className="absolute inset-x-0 bottom-6 text-center px-6">
@@ -160,10 +187,11 @@ export function EnvelopeLetter({
                   stage === "closed" && "wax-pulse",
                   stage === "opening" && "wax-break",
                 )}
-                style={{ top: "42%" }}
+                style={{ top: "38%" }}
               >
-                <WaxSeal size={72} motif={sealMotif} initials={sealInitials} />
+                <WaxSeal size={120} motif={sealMotif} initials={crestInitials} />
               </div>
+
             </div>
 
             <span className="block mt-8 type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
