@@ -126,18 +126,18 @@ export function WaxSeal({ size = 96, motif = "initials", initials = "", children
           <stop offset="0%" stopColor="color-mix(in oklab, var(--ds-wax-primary, #a8362a) 62%, #ffd9c9)" />
           <stop offset="42%" stopColor="var(--ds-wax-primary, #a8362a)" />
           <stop offset="78%" stopColor="var(--ds-wax-primary-dark, #75201a)" />
-          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 72%, black)" />
+          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 88%, black)" />
         </radialGradient>
         {/* Pressed rim: darker ring right at the edge */}
         <radialGradient id={`${uid}-rim`} cx="50%" cy="50%" r="50%">
           <stop offset="70%" stopColor="transparent" />
           <stop offset="92%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 55%, transparent)" />
-          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 85%, black)" />
+          <stop offset="100%" stopColor="color-mix(in oklab, var(--ds-wax-primary-dark, #75201a) 78%, black)" />
         </radialGradient>
         {/* Specular sheen, upper-left */}
         <radialGradient id={`${uid}-sheen`} cx="34%" cy="26%" r="46%">
-          <stop offset="0%" stopColor="white" stopOpacity="0.5" />
-          <stop offset="60%" stopColor="white" stopOpacity="0.08" />
+          <stop offset="0%" stopColor="white" stopOpacity="0.3" />
+          <stop offset="60%" stopColor="white" stopOpacity="0.05" />
           <stop offset="100%" stopColor="white" stopOpacity="0" />
         </radialGradient>
 
@@ -146,7 +146,7 @@ export function WaxSeal({ size = 96, motif = "initials", initials = "", children
           <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" result="n" />
           <feColorMatrix in="n" type="saturate" values="0" result="g" />
           <feComponentTransfer in="g" result="g2">
-            <feFuncA type="table" tableValues="0 0.25" />
+            <feFuncA type="table" tableValues="0 0.16" />
           </feComponentTransfer>
           <feComposite in="g2" in2="SourceAlpha" operator="in" />
         </filter>
@@ -210,8 +210,8 @@ export function WaxSeal({ size = 96, motif = "initials", initials = "", children
           {motif === "custom" && children}
 
           {/* Surface grain + gloss */}
-          <path d={WAX_BLOB} fill="#000" filter={`url(#${uid}-grain)`} opacity="0.35" />
-          <ellipse cx="72" cy="62" rx="52" ry="40" fill={`url(#${uid}-sheen)`} />
+          <path d={WAX_BLOB} fill="#000" filter={`url(#${uid}-grain)`} opacity="0.22" />
+          <ellipse cx="74" cy="60" rx="56" ry="42" fill={`url(#${uid}-sheen)`} />
         </g>
       </g>
     </svg>
