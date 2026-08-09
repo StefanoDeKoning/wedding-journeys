@@ -173,14 +173,22 @@ export function WaxSeal({ size = 96, motif = "initials", initials = "", children
           <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="rgba(60,15,10,0.45)" />
         </filter>
 
+        {/* Rough, hand-poured edge */}
+        <filter id={`${uid}-rough`} x="-15%" y="-15%" width="130%" height="130%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="11" result="t" />
+          <feDisplacementMap in="SourceGraphic" in2="t" scale="9" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+
         <clipPath id={`${uid}-clip`}>
           <path d={WAX_BLOB} />
         </clipPath>
       </defs>
 
       <g filter={`url(#${uid}-drop)`}>
-        <path d={WAX_BLOB} fill={`url(#${uid}-body)`} />
-        <path d={WAX_BLOB} fill={`url(#${uid}-rim)`} />
+        <g filter={`url(#${uid}-rough)`}>
+          <path d={WAX_BLOB} fill={`url(#${uid}-body)`} />
+          <path d={WAX_BLOB} fill={`url(#${uid}-rim)`} />
+        </g>
 
         <g clipPath={`url(#${uid}-clip)`}>
           {/* Pressed inner ring (the stamp shoulder) */}
@@ -211,7 +219,7 @@ export function WaxSeal({ size = 96, motif = "initials", initials = "", children
 
           {/* Surface grain + gloss */}
           <path d={WAX_BLOB} fill="#000" filter={`url(#${uid}-grain)`} opacity="0.22" />
-          <ellipse cx="74" cy="60" rx="56" ry="42" fill={`url(#${uid}-sheen)`} />
+          <ellipse cx="74" cy="60" rx="58" ry="44" fill={`url(#${uid}-sheen)`} opacity="0.55" />
         </g>
       </g>
     </svg>

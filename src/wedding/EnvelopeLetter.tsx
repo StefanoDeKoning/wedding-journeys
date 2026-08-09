@@ -125,33 +125,38 @@ export function EnvelopeLetter({
 
                 {/* Engraved gold leaf sprig, lower-left of the seal */}
                 <svg
-                  viewBox="0 0 120 70"
+                  viewBox="0 0 130 70"
                   aria-hidden
                   className="absolute pointer-events-none"
-                  style={{ left: "12%", top: "58%", width: "26%", opacity: 0.9 }}
+                  style={{ left: "11%", top: "56%", width: "27%", opacity: 0.75 }}
                 >
-                  <g stroke="var(--ds-wax-gold, #c9a227)" strokeLinecap="round">
-                    {/* Stem */}
-                    <path d="M6,62 C34,54 70,34 112,8" fill="none" strokeWidth="1.6" />
-                    {/* Leaves alternating along the stem */}
-                    {[0.1, 0.26, 0.42, 0.58, 0.74].map((t, i) => {
-                      const x = 6 + 106 * t;
-                      const y = 62 - (54 * t * (0.55 + 0.6 * t));
-                      const up = i % 2 === 0;
-                      const dy = up ? -1 : 1;
-                      return (
-                        <path
-                          key={t}
-                          d={`M${x},${y} C${x + 4},${y + dy * 9} ${x + 15},${y + dy * 11} ${x + 19},${y + dy * 2} C${x + 13},${y - dy * 1} ${x + 6},${y + dy * 2} ${x},${y} Z`}
-                          fill="var(--ds-wax-gold, #c9a227)"
-                          fillOpacity="0.35"
-                          strokeWidth="1.1"
-                        />
-                      );
-                    })}
-                  </g>
+                  <path
+                    d="M4,64 C34,58 74,40 122,6"
+                    fill="none"
+                    stroke="var(--ds-wax-gold, #c9a227)"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                  />
+                  {[0.12, 0.3, 0.48, 0.66, 0.82].map((t, i) => {
+                    const x = 4 + 118 * t;
+                    const y = 64 - 58 * (0.35 * t + 0.65 * t * t);
+                    const up = i % 2 === 0;
+                    return (
+                      <ellipse
+                        key={t}
+                        cx={x + 9}
+                        cy={y + (up ? -7 : 7)}
+                        rx="11"
+                        ry="4.4"
+                        transform={`rotate(${up ? -52 : 32} ${x + 9} ${y + (up ? -7 : 7)})`}
+                        fill="var(--ds-wax-gold, #c9a227)"
+                        fillOpacity="0.5"
+                        stroke="var(--ds-wax-gold, #c9a227)"
+                        strokeWidth="0.9"
+                      />
+                    );
+                  })}
                 </svg>
-
 
                 {/* Centered name plate */}
                 <div className="absolute inset-x-0 bottom-6 text-center px-6">
