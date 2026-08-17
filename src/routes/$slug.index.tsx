@@ -50,6 +50,8 @@ function formatTime(iso: string | null) {
 function InvitationPage() {
   const { slug } = Route.useParams();
   const { wedding, guest } = useWeddingContext();
+  const [rsvpOpen, setRsvpOpen] = useState(false);
+
 
   const isEvening = guest?.guest_type === "evening";
   const target = isEvening
