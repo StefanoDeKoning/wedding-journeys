@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
   Mail,
-  ListChecks,
   BookHeart,
   CalendarHeart,
   Image as ImageIcon,
