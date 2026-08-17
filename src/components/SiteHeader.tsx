@@ -41,12 +41,15 @@ export function SiteHeader() {
             </Link>
           )}
         </nav>
-        <div className="flex items-center gap-3">
-          <Link to="/login" className={NAV_LINK}>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Link to="/login" className={`${NAV_LINK} whitespace-nowrap`}>
             Login
           </Link>
-          <ThemedButton asChild size="sm">
-            <Link to="/create">Start your story</Link>
+          <ThemedButton asChild size="sm" className="whitespace-nowrap">
+            <Link to="/create">
+              <span className="sm:hidden">Start</span>
+              <span className="hidden sm:inline">Start your story</span>
+            </Link>
           </ThemedButton>
         </div>
       </div>
