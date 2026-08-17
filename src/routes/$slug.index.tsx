@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { CalendarDays, MapPin, Heart, ListChecks, Clock } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
 import { WishlistSection } from "@/wedding/WishlistSection";
+import { RsvpDialog, type GuestType } from "@/wedding/RsvpForm";
 import { safeHttpUrl } from "@/lib/safeUrl";
 import {
   PageCanvas,
