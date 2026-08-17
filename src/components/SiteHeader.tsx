@@ -19,8 +19,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-paper">
-      <div className="mx-auto max-w-7xl px-gutter h-20 flex items-center justify-between">
-        <Logo />
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-gutter h-16 sm:h-20 md:flex md:justify-between md:gap-6">
+        <div className="min-w-0 truncate">
+          <Logo />
+        </div>
         <nav className="hidden md:flex items-center gap-stack">
           {nav.map((n) => (
             <Link
