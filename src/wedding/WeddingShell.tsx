@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
   Mail,
-  ListChecks,
   BookHeart,
   CalendarHeart,
   Image as ImageIcon,
@@ -25,7 +24,7 @@ const TAB_ACTIVE = "text-primary bg-primary/10 border-gilded shadow-elev-1";
 
 const tabs = [
   { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true },
-  { to: "/$slug/rsvp" as const, label: "RSVP", icon: ListChecks, exact: false },
+  
   { to: "/$slug/story" as const, label: "Story", icon: BookHeart, exact: false },
   { to: "/$slug/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false },
   { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false },

@@ -19,8 +19,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-paper">
-      <div className="mx-auto max-w-7xl px-gutter h-20 flex items-center justify-between">
-        <Logo />
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-gutter h-16 sm:h-20 md:flex md:justify-between md:gap-6">
+        <div className="min-w-0 truncate">
+          <Logo />
+        </div>
         <nav className="hidden md:flex items-center gap-stack">
           {nav.map((n) => (
             <Link
@@ -39,12 +41,15 @@ export function SiteHeader() {
             </Link>
           )}
         </nav>
-        <div className="flex items-center gap-3">
-          <Link to="/login" className={NAV_LINK}>
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <Link to="/login" className={`${NAV_LINK} whitespace-nowrap`}>
             Login
           </Link>
-          <ThemedButton asChild size="sm">
-            <Link to="/create">Start your story</Link>
+          <ThemedButton asChild size="sm" className="whitespace-nowrap">
+            <Link to="/create">
+              <span className="sm:hidden">Start</span>
+              <span className="hidden sm:inline">Start your story</span>
+            </Link>
           </ThemedButton>
         </div>
       </div>
