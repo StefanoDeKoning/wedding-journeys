@@ -61,7 +61,7 @@ const sections = [
     icon: MailCheck,
     t: "RSVP",
     d: "Elegant response form with meal choices and dietary needs.",
-    to: "/$slug/rsvp" as const,
+    to: "/$slug" as const,
   },
   {
     icon: MapPin,
