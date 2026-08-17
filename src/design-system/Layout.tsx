@@ -49,15 +49,16 @@ export function PageCanvas({
       {decor && (
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
           {/* Painted floral columns hugging both margins — pinned to the
-              viewport so the flowers keep the same scale on long pages. */}
-          <div className="hidden lg:block">
+              viewport so the flowers keep the same scale on long pages.
+              On phones they scale down instead of disappearing. */}
+          <div>
             <img
               src={floralColumn.url}
               alt=""
               loading="lazy"
               width={640}
               height={1920}
-              className="fixed left-0 top-0 h-screen w-[clamp(11rem,20vw,20rem)] object-cover object-right decor-fade-x"
+              className="fixed left-0 top-0 h-screen w-[clamp(4.5rem,26vw,20rem)] object-cover object-right decor-fade-x sm:w-[clamp(7rem,24vw,20rem)] lg:w-[clamp(11rem,20vw,20rem)]"
               style={{ opacity: intensity * 0.9 }}
             />
             <img
@@ -66,29 +67,29 @@ export function PageCanvas({
               loading="lazy"
               width={640}
               height={1920}
-              className="fixed right-0 top-0 h-screen w-[clamp(11rem,20vw,20rem)] -scale-x-100 object-cover object-right decor-fade-x"
+              className="fixed right-0 top-0 h-screen w-[clamp(4.5rem,26vw,20rem)] -scale-x-100 object-cover object-right decor-fade-x sm:w-[clamp(7rem,24vw,20rem)] lg:w-[clamp(11rem,20vw,20rem)]"
               style={{ opacity: intensity * 0.9 }}
             />
           </div>
 
-          {/* Painted margins — hidden on small screens, replaced by soft washes */}
-          <div className="hidden lg:block decor-fade-x">
+          {/* Painted margins — softer and smaller on phones */}
+          <div className="decor-fade-x hidden sm:block">
             <DecorSideComposition placement="side-left" intensity={intensity * 0.5} motifs={theme.decor.sides} />
             <DecorSideComposition placement="side-right" intensity={intensity * 0.5} motifs={theme.decor.sides} />
           </div>
 
-          {/* Mobile keeps the atmosphere: repositioned washes instead of removal */}
+          {/* Mobile keeps extra atmosphere with soft washes behind the columns */}
           <div className="lg:hidden">
             <WatercolorWash
               color="decor-soft"
-              size="2xl"
-              intensity={intensity * 0.5}
+              size="xl"
+              intensity={intensity * 0.4}
               className="absolute -top-24 -right-28"
             />
             <WatercolorWash
               color="decor-leaf"
-              size="xl"
-              intensity={intensity * 0.4}
+              size="lg"
+              intensity={intensity * 0.3}
               className="absolute bottom-10 -left-24"
             />
           </div>
