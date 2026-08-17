@@ -19,7 +19,6 @@ import { Route as SlugIndexRouteImport } from './routes/$slug.index'
 import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
 import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
 import { Route as SlugStoryRouteImport } from './routes/$slug.story'
-import { Route as SlugRsvpRouteImport } from './routes/$slug.rsvp'
 import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
 import { Route as SlugLocationRouteImport } from './routes/$slug.location'
 import { Route as SlugGuestbookRouteImport } from './routes/$slug.guestbook'
@@ -91,11 +90,6 @@ const SlugTimelineRoute = SlugTimelineRouteImport.update({
 const SlugStoryRoute = SlugStoryRouteImport.update({
   id: '/story',
   path: '/story',
-  getParentRoute: () => SlugRoute,
-} as any)
-const SlugRsvpRoute = SlugRsvpRouteImport.update({
-  id: '/rsvp',
-  path: '/rsvp',
   getParentRoute: () => SlugRoute,
 } as any)
 const SlugPlaylistRoute = SlugPlaylistRouteImport.update({
@@ -222,7 +216,6 @@ export interface FileRoutesByFullPath {
   '/$slug/guestbook': typeof SlugGuestbookRoute
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
-  '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/admin/platform': typeof AdminPlatformRouteWithChildren
@@ -255,7 +248,6 @@ export interface FileRoutesByTo {
   '/$slug/guestbook': typeof SlugGuestbookRoute
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
-  '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/$slug': typeof SlugIndexRoute
@@ -290,7 +282,6 @@ export interface FileRoutesById {
   '/$slug/guestbook': typeof SlugGuestbookRoute
   '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
-  '/$slug/rsvp': typeof SlugRsvpRoute
   '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
   '/admin/platform': typeof AdminPlatformRouteWithChildren
@@ -327,7 +318,6 @@ export interface FileRouteTypes {
     | '/$slug/guestbook'
     | '/$slug/location'
     | '/$slug/playlist'
-    | '/$slug/rsvp'
     | '/$slug/story'
     | '/$slug/timeline'
     | '/admin/platform'
@@ -360,7 +350,6 @@ export interface FileRouteTypes {
     | '/$slug/guestbook'
     | '/$slug/location'
     | '/$slug/playlist'
-    | '/$slug/rsvp'
     | '/$slug/story'
     | '/$slug/timeline'
     | '/$slug'
@@ -394,7 +383,6 @@ export interface FileRouteTypes {
     | '/$slug/guestbook'
     | '/$slug/location'
     | '/$slug/playlist'
-    | '/$slug/rsvp'
     | '/$slug/story'
     | '/$slug/timeline'
     | '/admin/platform'
@@ -498,13 +486,6 @@ declare module '@tanstack/react-router' {
       path: '/story'
       fullPath: '/$slug/story'
       preLoaderRoute: typeof SlugStoryRouteImport
-      parentRoute: typeof SlugRoute
-    }
-    '/$slug/rsvp': {
-      id: '/$slug/rsvp'
-      path: '/rsvp'
-      fullPath: '/$slug/rsvp'
-      preLoaderRoute: typeof SlugRsvpRouteImport
       parentRoute: typeof SlugRoute
     }
     '/$slug/playlist': {
@@ -716,7 +697,6 @@ interface SlugRouteChildren {
   SlugGuestbookRoute: typeof SlugGuestbookRoute
   SlugLocationRoute: typeof SlugLocationRoute
   SlugPlaylistRoute: typeof SlugPlaylistRoute
-  SlugRsvpRoute: typeof SlugRsvpRoute
   SlugStoryRoute: typeof SlugStoryRoute
   SlugTimelineRoute: typeof SlugTimelineRoute
   SlugIndexRoute: typeof SlugIndexRoute
@@ -729,7 +709,6 @@ const SlugRouteChildren: SlugRouteChildren = {
   SlugGuestbookRoute: SlugGuestbookRoute,
   SlugLocationRoute: SlugLocationRoute,
   SlugPlaylistRoute: SlugPlaylistRoute,
-  SlugRsvpRoute: SlugRsvpRoute,
   SlugStoryRoute: SlugStoryRoute,
   SlugTimelineRoute: SlugTimelineRoute,
   SlugIndexRoute: SlugIndexRoute,
