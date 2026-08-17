@@ -193,10 +193,8 @@ function InvitationPage() {
         </div>
 
         <div className="mt-block flex flex-col sm:flex-row gap-gutter justify-center">
-          <ThemedButton asChild size="lg">
-            <Link to="/$slug/rsvp" params={{ slug }}>
-              <ListChecks className="w-4 h-4" /> Reply with your wishes
-            </Link>
+          <ThemedButton size="lg" onClick={() => setRsvpOpen(true)}>
+            <ListChecks className="w-4 h-4" /> Reply with your wishes
           </ThemedButton>
           <ThemedButton asChild variant="gilded" size="lg">
             <Link to="/$slug/timeline" params={{ slug }}>
@@ -204,6 +202,23 @@ function InvitationPage() {
             </Link>
           </ThemedButton>
         </div>
+
+        <RsvpDialog
+          open={rsvpOpen}
+          onOpenChange={setRsvpOpen}
+          weddingId={wedding.id}
+          rsvpDeadline={wedding.rsvp_deadline ?? null}
+          guest={
+            guest
+              ? {
+                  id: guest.id,
+                  first_name: guest.first_name,
+                  guest_type: guest.guest_type as GuestType,
+                  plus_one_allowed: guest.plus_one_allowed,
+                }
+              : null
+          }
+        />
       </Section>
     </PageCanvas>
   );
