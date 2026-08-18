@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -82,6 +83,12 @@ function GeneralTab({
   const [locationName, setLocationName] = useState("");
   const [locationAddress, setLocationAddress] = useState("");
   const [mapsUrl, setMapsUrl] = useState("");
+  const [tabs, setTabs] = useState({
+    story_enabled: true,
+    gallery_enabled: true,
+    playlist_enabled: true,
+    guestbook_enabled: true,
+  });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -93,6 +100,12 @@ function GeneralTab({
     setLocationName(wedding.location_name ?? "");
     setLocationAddress(wedding.location_address ?? "");
     setMapsUrl(wedding.maps_url ?? "");
+    setTabs({
+      story_enabled: wedding.story_enabled !== false,
+      gallery_enabled: wedding.gallery_enabled !== false,
+      playlist_enabled: wedding.playlist_enabled !== false,
+      guestbook_enabled: wedding.guestbook_enabled !== false,
+    });
   }, [wedding]);
 
   const save = async () => {
@@ -108,6 +121,7 @@ function GeneralTab({
         location_name: locationName.trim() || null,
         location_address: locationAddress.trim() || null,
         maps_url: mapsUrl.trim() || null,
+        ...tabs,
       })
       .eq("id", wedding.id);
     setSaving(false);
@@ -247,6 +261,29 @@ function GeneralTab({
         </div>
       </section>
 
+      <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-4">
+        <div>
+          <h3 className="font-display text-lg">Guest pages</h3>
+          <p className="text-sm text-muted-foreground">
+            Choose which pages your guests can see. Hidden pages disappear from the
+            guest menu — you can still edit them as an admin.
+          </p>
+        </div>
+        {GUEST_PAGES.map((page) => (
+          <div key={page.field} className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium">{page.label}</p>
+              <p className="text-xs text-muted-foreground">{page.description}</p>
+            </div>
+            <Switch
+              checked={tabs[page.field]}
+              onCheckedChange={(v) => setTabs((prev) => ({ ...prev, [page.field]: v }))}
+              aria-label={`Show ${page.label} to guests`}
+            />
+          </div>
+        ))}
+      </section>
+
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving} className="rounded-full">
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
@@ -256,3 +293,26 @@ function GeneralTab({
     </div>
   );
 }
+
+const GUEST_PAGES = [
+  {
+    field: "story_enabled" as const,
+    label: "Our story",
+    description: "The chapters of how you met.",
+  },
+  {
+    field: "gallery_enabled" as const,
+    label: "Gallery",
+    description: "Photo sharing and uploads by guests.",
+  },
+  {
+    field: "playlist_enabled" as const,
+    label: "Playlist",
+    description: "Song suggestions from your guests.",
+  },
+  {
+    field: "guestbook_enabled" as const,
+    label: "Guestbook",
+    description: "Written messages and wishes.",
+  },
+];
