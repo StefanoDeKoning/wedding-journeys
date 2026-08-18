@@ -102,6 +102,12 @@ function WeddingLayout() {
         title={wedding.wedding_name ?? slug}
         guestFirstName={guest?.first_name}
         isAdmin={isAdmin}
+        features={{
+          story: wedding.story_enabled !== false,
+          gallery: wedding.gallery_enabled !== false,
+          playlist: wedding.playlist_enabled !== false,
+          guestbook: wedding.guestbook_enabled !== false,
+        }}
       >
         <Outlet />
       </WeddingShell>
