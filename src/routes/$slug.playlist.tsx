@@ -9,6 +9,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
+import { TabGate } from "@/wedding/TabGate";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,7 +36,11 @@ export const Route = createFileRoute("/$slug/playlist")({
       { name: "description", content: "Suggest a song for the dance floor." },
     ],
   }),
-  component: PlaylistPage,
+  component: () => (
+    <TabGate feature="playlist">
+      <PlaylistPage />
+    </TabGate>
+  ),
 });
 
 interface Song {

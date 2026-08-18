@@ -23,26 +23,34 @@ const TAB_INACTIVE = "text-muted-foreground hover:text-primary hover:bg-primary/
 const TAB_ACTIVE = "text-primary bg-primary/10 border-gilded shadow-elev-1";
 
 const tabs = [
-  { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true },
-  
-  { to: "/$slug/story" as const, label: "Story", icon: BookHeart, exact: false },
-  { to: "/$slug/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false },
-  { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false },
-  { to: "/$slug/playlist" as const, label: "Playlist", icon: Music, exact: false },
-  { to: "/$slug/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false },
-  { to: "/$slug/location" as const, label: "Location", icon: MapPin, exact: false },
+  { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true, feature: null },
+  { to: "/$slug/story" as const, label: "Story", icon: BookHeart, exact: false, feature: "story" as const },
+  { to: "/$slug/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false, feature: null },
+  { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false, feature: "gallery" as const },
+  { to: "/$slug/playlist" as const, label: "Playlist", icon: Music, exact: false, feature: "playlist" as const },
+  { to: "/$slug/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false, feature: "guestbook" as const },
+  { to: "/$slug/location" as const, label: "Location", icon: MapPin, exact: false, feature: null },
 ];
+
+export interface EnabledFeatures {
+  story: boolean;
+  gallery: boolean;
+  playlist: boolean;
+  guestbook: boolean;
+}
 
 export function WeddingHeader({
   slug,
   title,
   guestFirstName,
   isAdmin = false,
+  features,
 }: {
   slug: string;
   title: string;
   guestFirstName?: string;
   isAdmin?: boolean;
+  features?: EnabledFeatures;
 }) {
   const { signOut } = useAuth();
 
@@ -88,7 +96,9 @@ export function WeddingHeader({
 
         {/* Tabs */}
         <nav className="flex gap-2 overflow-x-auto -mx-gutter px-gutter pb-4 scrollbar-thin">
-          {tabs.map((t) => {
+          {tabs
+            .filter((t) => !t.feature || !features || features[t.feature])
+            .map((t) => {
             const Icon = t.icon;
             return (
               <Link
@@ -115,17 +125,25 @@ export function WeddingShell({
   title,
   guestFirstName,
   isAdmin = false,
+  features,
   children,
 }: {
   slug: string;
   title: string;
   guestFirstName?: string;
   isAdmin?: boolean;
+  features?: EnabledFeatures;
   children: ReactNode;
 }) {
   return (
     <div className="min-h-screen flex flex-col bg-wash-page">
-      <WeddingHeader slug={slug} title={title} guestFirstName={guestFirstName} isAdmin={isAdmin} />
+      <WeddingHeader
+        slug={slug}
+        title={title}
+        guestFirstName={guestFirstName}
+        isAdmin={isAdmin}
+        features={features}
+      />
       <main className="flex-1">{children}</main>
       <footer className="text-center type-caption py-block">
         Made with love on{" "}

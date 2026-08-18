@@ -777,7 +777,9 @@ export type Database = {
           couple_name_one: string | null
           couple_name_two: string | null
           created_at: string
+          gallery_enabled: boolean
           groom_name: string | null
+          guestbook_enabled: boolean
           id: string
           invitation_content: string | null
           invitation_message: string | null
@@ -789,12 +791,14 @@ export type Database = {
           location_address: string | null
           location_name: string | null
           maps_url: string | null
+          playlist_enabled: boolean
           primary_admin_id: string
           reception_at: string | null
           rsvp_deadline: string | null
           slug: string
           status: Database["public"]["Enums"]["wedding_status"]
           storage_limit_bytes: number
+          story_enabled: boolean
           updated_at: string
           wedding_date: string | null
           wedding_name: string | null
@@ -806,7 +810,9 @@ export type Database = {
           couple_name_one?: string | null
           couple_name_two?: string | null
           created_at?: string
+          gallery_enabled?: boolean
           groom_name?: string | null
+          guestbook_enabled?: boolean
           id?: string
           invitation_content?: string | null
           invitation_message?: string | null
@@ -818,12 +824,14 @@ export type Database = {
           location_address?: string | null
           location_name?: string | null
           maps_url?: string | null
+          playlist_enabled?: boolean
           primary_admin_id: string
           reception_at?: string | null
           rsvp_deadline?: string | null
           slug: string
           status?: Database["public"]["Enums"]["wedding_status"]
           storage_limit_bytes?: number
+          story_enabled?: boolean
           updated_at?: string
           wedding_date?: string | null
           wedding_name?: string | null
@@ -835,7 +843,9 @@ export type Database = {
           couple_name_one?: string | null
           couple_name_two?: string | null
           created_at?: string
+          gallery_enabled?: boolean
           groom_name?: string | null
+          guestbook_enabled?: boolean
           id?: string
           invitation_content?: string | null
           invitation_message?: string | null
@@ -847,12 +857,14 @@ export type Database = {
           location_address?: string | null
           location_name?: string | null
           maps_url?: string | null
+          playlist_enabled?: boolean
           primary_admin_id?: string
           reception_at?: string | null
           rsvp_deadline?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["wedding_status"]
           storage_limit_bytes?: number
+          story_enabled?: boolean
           updated_at?: string
           wedding_date?: string | null
           wedding_name?: string | null

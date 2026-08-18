@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
+import { TabGate } from "@/wedding/TabGate";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PageCanvas,
@@ -23,7 +24,11 @@ export const Route = createFileRoute("/$slug/story")({
       { name: "description", content: "How it all began." },
     ],
   }),
-  component: StoryPage,
+  component: () => (
+    <TabGate feature="story">
+      <StoryPage />
+    </TabGate>
+  ),
 });
 
 interface Chapter {

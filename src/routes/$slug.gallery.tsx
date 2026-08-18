@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Upload, Loader2, QrCode, User, ExternalLink } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
+import { TabGate } from "@/wedding/TabGate";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { signPhotoUrls } from "@/lib/photoUrl";
@@ -36,7 +37,11 @@ export const Route = createFileRoute("/$slug/gallery")({
       { name: "description", content: "Photos from the day." },
     ],
   }),
-  component: GalleryPage,
+  component: () => (
+    <TabGate feature="gallery">
+      <GalleryPage />
+    </TabGate>
+  ),
 });
 
 interface Photo {

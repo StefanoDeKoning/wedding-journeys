@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Trash2, MessageCircleHeart } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
+import { TabGate } from "@/wedding/TabGate";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -25,7 +26,11 @@ export const Route = createFileRoute("/$slug/guestbook")({
       { name: "description", content: "Leave a message for the couple." },
     ],
   }),
-  component: GuestbookPage,
+  component: () => (
+    <TabGate feature="guestbook">
+      <GuestbookPage />
+    </TabGate>
+  ),
 });
 
 interface Message {
