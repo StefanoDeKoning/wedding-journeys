@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { MapPin, Loader2 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
-import { illustrationFor } from "@/wedding/timelineCategories";
 import { resolveTimelinePicture } from "@/wedding/timelineIllustrations";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
 import {
@@ -16,7 +15,6 @@ import {
   Hero,
   EmptyState,
 } from "@/design-system";
-import { DecorMotifArt } from "@/design-system/decor/Illustrations";
 
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
@@ -161,19 +159,10 @@ function TimelineChapter({
   isNext: boolean;
   isLeft: boolean;
 }) {
-  const motif = illustrationFor(e.category, e.title);
   const picture = resolveTimelinePicture(e.illustration, e.category, e.title);
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] lg:items-start lg:gap-x-6">
-      <span
-        className={`relative z-10 mx-auto mb-4 flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full surface-veil border-gilded shadow-elev-2 lg:col-start-2 lg:row-start-1 lg:mb-0 ${
-          isNext ? "shadow-elev-4" : ""
-        }`}
-      >
-        <DecorMotifArt motif={motif} size="sm" intensity={0.95} />
-      </span>
-
       <ThemedCard
         variant={isNext ? "framed" : "paper"}
         ornament={isNext}

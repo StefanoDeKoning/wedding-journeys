@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Loader2,
   Trophy,
+  Heart,
 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
 import { TabGate } from "@/wedding/TabGate";
@@ -28,12 +29,13 @@ import {
   EmptyState,
   ConfirmDialog,
 } from "@/design-system";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/$slug/playlist")({
   head: () => ({
     meta: [
-      { title: "Playlist" },
-      { name: "description", content: "Suggest a song for the dance floor." },
+      { title: "Song requests" },
+      { name: "description", content: "Suggest or vote for a song for the dance floor." },
     ],
   }),
   component: () => (
@@ -57,11 +59,13 @@ interface Song {
 function PlaylistPage() {
   const { wedding, guest, isAdmin } = useWeddingContext();
   const [songs, setSongs] = useState<Song[]>([]);
+  const [myVotes, setMyVotes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [spotify, setSpotify] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [votingId, setVotingId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const load = async () => {
@@ -72,31 +76,34 @@ function PlaylistPage() {
         "id, guest_id, submitted_by_name, title, artist, spotify_url, vote_count, created_at",
       )
       .eq("wedding_id", wedding.id)
+      .order("vote_count", { ascending: false })
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     setSongs((data ?? []) as Song[]);
+
+    if (guest) {
+      const { data: votes } = await supabase
+        .from("playlist_votes")
+        .select("song_id")
+        .eq("guest_id", guest.id);
+      setMyVotes((votes ?? []).map((v) => v.song_id as string));
+    } else {
+      setMyVotes([]);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wedding.id]);
+  }, [wedding.id, guest?.id]);
 
-  const myCount = useMemo(
+  const mySongCount = useMemo(
     () => (guest ? songs.filter((s) => s.guest_id === guest.id).length : 0),
     [songs, guest],
   );
-  const remaining = Math.max(0, 3 - myCount);
-
-  const top = useMemo(
-    () =>
-      [...songs]
-        .sort((a, b) => b.vote_count - a.vote_count)
-        .slice(0, 5)
-        .filter((s) => s.vote_count > 0),
-    [songs],
-  );
+  const used = mySongCount + myVotes.length;
+  const remaining = Math.max(0, 3 - used);
 
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +116,7 @@ function PlaylistPage() {
       return;
     }
     if (remaining <= 0) {
-      toast.error("You've reached the 3-song limit.");
+      toast.error("You've used all 3 of your song requests.");
       return;
     }
     if (spotify.trim() && !/^https?:\/\/(open\.)?spotify\.com\//i.test(spotify.trim())) {
@@ -137,6 +144,45 @@ function PlaylistPage() {
     void load();
   };
 
+  const toggleVote = async (songId: string) => {
+    if (!guest) {
+      toast.error("Only guests can vote.");
+      return;
+    }
+    const voted = myVotes.includes(songId);
+    if (!voted && remaining <= 0) {
+      toast.error("You've used all 3 of your song requests — remove a vote to free one up.");
+      return;
+    }
+    setVotingId(songId);
+    if (voted) {
+      const { error } = await supabase
+        .from("playlist_votes")
+        .delete()
+        .eq("song_id", songId)
+        .eq("guest_id", guest.id);
+      setVotingId(null);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success("Vote removed.");
+    } else {
+      const { error } = await supabase.from("playlist_votes").insert({
+        wedding_id: wedding.id,
+        song_id: songId,
+        guest_id: guest.id,
+      });
+      setVotingId(null);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success("Voted!");
+    }
+    void load();
+  };
+
   const remove = async (id: string) => {
     const { error } = await supabase.from("playlist_songs").delete().eq("id", id);
     if (error) {
@@ -152,40 +198,15 @@ function PlaylistPage() {
       <Container width="prose">
         <Hero
           script="help us fill the floor"
-          title="Playlist requests"
+          title="Song requests"
           subtitle={
             <>
-              Drop up to <span className="text-foreground font-medium">3 songs</span> you'd love
-              to hear. The couple curates the final list.
+              You have <span className="text-foreground font-medium">3 requests</span> in total —
+              use them to suggest songs or to vote for songs other guests suggested.
             </>
           }
         />
       </Container>
-
-      {top.length > 0 && (
-        <Section size="compact" width="prose">
-          <ThemedCard variant="veil">
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-4 h-4 text-primary" />
-              <h2 className="type-card-title">Top requests</h2>
-            </div>
-            <ol className="space-y-2">
-              {top.map((s, i) => (
-                <li key={s.id} className="flex items-center gap-3 type-body">
-                  <span className="type-card-title text-primary w-5 text-center">{i + 1}</span>
-                  <span className="flex-1 truncate">
-                    <span className="font-medium">{s.title}</span>{" "}
-                    <span className="text-muted-foreground">— {s.artist}</span>
-                  </span>
-                  <Badge tone="primary">
-                    {s.vote_count} {s.vote_count === 1 ? "vote" : "votes"}
-                  </Badge>
-                </li>
-              ))}
-            </ol>
-          </ThemedCard>
-        </Section>
-      )}
 
       {guest && (
         <Section size="compact" width="prose">
@@ -193,8 +214,8 @@ function PlaylistPage() {
             <form onSubmit={add} className="space-y-4">
               <p className="type-caption">
                 {remaining > 0
-                  ? `${remaining} of 3 song${remaining === 1 ? "" : "s"} left`
-                  : "You've used all 3 of your song requests."}
+                  ? `${remaining} of 3 request${remaining === 1 ? "" : "s"} left`
+                  : "You've used all 3 of your requests."}
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
@@ -240,7 +261,11 @@ function PlaylistPage() {
       )}
 
       <Section size="spacious" width="content">
-        <SectionHeader eyebrow="the full list" title={`All requests (${songs.length})`} align="center" />
+        <SectionHeader
+          eyebrow="vote for your favourites"
+          title={`Top requests (${songs.length})`}
+          align="center"
+        />
         <div className="mt-block">
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">
@@ -249,49 +274,87 @@ function PlaylistPage() {
           ) : songs.length === 0 ? (
             <EmptyState motif="music-note" title="No songs yet" description="Be the first to request one!" />
           ) : (
-            <ul className="space-y-3">
-              {songs.map((s) => {
-                const mine = guest && s.guest_id === guest.id;
-                const canDelete = mine || isAdmin;
-                return (
-                  <li key={s.id}>
-                    <ThemedCard className="flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-full bg-primary/12 flex items-center justify-center text-primary shrink-0">
-                        <Music aria-hidden="true" className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{s.title}</p>
-                        <p className="type-caption truncate">
-                          {s.artist} · suggested by {s.submitted_by_name}
-                          {mine && " · you"}
-                        </p>
-                      </div>
-                      {safeHttpUrl(s.spotify_url) && (
-                        <a
-                          href={safeHttpUrl(s.spotify_url)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-muted-foreground hover:text-primary focus-ring-elegant rounded-full p-1"
-                          aria-label="Open in Spotify"
-                        >
-                          <ExternalLink aria-hidden="true" className="w-4 h-4" />
-                        </a>
-                      )}
-                      {canDelete && (
-                        <button
-                          type="button"
-                          onClick={() => setPendingDeleteId(s.id)}
-                          className="text-muted-foreground hover:text-destructive focus-ring-elegant rounded-full p-1"
-                          aria-label="Remove"
-                        >
-                          <Trash2 aria-hidden="true" className="w-4 h-4" />
-                        </button>
-                      )}
-                    </ThemedCard>
-                  </li>
-                );
-              })}
-            </ul>
+            <ThemedCard variant="veil">
+              <div className="flex items-center gap-2 mb-4">
+                <Trophy aria-hidden="true" className="w-4 h-4 text-primary" />
+                <h2 className="type-card-title">Most wanted on the dance floor</h2>
+              </div>
+              <ol className="space-y-3">
+                {songs.map((s, i) => {
+                  const mine = guest && s.guest_id === guest.id;
+                  const voted = myVotes.includes(s.id);
+                  const canDelete = mine || isAdmin;
+                  const link = safeHttpUrl(s.spotify_url);
+                  return (
+                    <li key={s.id}>
+                      <ThemedCard className="flex items-center gap-3 sm:gap-4">
+                        <span className="type-card-title text-primary w-6 shrink-0 text-center tabular-nums">
+                          {i + 1}
+                        </span>
+                        <div className="w-10 h-10 rounded-full bg-primary/12 hidden sm:flex items-center justify-center text-primary shrink-0">
+                          <Music aria-hidden="true" className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{s.title}</p>
+                          <p className="type-caption truncate">
+                            {s.artist} · suggested by {s.submitted_by_name}
+                            {mine && " · you"}
+                          </p>
+                        </div>
+                        <Badge tone="primary">
+                          {s.vote_count} {s.vote_count === 1 ? "vote" : "votes"}
+                        </Badge>
+                        {guest && (
+                          <button
+                            type="button"
+                            onClick={() => void toggleVote(s.id)}
+                            disabled={votingId === s.id || (!voted && remaining <= 0)}
+                            aria-pressed={voted}
+                            aria-label={voted ? "Remove your vote" : "Vote for this song"}
+                            className={cn(
+                              "rounded-full p-2 focus-ring-elegant transition-colors disabled:opacity-40",
+                              voted
+                                ? "text-primary bg-primary/12"
+                                : "text-muted-foreground hover:text-primary hover:bg-primary/8",
+                            )}
+                          >
+                            {votingId === s.id ? (
+                              <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Heart
+                                aria-hidden="true"
+                                className={cn("w-4 h-4", voted && "fill-current")}
+                              />
+                            )}
+                          </button>
+                        )}
+                        {link && (
+                          <a
+                            href={link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-muted-foreground hover:text-primary focus-ring-elegant rounded-full p-1"
+                            aria-label="Open in Spotify"
+                          >
+                            <ExternalLink aria-hidden="true" className="w-4 h-4" />
+                          </a>
+                        )}
+                        {canDelete && (
+                          <button
+                            type="button"
+                            onClick={() => setPendingDeleteId(s.id)}
+                            className="text-muted-foreground hover:text-destructive focus-ring-elegant rounded-full p-1"
+                            aria-label="Remove"
+                          >
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
+                          </button>
+                        )}
+                      </ThemedCard>
+                    </li>
+                  );
+                })}
+              </ol>
+            </ThemedCard>
           )}
         </div>
       </Section>

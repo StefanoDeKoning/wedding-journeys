@@ -20,7 +20,6 @@ import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
 import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
 import { Route as SlugStoryRouteImport } from './routes/$slug.story'
 import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
-import { Route as SlugLocationRouteImport } from './routes/$slug.location'
 import { Route as SlugGuestbookRouteImport } from './routes/$slug.guestbook'
 import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugAdminRouteImport } from './routes/$slug.admin'
@@ -95,11 +94,6 @@ const SlugStoryRoute = SlugStoryRouteImport.update({
 const SlugPlaylistRoute = SlugPlaylistRouteImport.update({
   id: '/playlist',
   path: '/playlist',
-  getParentRoute: () => SlugRoute,
-} as any)
-const SlugLocationRoute = SlugLocationRouteImport.update({
-  id: '/location',
-  path: '/location',
   getParentRoute: () => SlugRoute,
 } as any)
 const SlugGuestbookRoute = SlugGuestbookRouteImport.update({
@@ -214,7 +208,6 @@ export interface FileRoutesByFullPath {
   '/$slug/admin': typeof SlugAdminRouteWithChildren
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
   '/$slug/guestbook': typeof SlugGuestbookRoute
-  '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
@@ -246,7 +239,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
   '/$slug/guestbook': typeof SlugGuestbookRoute
-  '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
@@ -280,7 +272,6 @@ export interface FileRoutesById {
   '/$slug/admin': typeof SlugAdminRouteWithChildren
   '/$slug/gallery': typeof SlugGalleryRouteWithChildren
   '/$slug/guestbook': typeof SlugGuestbookRoute
-  '/$slug/location': typeof SlugLocationRoute
   '/$slug/playlist': typeof SlugPlaylistRoute
   '/$slug/story': typeof SlugStoryRoute
   '/$slug/timeline': typeof SlugTimelineRoute
@@ -316,7 +307,6 @@ export interface FileRouteTypes {
     | '/$slug/admin'
     | '/$slug/gallery'
     | '/$slug/guestbook'
-    | '/$slug/location'
     | '/$slug/playlist'
     | '/$slug/story'
     | '/$slug/timeline'
@@ -348,7 +338,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/$slug/gallery'
     | '/$slug/guestbook'
-    | '/$slug/location'
     | '/$slug/playlist'
     | '/$slug/story'
     | '/$slug/timeline'
@@ -381,7 +370,6 @@ export interface FileRouteTypes {
     | '/$slug/admin'
     | '/$slug/gallery'
     | '/$slug/guestbook'
-    | '/$slug/location'
     | '/$slug/playlist'
     | '/$slug/story'
     | '/$slug/timeline'
@@ -493,13 +481,6 @@ declare module '@tanstack/react-router' {
       path: '/playlist'
       fullPath: '/$slug/playlist'
       preLoaderRoute: typeof SlugPlaylistRouteImport
-      parentRoute: typeof SlugRoute
-    }
-    '/$slug/location': {
-      id: '/$slug/location'
-      path: '/location'
-      fullPath: '/$slug/location'
-      preLoaderRoute: typeof SlugLocationRouteImport
       parentRoute: typeof SlugRoute
     }
     '/$slug/guestbook': {
@@ -695,7 +676,6 @@ interface SlugRouteChildren {
   SlugAdminRoute: typeof SlugAdminRouteWithChildren
   SlugGalleryRoute: typeof SlugGalleryRouteWithChildren
   SlugGuestbookRoute: typeof SlugGuestbookRoute
-  SlugLocationRoute: typeof SlugLocationRoute
   SlugPlaylistRoute: typeof SlugPlaylistRoute
   SlugStoryRoute: typeof SlugStoryRoute
   SlugTimelineRoute: typeof SlugTimelineRoute
@@ -707,7 +687,6 @@ const SlugRouteChildren: SlugRouteChildren = {
   SlugAdminRoute: SlugAdminRouteWithChildren,
   SlugGalleryRoute: SlugGalleryRouteWithChildren,
   SlugGuestbookRoute: SlugGuestbookRoute,
-  SlugLocationRoute: SlugLocationRoute,
   SlugPlaylistRoute: SlugPlaylistRoute,
   SlugStoryRoute: SlugStoryRoute,
   SlugTimelineRoute: SlugTimelineRoute,

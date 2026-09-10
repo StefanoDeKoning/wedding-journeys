@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.tg_sync_song_vote_count() FROM PUBLIC, anon, authenticated;

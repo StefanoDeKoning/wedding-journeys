@@ -83,6 +83,10 @@ function GeneralTab({
   const [locationName, setLocationName] = useState("");
   const [locationAddress, setLocationAddress] = useState("");
   const [mapsUrl, setMapsUrl] = useState("");
+  const [cmName, setCmName] = useState("");
+  const [cmRole, setCmRole] = useState("");
+  const [cmPhone, setCmPhone] = useState("");
+  const [cmEmail, setCmEmail] = useState("");
   const [tabs, setTabs] = useState({
     story_enabled: true,
     gallery_enabled: true,
@@ -100,6 +104,10 @@ function GeneralTab({
     setLocationName(wedding.location_name ?? "");
     setLocationAddress(wedding.location_address ?? "");
     setMapsUrl(wedding.maps_url ?? "");
+    setCmName(wedding.ceremony_master_name ?? "");
+    setCmRole(wedding.ceremony_master_role ?? "");
+    setCmPhone(wedding.ceremony_master_phone ?? "");
+    setCmEmail(wedding.ceremony_master_email ?? "");
     setTabs({
       story_enabled: wedding.story_enabled !== false,
       gallery_enabled: wedding.gallery_enabled !== false,
@@ -121,6 +129,10 @@ function GeneralTab({
         location_name: locationName.trim() || null,
         location_address: locationAddress.trim() || null,
         maps_url: mapsUrl.trim() || null,
+        ceremony_master_name: cmName.trim() || null,
+        ceremony_master_role: cmRole.trim() || null,
+        ceremony_master_phone: cmPhone.trim() || null,
+        ceremony_master_email: cmEmail.trim() || null,
         ...tabs,
       })
       .eq("id", wedding.id);
@@ -258,6 +270,62 @@ function GeneralTab({
             placeholder="https://maps.app.goo.gl/…"
             className="mt-1"
           />
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-5">
+        <div>
+          <h3 className="font-display text-lg">Ceremony master</h3>
+          <p className="text-sm text-muted-foreground">
+            The person guests can contact with questions. Shown on the invitation page.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="cmn">Name</Label>
+            <Input
+              id="cmn"
+              value={cmName}
+              onChange={(e) => setCmName(e.target.value)}
+              placeholder="Anna de Vries"
+              maxLength={120}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="cmr">Role (optional)</Label>
+            <Input
+              id="cmr"
+              value={cmRole}
+              onChange={(e) => setCmRole(e.target.value)}
+              placeholder="Ceremony master"
+              maxLength={120}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="cmp">Phone</Label>
+            <Input
+              id="cmp"
+              value={cmPhone}
+              onChange={(e) => setCmPhone(e.target.value)}
+              placeholder="+31 6 12345678"
+              maxLength={40}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label htmlFor="cme">Email</Label>
+            <Input
+              id="cme"
+              type="email"
+              value={cmEmail}
+              onChange={(e) => setCmEmail(e.target.value)}
+              placeholder="anna@example.com"
+              maxLength={200}
+              className="mt-1"
+            />
+          </div>
         </div>
       </section>
 

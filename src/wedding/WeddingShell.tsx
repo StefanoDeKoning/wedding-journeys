@@ -6,7 +6,6 @@ import {
   Image as ImageIcon,
   Music,
   MessageCircleHeart,
-  MapPin,
   LogOut,
   Settings,
 } from "lucide-react";
@@ -29,7 +28,6 @@ const tabs = [
   { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false, feature: "gallery" as const },
   { to: "/$slug/playlist" as const, label: "Playlist", icon: Music, exact: false, feature: "playlist" as const },
   { to: "/$slug/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false, feature: "guestbook" as const },
-  { to: "/$slug/location" as const, label: "Location", icon: MapPin, exact: false, feature: null },
 ];
 
 export interface EnabledFeatures {

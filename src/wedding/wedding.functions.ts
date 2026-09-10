@@ -42,7 +42,10 @@ export interface PublicWedding {
   gallery_enabled: boolean;
   playlist_enabled: boolean;
   guestbook_enabled: boolean;
-
+  ceremony_master_name: string | null;
+  ceremony_master_role: string | null;
+  ceremony_master_phone: string | null;
+  ceremony_master_email: string | null;
 }
 
 export const DEFAULT_INVITATION_TEXT = `Dear {FirstName} {LastName},
@@ -71,7 +74,7 @@ export const getPublishedWedding = createServerFn({ method: "POST" })
     const { data: row, error } = await admin
       .from("weddings")
       .select(
-        "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, invitation_text, rsvp_deadline, status, invitation_title, invitation_content, invitation_template, invitation_visible, wishlist_enabled, story_enabled, gallery_enabled, playlist_enabled, guestbook_enabled",
+        "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, invitation_text, rsvp_deadline, status, invitation_title, invitation_content, invitation_template, invitation_visible, wishlist_enabled, story_enabled, gallery_enabled, playlist_enabled, guestbook_enabled, ceremony_master_name, ceremony_master_role, ceremony_master_phone, ceremony_master_email",
       )
       .eq("slug", data.slug)
       .eq("status", "published")

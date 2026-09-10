@@ -4,7 +4,6 @@ import {
   MailOpen,
   CalendarClock,
   MailCheck,
-  MapPin,
   Camera,
   Music2,
   Gift,
@@ -62,12 +61,6 @@ const sections = [
     t: "RSVP",
     d: "Elegant response form with meal choices and dietary needs.",
     to: "/$slug" as const,
-  },
-  {
-    icon: MapPin,
-    t: "Location",
-    d: "Directions and everything guests need to arrive on time.",
-    to: "/$slug/location" as const,
   },
   {
     icon: Camera,
