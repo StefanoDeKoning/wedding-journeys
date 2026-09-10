@@ -64,12 +64,6 @@ const sections = [
     to: "/$slug" as const,
   },
   {
-    icon: MapPin,
-    t: "Location",
-    d: "Directions and everything guests need to arrive on time.",
-    to: "/$slug/location" as const,
-  },
-  {
     icon: Camera,
     t: "Gallery",
     d: "A growing memory book, with guest uploads.",
