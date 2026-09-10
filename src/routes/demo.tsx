@@ -4,7 +4,6 @@ import {
   MailOpen,
   CalendarClock,
   MailCheck,
-  MapPin,
   Camera,
   Music2,
   Gift,
