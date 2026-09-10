@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CalendarDays, MapPin, Heart, ListChecks, Clock } from "lucide-react";
+import {
+  CalendarDays,
+  MapPin,
+  Heart,
+  ListChecks,
+  Clock,
+  Music,
+  HelpCircle,
+  Phone,
+  Mail,
+} from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
@@ -201,6 +211,47 @@ function InvitationPage() {
           </ThemedCard>
         </div>
 
+        {(wedding.ceremony_master_name ||
+          wedding.ceremony_master_phone ||
+          wedding.ceremony_master_email) && (
+          <ThemedCard variant="veil" className="mt-block animate-ds-reveal-left">
+            <Badge tone="primary">
+              <HelpCircle aria-hidden="true" className="w-3 h-3" /> Questions?
+            </Badge>
+            <p className="type-card-title mt-4">
+              {wedding.ceremony_master_name || "Our ceremony master"}
+            </p>
+            <p className="type-caption mt-1">
+              {wedding.ceremony_master_role || "Ceremony master"} — happy to help with anything
+              about the day.
+            </p>
+            <div className="mt-4 space-y-2 type-body">
+              {wedding.ceremony_master_phone && (
+                <p className="flex items-center gap-2">
+                  <Phone aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
+                  <a
+                    href={`tel:${wedding.ceremony_master_phone.replace(/\s+/g, "")}`}
+                    className="text-primary hover-gild focus-ring-elegant"
+                  >
+                    {wedding.ceremony_master_phone}
+                  </a>
+                </p>
+              )}
+              {wedding.ceremony_master_email && (
+                <p className="flex items-center gap-2">
+                  <Mail aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
+                  <a
+                    href={`mailto:${wedding.ceremony_master_email}`}
+                    className="text-primary hover-gild focus-ring-elegant break-all"
+                  >
+                    {wedding.ceremony_master_email}
+                  </a>
+                </p>
+              )}
+            </div>
+          </ThemedCard>
+        )}
+
         <div className="mt-block flex flex-col sm:flex-row gap-gutter justify-center">
           <ThemedButton size="lg" onClick={() => setRsvpOpen(true)}>
             <ListChecks className="w-4 h-4" /> Reply with your wishes
@@ -210,6 +261,13 @@ function InvitationPage() {
               <Heart className="w-4 h-4" /> See the day
             </Link>
           </ThemedButton>
+          {wedding.playlist_enabled && (
+            <ThemedButton asChild variant="gilded" size="lg">
+              <Link to="/$slug/playlist" params={{ slug }}>
+                <Music className="w-4 h-4" /> Song requests
+              </Link>
+            </ThemedButton>
+          )}
         </div>
 
         <RsvpDialog
