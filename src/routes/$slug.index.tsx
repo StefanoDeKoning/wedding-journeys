@@ -171,6 +171,11 @@ function InvitationPage() {
                 You're invited to the evening celebration.
               </p>
             )}
+            {target && (
+              <div className="mt-6 border-t border-paper pt-5">
+                <Countdown target={target} label={countdownLabel} compact />
+              </div>
+            )}
           </ThemedCard>
 
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-right lg:mt-12">
