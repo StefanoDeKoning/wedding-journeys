@@ -12,6 +12,8 @@ import {
   Mail,
 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
+import { useFirstTimelineEventTime } from "@/wedding/useFirstTimelineEvent";
+
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
 import { WishlistSection } from "@/wedding/WishlistSection";
@@ -64,9 +66,13 @@ function InvitationPage() {
 
 
   const isEvening = guest?.guest_type === "evening";
-  const target = isEvening
-    ? (wedding.reception_at ?? wedding.ceremony_at)
-    : (wedding.ceremony_at ?? wedding.reception_at);
+  const firstEventTime = useFirstTimelineEventTime(wedding.id, guest?.guest_type ?? null);
+  const target =
+    firstEventTime ??
+    (isEvening
+      ? (wedding.reception_at ?? wedding.ceremony_at)
+      : (wedding.ceremony_at ?? wedding.reception_at));
+
 
   const countdownLabel = isEvening
     ? "until we celebrate together"
