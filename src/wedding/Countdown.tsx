@@ -9,6 +9,8 @@ interface CountdownProps {
   label?: string;
   /** Compact layout for tight spaces (e.g. tucked under an invitation title). */
   compact?: boolean;
+  /** Show the seconds tile (default true). */
+  showSeconds?: boolean;
 }
 
 function diff(target: Date) {
@@ -20,7 +22,8 @@ function diff(target: Date) {
   return { days, hours, minutes, seconds, done: ms === 0 };
 }
 
-export function Countdown({ target, label, compact }: CountdownProps) {
+export function Countdown({ target, label, compact, showSeconds = true }: CountdownProps) {
+
   const date = new Date(target);
   const [t, setT] = useState(() => diff(date));
 
@@ -42,13 +45,20 @@ export function Countdown({ target, label, compact }: CountdownProps) {
     { value: t.days, label: "days" },
     { value: t.hours, label: "hours" },
     { value: t.minutes, label: "minutes" },
-    { value: t.seconds, label: "seconds" },
+    ...(showSeconds ? [{ value: t.seconds, label: "seconds" }] : []),
   ];
 
   return (
     <div className="text-center">
       {label && <p className={cn("type-script-sm", compact ? "mb-2" : "mb-4")}>{label}</p>}
-      <div className={cn("grid grid-cols-4 gap-gutter max-w-xl mx-auto", compact && "max-w-sm")}>
+      <div
+        className={cn(
+          "grid gap-gutter max-w-xl mx-auto",
+          showSeconds ? "grid-cols-4" : "grid-cols-3",
+          compact && "max-w-sm",
+        )}
+      >
+
         {items.map((i) => (
           <div
             key={i.label}
