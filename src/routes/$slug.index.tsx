@@ -189,9 +189,18 @@ function InvitationPage() {
             )}
             {target && (
               <div className="mt-6 border-t border-paper pt-5">
-                <Countdown target={target} label={countdownLabel} compact />
+                <Countdown
+                  target={target}
+                  label={
+                    isEvening
+                      ? "until the evening celebration begins"
+                      : "until the celebration begins"
+                  }
+                  showSeconds={false}
+                />
               </div>
             )}
+
           </ThemedCard>
 
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-right lg:mt-12">
