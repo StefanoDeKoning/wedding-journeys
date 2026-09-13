@@ -66,7 +66,11 @@ function InvitationPage() {
 
 
   const isEvening = guest?.guest_type === "evening";
-  const firstEventTime = useFirstTimelineEventTime(wedding.id, guest?.guest_type ?? null);
+  const firstEventTime = useFirstTimelineEventTime(
+    wedding.id,
+    guest?.guest_type ?? null,
+    wedding.wedding_date,
+  );
   const target =
     firstEventTime ??
     (isEvening
