@@ -27,6 +27,8 @@ export function Countdown({ target, label, compact, showSeconds = true }: Countd
   const date = new Date(target);
   const [t, setT] = useState(() => diff(date));
 
+  if (Number.isNaN(date.getTime())) return null;
+
   useEffect(() => {
     const id = setInterval(() => setT(diff(date)), 1000);
     return () => clearInterval(id);
