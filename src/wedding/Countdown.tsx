@@ -25,13 +25,17 @@ function diff(target: Date) {
 export function Countdown({ target, label, compact, showSeconds = true }: CountdownProps) {
 
   const date = new Date(target);
+  const valid = !Number.isNaN(date.getTime());
   const [t, setT] = useState(() => diff(date));
 
   useEffect(() => {
+    if (!valid) return;
     const id = setInterval(() => setT(diff(date)), 1000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target]);
+  }, [target, valid]);
+
+  if (!valid) return null;
 
   if (t.done) {
     return (
