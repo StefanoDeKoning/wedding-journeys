@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Plus, Trash2, Pencil, GripVertical, BookHeart } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil, GripVertical, BookHeart, ImagePlus } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,6 +118,7 @@ function AdminStory() {
         details: { title: c.title },
       });
     }
+    void removeStoryImage(c.image_url);
     toast.success("Chapter removed.");
     void load();
   };
@@ -271,7 +272,39 @@ function ChapterDialog({
   const [body, setBody] = useState(chapter?.body ?? "");
   const [eventDate, setEventDate] = useState(chapter?.event_date ?? "");
   const [motif, setMotif] = useState<string>(chapter?.illustration_motif ?? "flourish");
+  const [imageValue, setImageValue] = useState<string | null>(chapter?.image_url ?? null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void resolveStoryImage(imageValue).then((url) => {
+      if (!cancelled) setImagePreview(url);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [imageValue]);
+
+  const onPickFile = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const path = await uploadStoryImage(weddingId, file);
+      const previous = imageValue;
+      setImageValue(path);
+      if (previous && previous !== chapter?.image_url) void removeStoryImage(previous);
+      toast.success("Picture uploaded.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed.");
+    }
+    setUploading(false);
+  };
 
   const save = async () => {
     if (!title.trim() || !body.trim()) {
@@ -285,6 +318,7 @@ function ChapterDialog({
       body: body.trim(),
       event_date: eventDate || null,
       illustration_motif: motif,
+      image_url: imageValue,
     };
     if (isNew) {
       const { data, error } = await supabase
@@ -350,7 +384,46 @@ function ChapterDialog({
             <Textarea id="bd" value={body} onChange={(e) => setBody(e.target.value)} rows={5} maxLength={2000} />
           </div>
           <div className="space-y-1.5">
-            <Label>Illustration</Label>
+            <Label>Chapter picture</Label>
+            {imagePreview ? (
+              <div className="relative overflow-hidden rounded-lg border border-border">
+                <img src={imagePreview} alt="Chapter" className="h-40 w-full object-cover" />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={() => {
+                    if (imageValue && imageValue !== chapter?.image_url) void removeStoryImage(imageValue);
+                    setImageValue(null);
+                    setImagePreview(null);
+                  }}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                </Button>
+              </div>
+            ) : (
+              <label className="flex h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:bg-muted/30">
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <ImagePlus className="w-4 h-4" />
+                    <span>Upload a picture</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={(e) => void onPickFile(e.target.files?.[0])}
+                />
+              </label>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Illustration (fallback when no picture)</Label>
             <Select value={motif} onValueChange={setMotif}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
