@@ -161,7 +161,7 @@ function InvitationPage() {
         />
 
         <div className="mt-block grid gap-stack lg:grid-cols-2 lg:gap-block">
-          <ThemedCard variant="framed" ornament className="animate-ds-reveal-left">
+          <ThemedCard variant="framed" ornament className="animate-ds-reveal-left h-full">
             <Badge tone="primary">
               <CalendarDays aria-hidden="true" className="w-3 h-3" /> When
             </Badge>
@@ -203,7 +203,7 @@ function InvitationPage() {
 
           </ThemedCard>
 
-          <ThemedCard variant="framed" ornament className="animate-ds-reveal-right lg:mt-12">
+          <ThemedCard variant="framed" ornament className="animate-ds-reveal-right h-full">
             <Badge tone="leaf">
               <MapPin aria-hidden="true" className="w-3 h-3" /> Where
             </Badge>
