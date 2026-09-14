@@ -10,6 +10,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
 import {
+  resolveStoryImage,
+  uploadStoryImage,
+  removeStoryImage,
+} from "@/wedding/storyImage";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -84,7 +89,7 @@ function AdminStory() {
     setLoading(true);
     const { data, error } = await supabase
       .from("story_chapters")
-      .select("id, position, chapter_label, title, body, event_date, illustration_motif")
+      .select("id, position, chapter_label, title, body, event_date, illustration_motif, image_url")
       .eq("wedding_id", wedding.id)
       .order("position");
     if (error) toast.error(error.message);
