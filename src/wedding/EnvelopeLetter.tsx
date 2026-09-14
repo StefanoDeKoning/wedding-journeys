@@ -194,7 +194,7 @@ export function EnvelopeLetter({
 
             </div>
 
-            <span className="block mt-8 type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
+            <span className="block mt-8 text-[22px] type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
               tap to break the seal
             </span>
           </button>
@@ -214,7 +214,7 @@ export function EnvelopeLetter({
             <DecorCorner placement="corner-bottom-left" motif="leaf" size="xs" intensity={0.3} />
 
             <header className="text-center mb-8">
-              <p className="font-parchment-script text-3xl md:text-4xl">an invitation</p>
+              <p className="font-parchment-script text-[36px] md:text-[40px]">an invitation</p>
               <div className="mt-3 inline-block border-t border-b border-current/30 px-6 py-1">
                 <span className="type-label !text-current">Sealed with love</span>
               </div>

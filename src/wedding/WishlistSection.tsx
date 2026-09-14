@@ -44,7 +44,7 @@ export function WishlistSection({ weddingId }: { weddingId: string }) {
       <SectionHeader
         eyebrow="a small favor"
         script="our wishlist"
-        title="Gift ideas, if you're inclined"
+        title="Gift ideas"
         description="Your presence is the greatest gift. If you'd still like to spoil us, here are a few ideas."
       />
 
