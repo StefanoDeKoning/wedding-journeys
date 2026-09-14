@@ -15,6 +15,7 @@ import {
   EmptyState,
 } from "@/design-system";
 import { DecorMotifArt } from "@/design-system/decor/Illustrations";
+import { resolveStoryImages } from "@/wedding/storyImage";
 import type { DecorMotif } from "@/theme/types";
 
 export const Route = createFileRoute("/$slug/story")({
@@ -39,6 +40,7 @@ interface Chapter {
   body: string;
   event_date: string | null;
   illustration_motif: string | null;
+  image_url: string | null;
 }
 
 function formatChapterDate(iso: string | null) {
@@ -52,6 +54,7 @@ function formatChapterDate(iso: string | null) {
 function StoryPage() {
   const { wedding } = useWeddingContext();
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [images, setImages] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,13 +63,16 @@ function StoryPage() {
       setLoading(true);
       const { data } = await supabase
         .from("story_chapters")
-        .select("id, position, chapter_label, title, body, event_date, illustration_motif")
+        .select("id, position, chapter_label, title, body, event_date, illustration_motif, image_url")
         .eq("wedding_id", wedding.id)
         .order("position");
+      const rows = (data ?? []) as Chapter[];
       if (!cancelled) {
-        setChapters((data ?? []) as Chapter[]);
+        setChapters(rows);
         setLoading(false);
       }
+      const resolved = await resolveStoryImages(rows.map((r) => r.image_url));
+      if (!cancelled) setImages(resolved);
     })();
     return () => {
       cancelled = true;
@@ -103,7 +109,7 @@ function StoryPage() {
             {chapters.map((c, i) => (
               <div key={c.id}>
                 {i > 0 && <Divider motif={(c.illustration_motif as DecorMotif) ?? "flourish"} />}
-                <StoryChapter chapter={c} reverse={i % 2 === 1} />
+                <StoryChapter chapter={c} imageSrc={c.image_url ? images[c.image_url] : undefined} />
               </div>
             ))}
           </div>
@@ -113,27 +119,37 @@ function StoryPage() {
   );
 }
 
-function StoryChapter({ chapter, reverse }: { chapter: Chapter; reverse: boolean }) {
+function StoryChapter({ chapter, imageSrc }: { chapter: Chapter; imageSrc?: string }) {
   const dateLabel = formatChapterDate(chapter.event_date);
   const motif = (chapter.illustration_motif as DecorMotif) ?? "flourish";
 
   return (
-    <div className="grid items-center gap-block lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-      <div className={`flex justify-center ${reverse ? "lg:order-2" : "lg:order-1"}`}>
-        <ThemedCard variant="veil" className="flex h-48 w-48 items-center justify-center sm:h-56 sm:w-56">
-          <DecorMotifArt motif={motif} size="lg" intensity={0.85} />
-        </ThemedCard>
+    <article className="mx-auto flex max-w-3xl flex-col items-center text-center">
+      <div className="w-full animate-ds-reveal-up">
+        {imageSrc ? (
+          <ThemedCard variant="veil" className="overflow-hidden p-0">
+            <img
+              src={imageSrc}
+              alt={chapter.title}
+              loading="lazy"
+              className="aspect-[4/3] w-full object-cover"
+            />
+          </ThemedCard>
+        ) : (
+          <ThemedCard variant="veil" className="flex items-center justify-center py-12">
+            <DecorMotifArt motif={motif} size="lg" intensity={0.85} />
+          </ThemedCard>
+        )}
       </div>
-      <ThemedCard
-        variant="framed"
-        ornament
-        className={`${reverse ? "lg:order-1 animate-ds-reveal-right" : "lg:order-2 animate-ds-reveal-left"}`}
-      >
+
+      <ThemedCard variant="framed" ornament className="mt-block w-full animate-ds-reveal-up">
         {chapter.chapter_label && <Badge tone="gold">{chapter.chapter_label}</Badge>}
         <h2 className="type-section-title mt-4">{chapter.title}</h2>
         {dateLabel && <p className="type-label mt-1">{dateLabel}</p>}
-        <p className="type-body-lg mt-4 text-muted-foreground whitespace-pre-line">{chapter.body}</p>
+        <p className="type-body-lg mt-4 text-muted-foreground whitespace-pre-line text-left">
+          {chapter.body}
+        </p>
       </ThemedCard>
-    </div>
+    </article>
   );
 }
