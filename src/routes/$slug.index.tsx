@@ -78,9 +78,6 @@ function InvitationPage() {
       : (wedding.ceremony_at ?? wedding.reception_at));
 
 
-  const countdownLabel = isEvening
-    ? "until we celebrate together"
-    : "until we say I do";
 
   const recipientFirst = guest?.first_name ?? "Friend";
   const recipientLast = guest?.last_name ?? "";
