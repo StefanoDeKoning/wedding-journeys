@@ -68,6 +68,7 @@ interface Chapter {
   body: string;
   event_date: string | null;
   illustration_motif: string | null;
+  image_url: string | null;
 }
 
 function AdminStory() {
