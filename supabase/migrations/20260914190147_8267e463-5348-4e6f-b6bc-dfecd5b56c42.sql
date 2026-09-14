@@ -1,0 +1,1 @@
+ALTER TABLE public.story_chapters ADD COLUMN IF NOT EXISTS image_url text;
