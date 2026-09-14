@@ -78,9 +78,6 @@ function InvitationPage() {
       : (wedding.ceremony_at ?? wedding.reception_at));
 
 
-  const countdownLabel = isEvening
-    ? "until we celebrate together"
-    : "until we say I do";
 
   const recipientFirst = guest?.first_name ?? "Friend";
   const recipientLast = guest?.last_name ?? "";
@@ -127,7 +124,6 @@ function InvitationPage() {
           extra={
             <div className="flex flex-col items-center gap-4">
               <Divider className="w-full max-w-sm" />
-              {target && <Countdown target={target} label={countdownLabel} compact />}
             </div>
           }
         />
@@ -192,7 +188,7 @@ function InvitationPage() {
               </p>
             )}
             {target && (
-              <div className="mt-6 border-t border-paper pt-5">
+              <div className="mt-6 pt-5">
                 <Countdown
                   target={target}
                   label={
