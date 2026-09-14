@@ -573,6 +573,7 @@ export type Database = {
           event_date: string | null
           id: string
           illustration_motif: string | null
+          image_url: string | null
           position: number
           title: string
           updated_at: string
@@ -585,6 +586,7 @@ export type Database = {
           event_date?: string | null
           id?: string
           illustration_motif?: string | null
+          image_url?: string | null
           position?: number
           title: string
           updated_at?: string
@@ -597,6 +599,7 @@ export type Database = {
           event_date?: string | null
           id?: string
           illustration_motif?: string | null
+          image_url?: string | null
           position?: number
           title?: string
           updated_at?: string
