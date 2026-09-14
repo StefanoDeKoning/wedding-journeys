@@ -98,7 +98,7 @@ function InvitationPage() {
       <Container width="content">
         <Hero
           compact
-          script="together with their families"
+          script="together with the people they love"
           title={
             <>
               {wedding.bride_name}
