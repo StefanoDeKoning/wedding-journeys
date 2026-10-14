@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { WaxSeal, initialsFromCouple, type WaxSealMotif } from "./WaxSeal";
 import { renderInvitationText } from "./invitationTemplate";
-import { DecorCorner, Divider } from "@/design-system";
+import { DecorCorner } from "@/design-system";
 import { cn } from "@/lib/utils";
 
 interface EnvelopeLetterProps {
@@ -224,10 +224,6 @@ export function EnvelopeLetter({
 
             <div className="pt-6 text-center">
               <p className="font-parchment-script text-3xl md:text-4xl mt-2">{coupleSignature}</p>
-            </div>
-
-            <div className="mt-8">
-              <Divider />
             </div>
 
             {/* Tiny re-seal */}
