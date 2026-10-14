@@ -27,7 +27,6 @@ import {
   ThemedCard,
   ThemedButton,
   Badge,
-  Divider,
   Hero,
 } from "@/design-system";
 
@@ -121,11 +120,6 @@ function InvitationPage() {
               </span>
             )
           }
-          extra={
-            <div className="flex flex-col items-center gap-4">
-              <Divider className="w-full max-w-sm" />
-            </div>
-          }
         />
       </Container>
 
@@ -142,14 +136,7 @@ function InvitationPage() {
       </Section>
 
       {/* Wishlist / gift registry */}
-      {wedding.wishlist_enabled && (
-        <>
-          <Divider />
-          <WishlistSection weddingId={wedding.id} />
-        </>
-      )}
-
-      <Divider />
+      {wedding.wishlist_enabled && <WishlistSection weddingId={wedding.id} />}
 
       {/* Practical info — alternating, asymmetric rhythm rather than matched cards */}
       <Section size="spacious" width="content">
