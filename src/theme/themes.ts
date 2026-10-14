@@ -9,7 +9,7 @@ import type { ThemeDefinition, ThemeId } from "./types";
  */
 
 const ROMANTIC_GARDEN_FONTS = [
-  "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&display=swap",
+  "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Karla:ital,wght@0,400;0,500;0,600;1,400&display=swap",
 ];
 
 export const romanticGarden: ThemeDefinition = {
