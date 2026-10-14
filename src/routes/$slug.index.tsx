@@ -27,7 +27,6 @@ import {
   ThemedCard,
   ThemedButton,
   Badge,
-  Divider,
   Hero,
 } from "@/design-system";
 
@@ -120,11 +119,6 @@ function InvitationPage() {
                 )}
               </span>
             )
-          }
-          extra={
-            <div className="flex flex-col items-center gap-4">
-              <Divider className="w-full max-w-sm" />
-            </div>
           }
         />
       </Container>
