@@ -80,7 +80,7 @@ export function PageCanvas({
             loading="lazy"
             width={1024}
             height={1024}
-            className="animate-bouquet absolute -left-8 -top-6 w-[clamp(9rem,34vw,26rem)]"
+            className="animate-bouquet absolute -left-8 top-14 w-[clamp(9rem,34vw,26rem)]"
             style={{ opacity: Math.min(1, intensity + 0.15) }}
           />
           <img
