@@ -136,14 +136,7 @@ function InvitationPage() {
       </Section>
 
       {/* Wishlist / gift registry */}
-      {wedding.wishlist_enabled && (
-        <>
-          <Divider />
-          <WishlistSection weddingId={wedding.id} />
-        </>
-      )}
-
-      <Divider />
+      {wedding.wishlist_enabled && <WishlistSection weddingId={wedding.id} />}
 
       {/* Practical info — alternating, asymmetric rhythm rather than matched cards */}
       <Section size="spacious" width="content">
