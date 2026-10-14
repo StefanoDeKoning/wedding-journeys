@@ -444,7 +444,8 @@
 
   /* Typography */
   --ds-font-display: "Playfair Display", serif;
-  --ds-font-body: "Lora", serif;
+  --ds-font-body: "Karla", system-ui, sans-serif;
+  --ds-coral: oklch(0.64 0.15 28);
   --ds-font-script: "Great Vibes", cursive;
   --ds-tracking-label: 0.22em;
 
@@ -755,4 +756,22 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Accent coral for ampersands & small flourishes */
+@utility text-coral {
+  color: var(--ds-coral);
+}
+
+/* Gentle floating corner bouquets */
+@keyframes ds-bouquet-sway {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -6px, 0) rotate(-1.2deg); }
+}
+@utility animate-bouquet {
+  animation: ds-bouquet-sway 9s var(--ds-ease-soft) infinite;
+  transform-origin: top left;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-bouquet { animation: none; }
 }
