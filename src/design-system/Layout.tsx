@@ -143,7 +143,7 @@ export function Section({
   const pad = {
     compact: "py-block",
     regular: "py-section",
-    spacious: "py-section-lg",
+    spacious: "py-section",
     hero: "py-hero",
   } as const;
   return (
