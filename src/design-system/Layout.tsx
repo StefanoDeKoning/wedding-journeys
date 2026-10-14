@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import floralColumn from "@/assets/floral-column-gold.png.asset.json";
-import cornerBouquet from "@/assets/corner-bouquet.png.asset.json";
 import { useTheme } from "@/theme/ThemeProvider";
 
 import {
@@ -72,26 +71,6 @@ export function PageCanvas({
               style={{ opacity: intensity * 0.9 }}
             />
           </div>
-
-          {/* Watercolour corner bouquets spilling over the screen edges */}
-          <img
-            src={cornerBouquet.url}
-            alt=""
-            loading="lazy"
-            width={1024}
-            height={1024}
-            className="animate-bouquet absolute -left-8 top-14 w-[clamp(9rem,34vw,26rem)]"
-            style={{ opacity: Math.min(1, intensity + 0.15) }}
-          />
-          <img
-            src={cornerBouquet.url}
-            alt=""
-            loading="lazy"
-            width={1024}
-            height={1024}
-            className="absolute -right-8 top-[38rem] w-[clamp(8rem,28vw,22rem)] -scale-x-100 rotate-90 hidden sm:block"
-            style={{ opacity: intensity * 0.9 }}
-          />
 
           {/* Painted margins — softer and smaller on phones */}
           <div className="decor-fade-x hidden sm:block">

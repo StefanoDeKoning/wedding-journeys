@@ -99,7 +99,7 @@ function InvitationPage() {
           title={
             <>
               {wedding.bride_name}
-              <span className="type-script text-coral mx-4 align-baseline">&</span>
+              <span className="type-script mx-4 align-baseline">&</span>
               {wedding.groom_name}
             </>
           }
