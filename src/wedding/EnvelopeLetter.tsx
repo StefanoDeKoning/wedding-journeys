@@ -242,7 +242,7 @@ export function EnvelopeLetter({
               {/* Wax seal pinned to the flap point */}
               <div
                 className={cn(
-                  "absolute left-1/2 -translate-x-1/2 pointer-events-none",
+                  "absolute left-1/2 -translate-x-1/2 pointer-events-none w-[19.354839%] [&>svg]:w-full [&>svg]:h-auto",
                   stage === "closed" && "wax-pulse",
                   stage === "opening" && "wax-break",
                 )}
