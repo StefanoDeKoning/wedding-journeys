@@ -9,56 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as FeaturesRouteImport } from './routes/features'
-import { Route as DemoRouteImport } from './routes/demo'
-import { Route as CreateRouteImport } from './routes/create'
-import { Route as SlugRouteImport } from './routes/$slug'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SlugRouteImport } from './routes/$slug'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as DemoRouteImport } from './routes/demo'
+import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as SlugIndexRouteImport } from './routes/$slug.index'
-import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
-import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
-import { Route as SlugStoryRouteImport } from './routes/$slug.story'
-import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
-import { Route as SlugGuestbookRouteImport } from './routes/$slug.guestbook'
-import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
 import { Route as SlugAdminRouteImport } from './routes/$slug.admin'
-import { Route as AdminPlatformIndexRouteImport } from './routes/admin.platform.index'
+import { Route as SlugGalleryRouteImport } from './routes/$slug.gallery'
+import { Route as SlugGuestbookRouteImport } from './routes/$slug.guestbook'
+import { Route as SlugPlaylistRouteImport } from './routes/$slug.playlist'
+import { Route as SlugStoryRouteImport } from './routes/$slug.story'
+import { Route as SlugTimelineRouteImport } from './routes/$slug.timeline'
+import { Route as AdminPlatformRouteImport } from './routes/admin.platform'
 import { Route as SlugAdminIndexRouteImport } from './routes/$slug.admin.index'
-import { Route as AdminPlatformTodoTemplatesRouteImport } from './routes/admin.platform.todo-templates'
-import { Route as AdminPlatformClaimRouteImport } from './routes/admin.platform.claim'
-import { Route as SlugInviteCodeRouteImport } from './routes/$slug.invite.$code'
-import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
-import { Route as SlugAdminTodoRouteImport } from './routes/$slug.admin.todo'
-import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
-import { Route as SlugAdminStoryRouteImport } from './routes/$slug.admin.story'
-import { Route as SlugAdminSettingsRouteImport } from './routes/$slug.admin.settings'
-import { Route as SlugAdminSeatingRouteImport } from './routes/$slug.admin.seating'
-import { Route as SlugAdminRsvpRouteImport } from './routes/$slug.admin.rsvp'
-import { Route as SlugAdminPlaylistRouteImport } from './routes/$slug.admin.playlist'
-import { Route as SlugAdminPhotosRouteImport } from './routes/$slug.admin.photos'
-import { Route as SlugAdminInvitationRouteImport } from './routes/$slug.admin.invitation'
-import { Route as SlugAdminGuestbookRouteImport } from './routes/$slug.admin.guestbook'
 import { Route as SlugAdminBudgetRouteImport } from './routes/$slug.admin.budget'
+import { Route as SlugAdminGuestbookRouteImport } from './routes/$slug.admin.guestbook'
+import { Route as SlugAdminInvitationRouteImport } from './routes/$slug.admin.invitation'
+import { Route as SlugAdminPhotosRouteImport } from './routes/$slug.admin.photos'
+import { Route as SlugAdminPlaylistRouteImport } from './routes/$slug.admin.playlist'
+import { Route as SlugAdminRsvpRouteImport } from './routes/$slug.admin.rsvp'
+import { Route as SlugAdminSeatingRouteImport } from './routes/$slug.admin.seating'
+import { Route as SlugAdminSettingsRouteImport } from './routes/$slug.admin.settings'
+import { Route as SlugAdminStoryRouteImport } from './routes/$slug.admin.story'
+import { Route as SlugAdminTimelineRouteImport } from './routes/$slug.admin.timeline'
+import { Route as SlugAdminTodoRouteImport } from './routes/$slug.admin.todo'
+import { Route as SlugGalleryMeRouteImport } from './routes/$slug.gallery.me'
+import { Route as SlugInviteCodeRouteImport } from './routes/$slug.invite.$code'
+import { Route as AdminPlatformIndexRouteImport } from './routes/admin.platform.index'
+import { Route as AdminPlatformClaimRouteImport } from './routes/admin.platform.claim'
+import { Route as AdminPlatformTodoTemplatesRouteImport } from './routes/admin.platform.todo-templates'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeaturesRoute = FeaturesRouteImport.update({
-  id: '/features',
-  path: '/features',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoRoute = DemoRouteImport.update({
-  id: '/demo',
-  path: '/demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreateRoute = CreateRouteImport.update({
-  id: '/create',
-  path: '/create',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugRoute = SlugRouteImport.update({
@@ -66,9 +51,24 @@ const SlugRoute = SlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRoute = FeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlugIndexRoute = SlugIndexRouteImport.update({
@@ -76,29 +76,9 @@ const SlugIndexRoute = SlugIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SlugRoute,
 } as any)
-const AdminPlatformRoute = AdminPlatformRouteImport.update({
-  id: '/admin/platform',
-  path: '/admin/platform',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SlugTimelineRoute = SlugTimelineRouteImport.update({
-  id: '/timeline',
-  path: '/timeline',
-  getParentRoute: () => SlugRoute,
-} as any)
-const SlugStoryRoute = SlugStoryRouteImport.update({
-  id: '/story',
-  path: '/story',
-  getParentRoute: () => SlugRoute,
-} as any)
-const SlugPlaylistRoute = SlugPlaylistRouteImport.update({
-  id: '/playlist',
-  path: '/playlist',
-  getParentRoute: () => SlugRoute,
-} as any)
-const SlugGuestbookRoute = SlugGuestbookRouteImport.update({
-  id: '/guestbook',
-  path: '/guestbook',
+const SlugAdminRoute = SlugAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => SlugRoute,
 } as any)
 const SlugGalleryRoute = SlugGalleryRouteImport.update({
@@ -106,90 +86,34 @@ const SlugGalleryRoute = SlugGalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => SlugRoute,
 } as any)
-const SlugAdminRoute = SlugAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const SlugGuestbookRoute = SlugGuestbookRouteImport.update({
+  id: '/guestbook',
+  path: '/guestbook',
   getParentRoute: () => SlugRoute,
 } as any)
-const AdminPlatformIndexRoute = AdminPlatformIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminPlatformRoute,
+const SlugPlaylistRoute = SlugPlaylistRouteImport.update({
+  id: '/playlist',
+  path: '/playlist',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugStoryRoute = SlugStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => SlugRoute,
+} as any)
+const SlugTimelineRoute = SlugTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => SlugRoute,
+} as any)
+const AdminPlatformRoute = AdminPlatformRouteImport.update({
+  id: '/admin/platform',
+  path: '/admin/platform',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SlugAdminIndexRoute = SlugAdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const AdminPlatformTodoTemplatesRoute =
-  AdminPlatformTodoTemplatesRouteImport.update({
-    id: '/todo-templates',
-    path: '/todo-templates',
-    getParentRoute: () => AdminPlatformRoute,
-  } as any)
-const AdminPlatformClaimRoute = AdminPlatformClaimRouteImport.update({
-  id: '/claim',
-  path: '/claim',
-  getParentRoute: () => AdminPlatformRoute,
-} as any)
-const SlugInviteCodeRoute = SlugInviteCodeRouteImport.update({
-  id: '/invite/$code',
-  path: '/invite/$code',
-  getParentRoute: () => SlugRoute,
-} as any)
-const SlugGalleryMeRoute = SlugGalleryMeRouteImport.update({
-  id: '/me',
-  path: '/me',
-  getParentRoute: () => SlugGalleryRoute,
-} as any)
-const SlugAdminTodoRoute = SlugAdminTodoRouteImport.update({
-  id: '/todo',
-  path: '/todo',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminTimelineRoute = SlugAdminTimelineRouteImport.update({
-  id: '/timeline',
-  path: '/timeline',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminStoryRoute = SlugAdminStoryRouteImport.update({
-  id: '/story',
-  path: '/story',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminSettingsRoute = SlugAdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminSeatingRoute = SlugAdminSeatingRouteImport.update({
-  id: '/seating',
-  path: '/seating',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminRsvpRoute = SlugAdminRsvpRouteImport.update({
-  id: '/rsvp',
-  path: '/rsvp',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminPlaylistRoute = SlugAdminPlaylistRouteImport.update({
-  id: '/playlist',
-  path: '/playlist',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminPhotosRoute = SlugAdminPhotosRouteImport.update({
-  id: '/photos',
-  path: '/photos',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminInvitationRoute = SlugAdminInvitationRouteImport.update({
-  id: '/invitation',
-  path: '/invitation',
-  getParentRoute: () => SlugAdminRoute,
-} as any)
-const SlugAdminGuestbookRoute = SlugAdminGuestbookRouteImport.update({
-  id: '/guestbook',
-  path: '/guestbook',
   getParentRoute: () => SlugAdminRoute,
 } as any)
 const SlugAdminBudgetRoute = SlugAdminBudgetRouteImport.update({
@@ -197,6 +121,82 @@ const SlugAdminBudgetRoute = SlugAdminBudgetRouteImport.update({
   path: '/budget',
   getParentRoute: () => SlugAdminRoute,
 } as any)
+const SlugAdminGuestbookRoute = SlugAdminGuestbookRouteImport.update({
+  id: '/guestbook',
+  path: '/guestbook',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminInvitationRoute = SlugAdminInvitationRouteImport.update({
+  id: '/invitation',
+  path: '/invitation',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminPhotosRoute = SlugAdminPhotosRouteImport.update({
+  id: '/photos',
+  path: '/photos',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminPlaylistRoute = SlugAdminPlaylistRouteImport.update({
+  id: '/playlist',
+  path: '/playlist',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminRsvpRoute = SlugAdminRsvpRouteImport.update({
+  id: '/rsvp',
+  path: '/rsvp',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminSeatingRoute = SlugAdminSeatingRouteImport.update({
+  id: '/seating',
+  path: '/seating',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminSettingsRoute = SlugAdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminStoryRoute = SlugAdminStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminTimelineRoute = SlugAdminTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugAdminTodoRoute = SlugAdminTodoRouteImport.update({
+  id: '/todo',
+  path: '/todo',
+  getParentRoute: () => SlugAdminRoute,
+} as any)
+const SlugGalleryMeRoute = SlugGalleryMeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => SlugGalleryRoute,
+} as any)
+const SlugInviteCodeRoute = SlugInviteCodeRouteImport.update({
+  id: '/invite/$code',
+  path: '/invite/$code',
+  getParentRoute: () => SlugRoute,
+} as any)
+const AdminPlatformIndexRoute = AdminPlatformIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminPlatformRoute,
+} as any)
+const AdminPlatformClaimRoute = AdminPlatformClaimRouteImport.update({
+  id: '/claim',
+  path: '/claim',
+  getParentRoute: () => AdminPlatformRoute,
+} as any)
+const AdminPlatformTodoTemplatesRoute =
+  AdminPlatformTodoTemplatesRouteImport.update({
+    id: '/todo-templates',
+    path: '/todo-templates',
+    getParentRoute: () => AdminPlatformRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -406,32 +406,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/features': {
-      id: '/features'
-      path: '/features'
-      fullPath: '/features'
-      preLoaderRoute: typeof FeaturesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo': {
-      id: '/demo'
-      path: '/demo'
-      fullPath: '/demo'
-      preLoaderRoute: typeof DemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create': {
-      id: '/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof CreateRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug': {
@@ -441,11 +420,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$slug/': {
@@ -455,39 +455,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugIndexRouteImport
       parentRoute: typeof SlugRoute
     }
-    '/admin/platform': {
-      id: '/admin/platform'
-      path: '/admin/platform'
-      fullPath: '/admin/platform'
-      preLoaderRoute: typeof AdminPlatformRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/$slug/timeline': {
-      id: '/$slug/timeline'
-      path: '/timeline'
-      fullPath: '/$slug/timeline'
-      preLoaderRoute: typeof SlugTimelineRouteImport
-      parentRoute: typeof SlugRoute
-    }
-    '/$slug/story': {
-      id: '/$slug/story'
-      path: '/story'
-      fullPath: '/$slug/story'
-      preLoaderRoute: typeof SlugStoryRouteImport
-      parentRoute: typeof SlugRoute
-    }
-    '/$slug/playlist': {
-      id: '/$slug/playlist'
-      path: '/playlist'
-      fullPath: '/$slug/playlist'
-      preLoaderRoute: typeof SlugPlaylistRouteImport
-      parentRoute: typeof SlugRoute
-    }
-    '/$slug/guestbook': {
-      id: '/$slug/guestbook'
-      path: '/guestbook'
-      fullPath: '/$slug/guestbook'
-      preLoaderRoute: typeof SlugGuestbookRouteImport
+    '/$slug/admin': {
+      id: '/$slug/admin'
+      path: '/admin'
+      fullPath: '/$slug/admin'
+      preLoaderRoute: typeof SlugAdminRouteImport
       parentRoute: typeof SlugRoute
     }
     '/$slug/gallery': {
@@ -497,19 +469,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugGalleryRouteImport
       parentRoute: typeof SlugRoute
     }
-    '/$slug/admin': {
-      id: '/$slug/admin'
-      path: '/admin'
-      fullPath: '/$slug/admin'
-      preLoaderRoute: typeof SlugAdminRouteImport
+    '/$slug/guestbook': {
+      id: '/$slug/guestbook'
+      path: '/guestbook'
+      fullPath: '/$slug/guestbook'
+      preLoaderRoute: typeof SlugGuestbookRouteImport
       parentRoute: typeof SlugRoute
     }
-    '/admin/platform/': {
-      id: '/admin/platform/'
-      path: '/'
-      fullPath: '/admin/platform/'
-      preLoaderRoute: typeof AdminPlatformIndexRouteImport
-      parentRoute: typeof AdminPlatformRoute
+    '/$slug/playlist': {
+      id: '/$slug/playlist'
+      path: '/playlist'
+      fullPath: '/$slug/playlist'
+      preLoaderRoute: typeof SlugPlaylistRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/story': {
+      id: '/$slug/story'
+      path: '/story'
+      fullPath: '/$slug/story'
+      preLoaderRoute: typeof SlugStoryRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/$slug/timeline': {
+      id: '/$slug/timeline'
+      path: '/timeline'
+      fullPath: '/$slug/timeline'
+      preLoaderRoute: typeof SlugTimelineRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/admin/platform': {
+      id: '/admin/platform'
+      path: '/admin/platform'
+      fullPath: '/admin/platform'
+      preLoaderRoute: typeof AdminPlatformRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$slug/admin/': {
       id: '/$slug/admin/'
@@ -518,95 +511,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminIndexRouteImport
       parentRoute: typeof SlugAdminRoute
     }
-    '/admin/platform/todo-templates': {
-      id: '/admin/platform/todo-templates'
-      path: '/todo-templates'
-      fullPath: '/admin/platform/todo-templates'
-      preLoaderRoute: typeof AdminPlatformTodoTemplatesRouteImport
-      parentRoute: typeof AdminPlatformRoute
-    }
-    '/admin/platform/claim': {
-      id: '/admin/platform/claim'
-      path: '/claim'
-      fullPath: '/admin/platform/claim'
-      preLoaderRoute: typeof AdminPlatformClaimRouteImport
-      parentRoute: typeof AdminPlatformRoute
-    }
-    '/$slug/invite/$code': {
-      id: '/$slug/invite/$code'
-      path: '/invite/$code'
-      fullPath: '/$slug/invite/$code'
-      preLoaderRoute: typeof SlugInviteCodeRouteImport
-      parentRoute: typeof SlugRoute
-    }
-    '/$slug/gallery/me': {
-      id: '/$slug/gallery/me'
-      path: '/me'
-      fullPath: '/$slug/gallery/me'
-      preLoaderRoute: typeof SlugGalleryMeRouteImport
-      parentRoute: typeof SlugGalleryRoute
-    }
-    '/$slug/admin/todo': {
-      id: '/$slug/admin/todo'
-      path: '/todo'
-      fullPath: '/$slug/admin/todo'
-      preLoaderRoute: typeof SlugAdminTodoRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/timeline': {
-      id: '/$slug/admin/timeline'
-      path: '/timeline'
-      fullPath: '/$slug/admin/timeline'
-      preLoaderRoute: typeof SlugAdminTimelineRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/story': {
-      id: '/$slug/admin/story'
-      path: '/story'
-      fullPath: '/$slug/admin/story'
-      preLoaderRoute: typeof SlugAdminStoryRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/settings': {
-      id: '/$slug/admin/settings'
-      path: '/settings'
-      fullPath: '/$slug/admin/settings'
-      preLoaderRoute: typeof SlugAdminSettingsRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/seating': {
-      id: '/$slug/admin/seating'
-      path: '/seating'
-      fullPath: '/$slug/admin/seating'
-      preLoaderRoute: typeof SlugAdminSeatingRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/rsvp': {
-      id: '/$slug/admin/rsvp'
-      path: '/rsvp'
-      fullPath: '/$slug/admin/rsvp'
-      preLoaderRoute: typeof SlugAdminRsvpRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/playlist': {
-      id: '/$slug/admin/playlist'
-      path: '/playlist'
-      fullPath: '/$slug/admin/playlist'
-      preLoaderRoute: typeof SlugAdminPlaylistRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/photos': {
-      id: '/$slug/admin/photos'
-      path: '/photos'
-      fullPath: '/$slug/admin/photos'
-      preLoaderRoute: typeof SlugAdminPhotosRouteImport
-      parentRoute: typeof SlugAdminRoute
-    }
-    '/$slug/admin/invitation': {
-      id: '/$slug/admin/invitation'
-      path: '/invitation'
-      fullPath: '/$slug/admin/invitation'
-      preLoaderRoute: typeof SlugAdminInvitationRouteImport
+    '/$slug/admin/budget': {
+      id: '/$slug/admin/budget'
+      path: '/budget'
+      fullPath: '/$slug/admin/budget'
+      preLoaderRoute: typeof SlugAdminBudgetRouteImport
       parentRoute: typeof SlugAdminRoute
     }
     '/$slug/admin/guestbook': {
@@ -616,12 +525,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlugAdminGuestbookRouteImport
       parentRoute: typeof SlugAdminRoute
     }
-    '/$slug/admin/budget': {
-      id: '/$slug/admin/budget'
-      path: '/budget'
-      fullPath: '/$slug/admin/budget'
-      preLoaderRoute: typeof SlugAdminBudgetRouteImport
+    '/$slug/admin/invitation': {
+      id: '/$slug/admin/invitation'
+      path: '/invitation'
+      fullPath: '/$slug/admin/invitation'
+      preLoaderRoute: typeof SlugAdminInvitationRouteImport
       parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/photos': {
+      id: '/$slug/admin/photos'
+      path: '/photos'
+      fullPath: '/$slug/admin/photos'
+      preLoaderRoute: typeof SlugAdminPhotosRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/playlist': {
+      id: '/$slug/admin/playlist'
+      path: '/playlist'
+      fullPath: '/$slug/admin/playlist'
+      preLoaderRoute: typeof SlugAdminPlaylistRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/rsvp': {
+      id: '/$slug/admin/rsvp'
+      path: '/rsvp'
+      fullPath: '/$slug/admin/rsvp'
+      preLoaderRoute: typeof SlugAdminRsvpRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/seating': {
+      id: '/$slug/admin/seating'
+      path: '/seating'
+      fullPath: '/$slug/admin/seating'
+      preLoaderRoute: typeof SlugAdminSeatingRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/settings': {
+      id: '/$slug/admin/settings'
+      path: '/settings'
+      fullPath: '/$slug/admin/settings'
+      preLoaderRoute: typeof SlugAdminSettingsRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/story': {
+      id: '/$slug/admin/story'
+      path: '/story'
+      fullPath: '/$slug/admin/story'
+      preLoaderRoute: typeof SlugAdminStoryRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/timeline': {
+      id: '/$slug/admin/timeline'
+      path: '/timeline'
+      fullPath: '/$slug/admin/timeline'
+      preLoaderRoute: typeof SlugAdminTimelineRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/admin/todo': {
+      id: '/$slug/admin/todo'
+      path: '/todo'
+      fullPath: '/$slug/admin/todo'
+      preLoaderRoute: typeof SlugAdminTodoRouteImport
+      parentRoute: typeof SlugAdminRoute
+    }
+    '/$slug/gallery/me': {
+      id: '/$slug/gallery/me'
+      path: '/me'
+      fullPath: '/$slug/gallery/me'
+      preLoaderRoute: typeof SlugGalleryMeRouteImport
+      parentRoute: typeof SlugGalleryRoute
+    }
+    '/$slug/invite/$code': {
+      id: '/$slug/invite/$code'
+      path: '/invite/$code'
+      fullPath: '/$slug/invite/$code'
+      preLoaderRoute: typeof SlugInviteCodeRouteImport
+      parentRoute: typeof SlugRoute
+    }
+    '/admin/platform/': {
+      id: '/admin/platform/'
+      path: '/'
+      fullPath: '/admin/platform/'
+      preLoaderRoute: typeof AdminPlatformIndexRouteImport
+      parentRoute: typeof AdminPlatformRoute
+    }
+    '/admin/platform/claim': {
+      id: '/admin/platform/claim'
+      path: '/claim'
+      fullPath: '/admin/platform/claim'
+      preLoaderRoute: typeof AdminPlatformClaimRouteImport
+      parentRoute: typeof AdminPlatformRoute
+    }
+    '/admin/platform/todo-templates': {
+      id: '/admin/platform/todo-templates'
+      path: '/todo-templates'
+      fullPath: '/admin/platform/todo-templates'
+      preLoaderRoute: typeof AdminPlatformTodoTemplatesRouteImport
+      parentRoute: typeof AdminPlatformRoute
     }
   }
 }
