@@ -122,7 +122,7 @@ export function Container({
   );
 }
 
-/** Vertical rhythm wrapper for a page section. */
+/** Vertical rhythm lives below each section so adjacent spacing never doubles. */
 export function Section({
   children,
   className,
@@ -141,13 +141,13 @@ export function Section({
   id?: string;
 }) {
   const pad = {
-    compact: "py-block",
-    regular: "py-section",
-    spacious: "py-section",
-    hero: "py-hero",
+    compact: "pb-block",
+    regular: "pb-section",
+    spacious: "pb-section",
+    hero: "pb-section",
   } as const;
   return (
-    <Tag id={id} className={cn("relative", pad[size], className)}>
+    <Tag id={id} className={cn("relative", pad[size], className, "pt-0")}>
       <Container width={width} className={containerClassName}>
         {children}
       </Container>
