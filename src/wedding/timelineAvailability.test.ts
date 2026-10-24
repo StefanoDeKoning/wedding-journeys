@@ -1,18 +1,19 @@
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "node:test";
+import { strict as assert } from "node:assert";
 import { canViewTimeline } from "./timelineAvailability";
 
 describe("timeline release", () => {
   test("guests cannot see an unavailable timeline", () => {
-    expect(canViewTimeline(false, false)).toBe(false);
+    assert.equal(canViewTimeline(false, false), false);
   });
   test("guests see the timeline after explicit release", () => {
-    expect(canViewTimeline(true, false)).toBe(true);
+    assert.equal(canViewTimeline(true, false), true);
   });
   test("administrators preview before release", () => {
-    expect(canViewTimeline(false, true)).toBe(true);
+    assert.equal(canViewTimeline(false, true), true);
   });
   test("unresolved availability cannot flash timeline content", () => {
-    expect(canViewTimeline(undefined, false)).toBe(false);
-    expect(canViewTimeline(null, false)).toBe(false);
+    assert.equal(canViewTimeline(undefined, false), false);
+    assert.equal(canViewTimeline(null, false), false);
   });
 });
