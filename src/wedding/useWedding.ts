@@ -54,7 +54,7 @@ export function useWedding(slug: string): WeddingState {
       const { data } = await supabase
         .from("weddings")
         .select(
-          "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, invitation_text, rsvp_deadline, status, invitation_title, invitation_content, invitation_template, invitation_visible, wishlist_enabled, story_enabled, gallery_enabled, playlist_enabled, guestbook_enabled, ceremony_master_name, ceremony_master_role, ceremony_master_phone, ceremony_master_email",
+          "id, slug, wedding_name, bride_name, groom_name, wedding_date, ceremony_at, reception_at, location_name, location_address, maps_url, invitation_message, invitation_text, rsvp_deadline, status, invitation_title, invitation_content, invitation_template, invitation_visible, wishlist_enabled, story_enabled, gallery_enabled, playlist_enabled, guestbook_enabled, timeline_available, ceremony_master_name, ceremony_master_role, ceremony_master_phone, ceremony_master_email",
         )
         .eq("slug", slug)
         .maybeSingle();
@@ -99,14 +99,12 @@ export function useWedding(slug: string): WeddingState {
       setGuest(null);
     }
 
-    // Admin check via wedding_members
-    const { data: membership } = await supabase
-      .from("wedding_members")
-      .select("role")
-      .eq("wedding_id", w.id)
-      .eq("user_id", user.id)
-      .maybeSingle();
-    setIsAdmin(!!membership);
+    // Use the same role check as RLS, including platform administrators.
+    const { data: adminAccess } = await supabase.rpc("is_wedding_admin", {
+      _wedding_id: w.id,
+      _user_id: user.id,
+    });
+    setIsAdmin(adminAccess === true);
 
     setLoading(false);
   };
