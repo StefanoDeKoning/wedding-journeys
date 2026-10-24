@@ -76,6 +76,8 @@ function AdminTimeline() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Event | null>(null);
   const [adding, setAdding] = useState(false);
+  const [timelineAvailable, setTimelineAvailable] = useState<boolean | null>(null);
+  const [savingAvailability, setSavingAvailability] = useState(false);
 
   const load = async () => {
     if (!wedding) return;
@@ -92,7 +94,10 @@ function AdminTimeline() {
   };
 
   useEffect(() => {
-    if (wedding) void load();
+    if (wedding) {
+      setTimelineAvailable(wedding.timeline_available === true);
+      void load();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wedding?.id]);
 
@@ -150,10 +155,49 @@ function AdminTimeline() {
     }
   };
 
+  const toggleAvailability = async () => {
+    if (!wedding || savingAvailability || timelineAvailable === null) return;
+    setSavingAvailability(true);
+    const next = !timelineAvailable;
+    const { data, error } = await supabase
+      .from("weddings")
+      .update({ timeline_available: next })
+      .eq("id", wedding.id)
+      .select("timeline_available")
+      .single();
+    setSavingAvailability(false);
+    if (error || !data) {
+      toast.error("Could not save timeline availability. Please try again.");
+      return;
+    }
+    setTimelineAvailable(data.timeline_available);
+    toast.success(next ? "Timeline available to guests" : "Timeline hidden from guests");
+  };
+
   if (!wedding) return null;
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
+        <div className="min-w-0">
+          <p className="font-medium">Show timeline to guests</p>
+          <p className="text-sm text-muted-foreground">
+            {timelineAvailable === null
+              ? "Loading…"
+              : timelineAvailable
+                ? "Guests can see the timeline now."
+                : "Guests see a \"Coming soon\" screen until you turn this on."}
+          </p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          {savingAvailability && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
+          <Switch
+            checked={timelineAvailable === true}
+            disabled={savingAvailability || timelineAvailable === null}
+            onCheckedChange={toggleAvailability}
+          />
+        </div>
+      </div>
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
           Build your wedding day. Drag to reorder, hide events from guests anytime.
