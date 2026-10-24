@@ -94,7 +94,10 @@ function AdminTimeline() {
   };
 
   useEffect(() => {
-    if (wedding) void load();
+    if (wedding) {
+      setTimelineAvailable(wedding.timeline_available === true);
+      void load();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wedding?.id]);
 
