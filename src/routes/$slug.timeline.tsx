@@ -5,6 +5,7 @@ import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveTimelinePicture } from "@/wedding/timelineIllustrations";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
+import { canViewTimeline } from "@/wedding/timelineAvailability";
 import {
   PageCanvas,
   Container,
@@ -19,8 +20,12 @@ import {
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
     meta: [
-      { title: "Timeline" },
-      { name: "description", content: "How the day unfolds." },
+      { title: "Wedding timeline — OurJourney" },
+      { name: "description", content: "The schedule for your OurJourney wedding celebration." },
+      { property: "og:title", content: "Wedding timeline — OurJourney" },
+      { property: "og:description", content: "The schedule for your wedding celebration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TimelinePage,
@@ -40,7 +45,8 @@ interface TEvent {
 
 
 function TimelinePage() {
-  const { wedding, guest } = useWeddingContext();
+  const { wedding, guest, isAdmin } = useWeddingContext();
+  const timelineVisible = canViewTimeline(wedding.timeline_available, isAdmin);
   const [events, setEvents] = useState<TEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState<Date>(() => new Date());
@@ -52,6 +58,11 @@ function TimelinePage() {
 
   useEffect(() => {
     let cancelled = false;
+    if (!timelineVisible) {
+      setEvents([]);
+      setLoading(false);
+      return;
+    }
     (async () => {
       setLoading(true);
       const { data } = await supabase
@@ -68,7 +79,7 @@ function TimelinePage() {
     return () => {
       cancelled = true;
     };
-  }, [wedding.id]);
+  }, [wedding.id, timelineVisible]);
 
   const isEvening = guest?.guest_type === "evening";
   const visibleEvents = useMemo(
@@ -95,6 +106,23 @@ function TimelinePage() {
       return evDate.getTime() >= now.getTime();
     });
   }, [visibleEvents, wedding.wedding_date, now]);
+
+  if (!timelineVisible) {
+    return (
+      <PageCanvas density="regular">
+        <Container width="prose">
+          <Hero
+            script="how the day unfolds"
+            title="Coming soon"
+            subtitle="The timeline will be shared soon. Come back a little later!"
+          />
+        </Container>
+        <Section size="compact">
+          <EmptyState motif="olive-branch" title="Wedding timeline" />
+        </Section>
+      </PageCanvas>
+    );
+  }
 
   return (
     <PageCanvas density="regular">

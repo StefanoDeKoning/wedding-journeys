@@ -12,6 +12,7 @@ import {
   EyeOff,
   ExternalLink,
   ListTodo,
+  CalendarHeart,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useWedding } from "@/wedding/useWedding";
@@ -20,6 +21,16 @@ import { setWeddingStatus } from "@/auth/wedding.functions";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/$slug/admin/")({
+  head: () => ({
+    meta: [
+      { title: "Wedding dashboard — OurJourney" },
+      { name: "description", content: "Manage your wedding and release the timeline to guests." },
+      { property: "og:title", content: "Wedding dashboard — OurJourney" },
+      { property: "og:description", content: "Manage your wedding and timeline availability." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AdminOverview,
 });
 
@@ -43,10 +54,14 @@ function AdminOverview() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [localStatus, setLocalStatus] = useState<"draft" | "published" | null>(null);
+  const [timelineAvailable, setTimelineAvailable] = useState<boolean | null>(null);
+  const [savingTimeline, setSavingTimeline] = useState(false);
+  const [timelineError, setTimelineError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!wedding) return;
     setLocalStatus(wedding.status);
+    setTimelineAvailable(wedding.timeline_available === true);
     void (async () => {
       const [guests, rsvps, photos, songs, used, weddingRow, todos] = await Promise.all([
         supabase.from("guests").select("id", { count: "exact", head: true }).eq("wedding_id", wedding.id),
@@ -115,6 +130,30 @@ function AdminOverview() {
     }
     toast.success(next === "published" ? "Website published" : "Website unpublished");
     void refresh();
+  };
+
+  const handleTimelineAvailability = async () => {
+    if (!wedding || savingTimeline || timelineAvailable === null) return;
+    setSavingTimeline(true);
+    setTimelineError(null);
+    const next = !timelineAvailable;
+    try {
+      const { data, error } = await supabase
+        .from("weddings")
+        .update({ timeline_available: next })
+        .eq("id", wedding.id)
+        .select("timeline_available")
+        .single();
+      if (error || !data) throw new Error("Could not save timeline availability. Please try again.");
+      setTimelineAvailable(data.timeline_available);
+      toast.success(next ? "Timeline available to guests" : "Timeline hidden from guests");
+    } catch {
+      const message = "Could not save timeline availability. Please try again.";
+      setTimelineError(message);
+      toast.error(message);
+    } finally {
+      setSavingTimeline(false);
+    }
   };
 
   if (!wedding || !stats || !localStatus) {
@@ -200,6 +239,29 @@ function AdminOverview() {
           </div>
         </div>
       </div>
+
+      <section className="border-b border-border pb-6" aria-labelledby="timeline-availability-title">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 id="timeline-availability-title" className="flex items-center gap-2 font-display text-lg">
+              <CalendarHeart className="h-4 w-4 text-primary" /> Timeline
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground" role="status">
+              {timelineAvailable ? "Available to guests" : "Not available"}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant={timelineAvailable ? "outline" : "default"}
+            disabled={savingTimeline || timelineAvailable === null}
+            onClick={handleTimelineAvailability}
+          >
+            {savingTimeline && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+            {timelineAvailable ? "Make unavailable" : "Make available"}
+          </Button>
+        </div>
+        {timelineError && <p role="alert" className="mt-2 text-sm text-destructive">{timelineError}</p>}
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
