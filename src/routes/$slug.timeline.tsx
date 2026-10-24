@@ -5,6 +5,7 @@ import { useWeddingContext } from "@/wedding/WeddingContext";
 import { supabase } from "@/integrations/supabase/client";
 import { resolveTimelinePicture } from "@/wedding/timelineIllustrations";
 import { canGuestSeeEvent } from "@/wedding/timelineVisibility";
+import { canViewTimeline } from "@/wedding/timelineAvailability";
 import {
   PageCanvas,
   Container,
@@ -45,7 +46,7 @@ interface TEvent {
 
 function TimelinePage() {
   const { wedding, guest, isAdmin } = useWeddingContext();
-  const canViewTimeline = isAdmin || wedding.timeline_available === true;
+  const timelineVisible = canViewTimeline(wedding.timeline_available, isAdmin);
   const [events, setEvents] = useState<TEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState<Date>(() => new Date());
@@ -57,7 +58,7 @@ function TimelinePage() {
 
   useEffect(() => {
     let cancelled = false;
-    if (!canViewTimeline) {
+    if (!timelineVisible) {
       setEvents([]);
       setLoading(false);
       return;
@@ -78,7 +79,7 @@ function TimelinePage() {
     return () => {
       cancelled = true;
     };
-  }, [wedding.id, canViewTimeline]);
+  }, [wedding.id, timelineVisible]);
 
   const isEvening = guest?.guest_type === "evening";
   const visibleEvents = useMemo(
@@ -106,7 +107,7 @@ function TimelinePage() {
     });
   }, [visibleEvents, wedding.wedding_date, now]);
 
-  if (!canViewTimeline) {
+  if (!timelineVisible) {
     return (
       <PageCanvas density="regular">
         <Container width="prose">
