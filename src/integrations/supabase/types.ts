@@ -852,6 +852,7 @@ export type Database = {
           status: Database["public"]["Enums"]["wedding_status"]
           storage_limit_bytes: number
           story_enabled: boolean
+          timeline_available: boolean
           updated_at: string
           wedding_date: string | null
           wedding_name: string | null
@@ -889,6 +890,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["wedding_status"]
           storage_limit_bytes?: number
           story_enabled?: boolean
+          timeline_available?: boolean
           updated_at?: string
           wedding_date?: string | null
           wedding_name?: string | null
@@ -926,6 +928,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["wedding_status"]
           storage_limit_bytes?: number
           story_enabled?: boolean
+          timeline_available?: boolean
           updated_at?: string
           wedding_date?: string | null
           wedding_name?: string | null
