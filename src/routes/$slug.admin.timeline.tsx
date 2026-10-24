@@ -76,6 +76,8 @@ function AdminTimeline() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Event | null>(null);
   const [adding, setAdding] = useState(false);
+  const [timelineAvailable, setTimelineAvailable] = useState<boolean | null>(null);
+  const [savingAvailability, setSavingAvailability] = useState(false);
 
   const load = async () => {
     if (!wedding) return;
