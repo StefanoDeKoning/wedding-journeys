@@ -176,7 +176,7 @@ function TimelinePage() {
                 const isLeft = i % 2 === 0;
                 return (
                   <li key={e.id}>
-                    <TimelineChapter event={e} isNext={isNext} isLeft={isLeft} />
+                    <TimelineChapter event={e} isNext={isNext} isLeft={isLeft} isAdmin={isAdmin} />
                   </li>
                 );
               })}
