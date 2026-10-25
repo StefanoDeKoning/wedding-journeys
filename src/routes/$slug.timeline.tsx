@@ -41,6 +41,7 @@ interface TEvent {
   event_time: string;
   visibility: "all" | "day" | "evening";
   position: number;
+  is_visible: boolean;
 }
 
 
@@ -67,7 +68,7 @@ function TimelinePage() {
       setLoading(true);
       const { data } = await supabase
         .from("timeline_events")
-        .select("id, title, description, location, category, illustration, event_time, visibility, position")
+        .select("id, title, description, location, category, illustration, event_time, visibility, position, is_visible")
         .eq("wedding_id", wedding.id)
         .order("position")
         .order("event_time");
@@ -137,6 +138,16 @@ function TimelinePage() {
         />
       </Container>
 
+      {isAdmin && wedding.timeline_available !== true && (
+        <Container width="prose">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Preview for you as admin.</span> Guests
+            see a "Coming soon" screen until you turn on "Show timeline to guests" in the admin
+            timeline settings.
+          </div>
+        </Container>
+      )}
+
       {loading ? (
         <Section size="compact">
           <div className="py-12 text-center text-muted-foreground">
@@ -165,7 +176,7 @@ function TimelinePage() {
                 const isLeft = i % 2 === 0;
                 return (
                   <li key={e.id}>
-                    <TimelineChapter event={e} isNext={isNext} isLeft={isLeft} />
+                    <TimelineChapter event={e} isNext={isNext} isLeft={isLeft} isAdmin={isAdmin} />
                   </li>
                 );
               })}
@@ -182,10 +193,12 @@ function TimelineChapter({
   event: e,
   isNext,
   isLeft,
+  isAdmin,
 }: {
   event: TEvent;
   isNext: boolean;
   isLeft: boolean;
+  isAdmin: boolean;
 }) {
   const picture = resolveTimelinePicture(e.illustration, e.category, e.title);
 
@@ -209,6 +222,7 @@ function TimelineChapter({
               </span>
               <h3 className="type-card-title">{e.title}</h3>
               {isNext && <Badge tone="primary">Up next</Badge>}
+              {isAdmin && !e.is_visible && <Badge tone="muted">Hidden from guests</Badge>}
             </div>
             {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
             {e.location && (
