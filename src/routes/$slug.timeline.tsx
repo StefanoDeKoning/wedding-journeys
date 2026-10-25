@@ -138,6 +138,16 @@ function TimelinePage() {
         />
       </Container>
 
+      {isAdmin && wedding.timeline_available !== true && (
+        <Container width="prose">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Preview for you as admin.</span> Guests
+            see a "Coming soon" screen until you turn on "Show timeline to guests" in the admin
+            timeline settings.
+          </div>
+        </Container>
+      )}
+
       {loading ? (
         <Section size="compact">
           <div className="py-12 text-center text-muted-foreground">
