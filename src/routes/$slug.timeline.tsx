@@ -41,6 +41,7 @@ interface TEvent {
   event_time: string;
   visibility: "all" | "day" | "evening";
   position: number;
+  is_visible: boolean;
 }
 
 
