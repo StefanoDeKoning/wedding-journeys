@@ -68,7 +68,7 @@ function TimelinePage() {
       setLoading(true);
       const { data } = await supabase
         .from("timeline_events")
-        .select("id, title, description, location, category, illustration, event_time, visibility, position")
+        .select("id, title, description, location, category, illustration, event_time, visibility, position, is_visible")
         .eq("wedding_id", wedding.id)
         .order("position")
         .order("event_time");
