@@ -193,10 +193,12 @@ function TimelineChapter({
   event: e,
   isNext,
   isLeft,
+  isAdmin,
 }: {
   event: TEvent;
   isNext: boolean;
   isLeft: boolean;
+  isAdmin: boolean;
 }) {
   const picture = resolveTimelinePicture(e.illustration, e.category, e.title);
 
@@ -220,6 +222,7 @@ function TimelineChapter({
               </span>
               <h3 className="type-card-title">{e.title}</h3>
               {isNext && <Badge tone="primary">Up next</Badge>}
+              {isAdmin && !e.is_visible && <Badge tone="muted">Hidden from guests</Badge>}
             </div>
             {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
             {e.location && (
