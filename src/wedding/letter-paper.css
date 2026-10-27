@@ -184,10 +184,10 @@
   z-index: 1;
   padding: clamp(56px, 9vw, 96px) clamp(30px, 8vw, 84px);
   color: var(--letter-ink);
-  /* ink sinks into the paper, so the grain shows through the letters */
+  /* ink sinks into the paper, so a hint of texture shows through the letters */
   mix-blend-mode: multiply;
   /* letterpress: a faint light edge under each letter */
-  text-shadow: 0 1px 0 rgb(255 255 255 / 0.45);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.2);
 }
 
 .letter-content header {
@@ -202,8 +202,18 @@
   border-bottom: 1px solid rgb(74 52 38 / 0.3);
 }
 
+/* Letter typography: sized up for comfortable reading on paper, on any screen */
 .letter-body {
   white-space: pre-line;
+  font-family: var(--ds-font-body);
+  font-size: clamp(1.0625rem, 1.1rem + 0.4vw, 1.25rem);
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+
+.letter-content header .letter-rule .type-label {
+  font-size: 0.75rem;
+  letter-spacing: calc(var(--ds-tracking-label, 0.08em) + 0.02em);
 }
 
 .letter-signature {
