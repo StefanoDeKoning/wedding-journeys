@@ -47,35 +47,36 @@ function PaperFilters({ id }: { id: string }) {
           <feComposite in="m2" in2="SourceAlpha" operator="in" />
         </filter>
 
-        {/* Letter paper: the same grain, a little softer, plus a slightly irregular edge */}
+        {/* Letter paper: a very soft tooth (kept light so the ink stays crisp),
+            plus a slightly irregular edge */}
         <filter id={`${id}-paper`} x="-2%" y="-2%" width="104%" height="104%" colorInterpolationFilters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency={0.45} numOctaves={2} seed={3} result="grain" />
-          <feDiffuseLighting in="grain" surfaceScale={0.55} diffuseConstant={1.13} lightingColor="#ffffff" result="tooth">
-            <feDistantLight azimuth={225} elevation={62} />
+          <feTurbulence type="fractalNoise" baseFrequency={0.22} numOctaves={2} seed={3} result="grain" />
+          <feDiffuseLighting in="grain" surfaceScale={0.28} diffuseConstant={1.08} lightingColor="#ffffff" result="tooth">
+            <feDistantLight azimuth={225} elevation={72} />
           </feDiffuseLighting>
           <feTurbulence type="fractalNoise" baseFrequency="0.006 0.01" numOctaves={3} seed={12} result="mott" />
           <feColorMatrix
             in="mott"
             type="matrix"
-            values="0.12 0 0 0 0.88  0.12 0 0 0 0.86  0.12 0 0 0 0.82  0 0 0 0 1"
+            values="0.07 0 0 0 0.93  0.07 0 0 0 0.92  0.07 0 0 0 0.89  0 0 0 0 1"
             result="cloud"
           />
-          <feBlend in="SourceGraphic" in2="tooth" mode="multiply" result="m1" />
+          <feBlend in="SourceGraphic" in2="tooth" mode="soft-light" result="m1" />
           <feBlend in="m1" in2="cloud" mode="multiply" result="m2" />
           <feComposite in="m2" in2="SourceAlpha" operator="in" result="clipped" />
           <feTurbulence type="fractalNoise" baseFrequency={0.03} numOctaves={2} seed={8} result="wob" />
-          <feDisplacementMap in="clipped" in2="wob" scale={16} xChannelSelector="R" yChannelSelector="G" result="d1" />
+          <feDisplacementMap in="clipped" in2="wob" scale={14} xChannelSelector="R" yChannelSelector="G" result="d1" />
           <feTurbulence type="fractalNoise" baseFrequency={0.8} numOctaves={2} seed={2} result="fine" />
-          <feDisplacementMap in="d1" in2="fine" scale={5} xChannelSelector="G" yChannelSelector="R" />
+          <feDisplacementMap in="d1" in2="fine" scale={2} xChannelSelector="G" yChannelSelector="R" />
         </filter>
 
-        {/* Ink: uneven density and slightly soft edges, like pressed or pen ink */}
+        {/* Ink: gently uneven density with soft edges — readable first, textured second */}
         <filter id={`${id}-ink`} x="-2%" y="-2%" width="104%" height="104%" colorInterpolationFilters="sRGB">
           <feTurbulence type="fractalNoise" baseFrequency={0.9} numOctaves={2} seed={5} result="n" />
-          <feDisplacementMap in="SourceGraphic" in2="n" scale={2.2} xChannelSelector="R" yChannelSelector="G" result="rough" />
-          <feGaussianBlur in="rough" stdDeviation={0.3} result="soft" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale={0.8} xChannelSelector="R" yChannelSelector="G" result="rough" />
+          <feGaussianBlur in="rough" stdDeviation={0.15} result="soft" />
           <feTurbulence type="fractalNoise" baseFrequency={0.04} numOctaves={2} seed={21} result="dens" />
-          <feColorMatrix in="dens" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 1.2 0 0 0.3" result="densA" />
+          <feColorMatrix in="dens" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0.25 0 0 0.75" result="densA" />
           <feComposite in="soft" in2="densA" operator="in" />
         </filter>
       </defs>
@@ -277,7 +278,7 @@ export function EnvelopeLetter({
                 </div>
               </header>
 
-              <div className="letter-body space-y-5 type-body">{letterBody}</div>
+              <div className="letter-body space-y-5">{letterBody}</div>
 
               <div className="letter-signature">
                 <p className="font-parchment-script text-3xl md:text-4xl mt-2">{coupleSignature}</p>
