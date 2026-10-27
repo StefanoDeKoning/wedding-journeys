@@ -278,7 +278,7 @@ export function EnvelopeLetter({
                 </div>
               </header>
 
-              <div className="letter-body space-y-5 type-body">{letterBody}</div>
+              <div className="letter-body space-y-5">{letterBody}</div>
 
               <div className="letter-signature">
                 <p className="font-parchment-script text-3xl md:text-4xl mt-2">{coupleSignature}</p>
