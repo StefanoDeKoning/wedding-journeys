@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
@@ -9,15 +10,19 @@ import { guestLoginByCode } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
 import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
 
-export const Route = createFileRoute("/$slug/invite/$code")({
+export const Route = createFileRoute("/$slug_/invite/$code")({
   head: () => ({
     meta: [
-      { title: "Your invitation" },
+      { title: "Your personal invitation — OurJourney" },
       {
         name: "description",
         content: "Open your personal wedding invitation.",
       },
       { name: "robots", content: "noindex,nofollow" },
+      { property: "og:title", content: "Your personal invitation — OurJourney" },
+      { property: "og:description", content: "Open your personal wedding invitation." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: InvitePage,
@@ -26,6 +31,7 @@ export const Route = createFileRoute("/$slug/invite/$code")({
 function InvitePage() {
   const { slug, code } = Route.useParams();
   const navigate = useNavigate();
+  const loginByCode = useServerFn(guestLoginByCode);
   const { refresh } = useAuth();
   const [status, setStatus] = useState<"loading" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -37,7 +43,7 @@ function InvitePage() {
 
     void (async () => {
       try {
-        const result = await guestLoginByCode({
+        const result = await loginByCode({
           data: { weddingSlug: slug, invitationCode: code },
         });
         if (!result.ok || !result.session) {
@@ -56,13 +62,13 @@ function InvitePage() {
         }
         toast.success(`Welcome, ${result.guest?.first_name}!`);
         await refresh();
-        void navigate({ to: "/$slug", params: { slug: result.guest?.wedding_slug ?? slug } });
+        void navigate({ to: "/$slug", params: { slug: result.guest?.wedding_slug ?? slug }, replace: true });
       } catch (err) {
         setErrorMsg(err instanceof Error ? err.message : "Could not open invitation.");
         setStatus("error");
       }
     })();
-  }, [slug, code, navigate, refresh]);
+  }, [slug, code, navigate, refresh, loginByCode]);
 
   return (
     <SiteShell>
