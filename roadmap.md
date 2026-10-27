@@ -8,5 +8,5 @@
 
 # Personal invitation links
 
-- [ ] Fix copied invitation links opening login instead of automatically signing the guest into the correct wedding.
-- [ ] Test a copied link in a fresh guest browser and verify the invitation opens without manual login.
+- [x] Fix copied invitation links opening login instead of automatically signing the guest into the correct wedding.
+- [x] Test a copied link in a fresh guest browser and verify the invitation opens without manual login; automated test also confirms access survives reload.
