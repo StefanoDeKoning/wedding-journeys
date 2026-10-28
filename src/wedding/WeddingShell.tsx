@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
+import { LanguageToggle } from "@/i18n/LanguageToggle";
   Mail,
   BookHeart,
   CalendarHeart,
@@ -64,6 +65,7 @@ export function WeddingHeader({
             <span className="type-script-sm truncate">{title}</span>
           </Link>
           <div className="flex items-center gap-4 shrink-0">
+            <LanguageToggle />
             {guestFirstName && (
               <span className="hidden sm:inline type-caption">
                 Hi, <span className="text-foreground font-medium">{guestFirstName}</span>

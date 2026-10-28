@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/auth/AuthProvider";
+import { LanguageProvider } from "@/i18n";
 import { installSupabaseAuthFetch } from "@/integrations/supabase/fetch-interceptor";
 import {
   ThemeProvider,
@@ -64,7 +65,7 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="nl">
       <head>
         <HeadContent />
       </head>
@@ -82,10 +83,12 @@ function RootComponent() {
   }, []);
   return (
     <ThemeProvider themeId={DEFAULT_THEME_ID}>
-      <AuthProvider>
-        <Outlet />
-        <Toaster />
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <Outlet />
+          <Toaster />
+        </AuthProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
