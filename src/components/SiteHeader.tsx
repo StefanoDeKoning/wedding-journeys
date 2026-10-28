@@ -3,6 +3,7 @@ import { Crown } from "lucide-react";
 import { Logo } from "./Logo";
 import { useAuth } from "@/auth/AuthProvider";
 import { ThemedButton } from "@/design-system";
+import { LanguageToggle } from "@/i18n/LanguageToggle";
 
 const nav = [
   { to: "/" as const, label: "Home" },
@@ -42,6 +43,7 @@ export function SiteHeader() {
           )}
         </nav>
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <LanguageToggle />
           <Link to="/login" className={`${NAV_LINK} whitespace-nowrap`}>
             Login
           </Link>
