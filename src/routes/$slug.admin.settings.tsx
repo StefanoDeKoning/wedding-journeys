@@ -15,6 +15,8 @@ import { AdminsSection } from "@/wedding/admin/AdminsSection";
 import { StorageSection } from "@/wedding/admin/StorageSection";
 import { AuditSection } from "@/wedding/admin/AuditSection";
 
+import { useI18n, useT } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/admin/settings")({
   component: AdminSettings,
 });
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/$slug/admin/settings")({
 function AdminSettings() {
   const { slug } = Route.useParams();
   const { wedding, refresh } = useWedding(slug);
+  const t = useT();
 
   if (!wedding) {
     return (
@@ -36,19 +39,19 @@ function AdminSettings() {
       <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-2">
           <SettingsIcon className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-xl">Wedding settings</h2>
+          <h2 className="font-display text-xl">{t("Wedding settings")}</h2>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage your wedding configuration, admins, storage and activity history in one place.
+          {t("Manage your wedding configuration, admins, storage and activity history in one place.")}
         </p>
       </section>
 
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="w-full sm:w-auto grid grid-cols-4 sm:inline-flex">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="admins">Admins</TabsTrigger>
-          <TabsTrigger value="storage">Storage</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="general">{t("General")}</TabsTrigger>
+          <TabsTrigger value="admins">{t("Admins")}</TabsTrigger>
+          <TabsTrigger value="storage">{t("Storage")}</TabsTrigger>
+          <TabsTrigger value="activity">{t("Activity")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="mt-6">
@@ -87,6 +90,7 @@ function GeneralTab({
   const [cmRole, setCmRole] = useState("");
   const [cmPhone, setCmPhone] = useState("");
   const [cmEmail, setCmEmail] = useState("");
+  const { t, tx } = useI18n();
   const [tabs, setTabs] = useState({
     story_enabled: true,
     gallery_enabled: true,
@@ -138,10 +142,10 @@ function GeneralTab({
       .eq("id", wedding.id);
     setSaving(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success("Settings saved.");
+    toast.success(t("Settings saved."));
     void logAudit({
       weddingId: wedding.id,
       action: "wedding.updated",
@@ -158,14 +162,14 @@ function GeneralTab({
     <div className="space-y-6">
       <section className="rounded-2xl border border-border bg-card p-5 shadow-soft flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Publish status</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">{t("Publish status")}</p>
           <p className="font-display text-lg mt-1">
-            {isPublished ? "Published" : "Draft"}
+            {isPublished ? t("Published") : t("Draft")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             {isPublished
-              ? "Your wedding website is live for guests."
-              : "Only admins can see your wedding website. Publish it from the Overview page."}
+              ? t("Your wedding website is live for guests.")
+              : t("Only admins can see your wedding website. Publish it from the Overview page.")}
           </p>
         </div>
         <span
@@ -175,13 +179,13 @@ function GeneralTab({
               : "bg-muted text-muted-foreground"
           }`}
         >
-          {isPublished ? "Live" : "Draft"}
+          {isPublished ? t("Live") : t("Draft")}
         </span>
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-5">
         <div>
-          <Label htmlFor="wn">Wedding name</Label>
+          <Label htmlFor="wn">{t("Wedding name")}</Label>
           <Input
             id="wn"
             value={weddingName}
@@ -193,7 +197,7 @@ function GeneralTab({
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="bn">Partner one</Label>
+            <Label htmlFor="bn">{t("Partner one")}</Label>
             <Input
               id="bn"
               value={brideName}
@@ -203,7 +207,7 @@ function GeneralTab({
             />
           </div>
           <div>
-            <Label htmlFor="gn">Partner two</Label>
+            <Label htmlFor="gn">{t("Partner two")}</Label>
             <Input
               id="gn"
               value={groomName}
@@ -215,7 +219,7 @@ function GeneralTab({
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="dt">Wedding date</Label>
+            <Label htmlFor="dt">{t("Wedding date")}</Label>
             <Input
               id="dt"
               type="date"
@@ -225,7 +229,7 @@ function GeneralTab({
             />
           </div>
           <div>
-            <Label htmlFor="rd">RSVP deadline</Label>
+            <Label htmlFor="rd">{t("RSVP deadline")}</Label>
             <Input
               id="rd"
               type="date"
@@ -238,9 +242,9 @@ function GeneralTab({
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-5">
-        <h3 className="font-display text-lg">Venue</h3>
+        <h3 className="font-display text-lg">{t("Venue")}</h3>
         <div>
-          <Label htmlFor="ln">Location name</Label>
+          <Label htmlFor="ln">{t("Location name")}</Label>
           <Input
             id="ln"
             value={locationName}
@@ -250,7 +254,7 @@ function GeneralTab({
           />
         </div>
         <div>
-          <Label htmlFor="la">Address</Label>
+          <Label htmlFor="la">{t("Address")}</Label>
           <Textarea
             id="la"
             value={locationAddress}
@@ -261,7 +265,7 @@ function GeneralTab({
           />
         </div>
         <div>
-          <Label htmlFor="mu">Google Maps link</Label>
+          <Label htmlFor="mu">{t("Google Maps link")}</Label>
           <Input
             id="mu"
             type="url"
@@ -275,14 +279,14 @@ function GeneralTab({
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-5">
         <div>
-          <h3 className="font-display text-lg">Ceremony master</h3>
+          <h3 className="font-display text-lg">{t("Ceremony master")}</h3>
           <p className="text-sm text-muted-foreground">
-            The person guests can contact with questions. Shown on the invitation page.
+            {t("The person guests can contact with questions. Shown on the invitation page.")}
           </p>
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="cmn">Name</Label>
+            <Label htmlFor="cmn">{t("Name")}</Label>
             <Input
               id="cmn"
               value={cmName}
@@ -293,18 +297,18 @@ function GeneralTab({
             />
           </div>
           <div>
-            <Label htmlFor="cmr">Role (optional)</Label>
+            <Label htmlFor="cmr">{t("Role (optional)")}</Label>
             <Input
               id="cmr"
               value={cmRole}
               onChange={(e) => setCmRole(e.target.value)}
-              placeholder="Ceremony master"
+              placeholder={t("Ceremony master")}
               maxLength={120}
               className="mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="cmp">Phone</Label>
+            <Label htmlFor="cmp">{t("Phone")}</Label>
             <Input
               id="cmp"
               value={cmPhone}
@@ -315,7 +319,7 @@ function GeneralTab({
             />
           </div>
           <div>
-            <Label htmlFor="cme">Email</Label>
+            <Label htmlFor="cme">{t("Email")}</Label>
             <Input
               id="cme"
               type="email"
@@ -331,22 +335,23 @@ function GeneralTab({
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-4">
         <div>
-          <h3 className="font-display text-lg">Guest pages</h3>
+          <h3 className="font-display text-lg">{t("Guest pages")}</h3>
           <p className="text-sm text-muted-foreground">
-            Choose which pages your guests can see. Hidden pages disappear from the
-            guest menu — you can still edit them as an admin.
+            {t(
+              "Choose which pages your guests can see. Hidden pages disappear from the guest menu — you can still edit them as an admin.",
+            )}
           </p>
         </div>
         {GUEST_PAGES.map((page) => (
           <div key={page.field} className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium">{page.label}</p>
-              <p className="text-xs text-muted-foreground">{page.description}</p>
+              <p className="text-sm font-medium">{t(page.label)}</p>
+              <p className="text-xs text-muted-foreground">{t(page.description)}</p>
             </div>
             <Switch
               checked={tabs[page.field]}
               onCheckedChange={(v) => setTabs((prev) => ({ ...prev, [page.field]: v }))}
-              aria-label={`Show ${page.label} to guests`}
+              aria-label={t("Show {page} to guests", { page: t(page.label) })}
             />
           </div>
         ))}
@@ -355,7 +360,7 @@ function GeneralTab({
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving} className="rounded-full">
           {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-          Save changes
+          {t("Save changes")}
         </Button>
       </div>
     </div>
@@ -383,4 +388,4 @@ const GUEST_PAGES = [
     label: "Guestbook",
     description: "Written messages and wishes.",
   },
-];
+] as const;

@@ -102,6 +102,12 @@ export function describeAction(a: string): string {
     case "guestbook.hidden": return "hid a guestbook message";
     case "guestbook.shown": return "unhid a guestbook message";
     case "guestbook.removed": return "removed a guestbook message";
+    case "playlist.removed": return "removed a song request";
+    case "admin.invited": return "invited a co-admin";
+    case "admin.removed": return "removed a co-admin";
+    case "wishlist.created": return "added a gift";
+    case "wishlist.updated": return "edited a gift";
+    case "wishlist.deleted": return "removed a gift";
     default: return a;
   }
 }

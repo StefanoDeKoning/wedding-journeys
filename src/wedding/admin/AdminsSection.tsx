@@ -7,12 +7,14 @@ import { toast } from "sonner";
 import { listAdmins, inviteCoAdmin, removeCoAdmin, type AdminMember } from "@/auth/admins.functions";
 import { logAudit } from "@/wedding/audit";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/i18n";
 
 export function AdminsSection({ weddingId }: { weddingId: string }) {
   const [admins, setAdmins] = useState<AdminMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [inviting, setInviting] = useState(false);
+  const { t, tx } = useI18n();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const load = async () => {
@@ -21,7 +23,7 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
       const res = await listAdmins({ data: { weddingId } });
       setAdmins(res.admins);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not load admins.");
+      toast.error(e instanceof Error ? tx(e.message) : t("Could not load admins."));
     }
     setLoading(false);
   };
@@ -46,12 +48,12 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
     try {
       const res = await inviteCoAdmin({ data: { weddingId, email: email.trim() } });
       if (!res.ok) {
-        toast.error(res.error ?? "Could not invite.");
+        toast.error(res.error ? tx(res.error) : t("Could not invite."));
       } else {
         toast.success(
           res.member?.created
-            ? "Invite email sent. They'll get admin access after accepting."
-            : "Co-admin added.",
+            ? t("Invite email sent. They'll get admin access after accepting.")
+            : t("Co-admin added."),
         );
         void logAudit({
           weddingId,
@@ -64,18 +66,18 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
         void load();
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not invite.");
+      toast.error(err instanceof Error ? tx(err.message) : t("Could not invite."));
     }
     setInviting(false);
   };
 
   const remove = async (m: AdminMember) => {
     if (m.role === "primary_admin") return;
-    if (!confirm(`Remove ${m.email ?? "this co-admin"}?`)) return;
+    if (!confirm(t("Remove {name}?", { name: m.email ?? t("this co-admin") }))) return;
     try {
       const res = await removeCoAdmin({ data: { weddingId, userId: m.user_id } });
       if (!res.ok) {
-        toast.error(res.error ?? "Could not remove.");
+        toast.error(res.error ? tx(res.error) : t("Could not remove."));
         return;
       }
       void logAudit({
@@ -85,10 +87,10 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
         targetId: m.user_id,
         details: { email: m.email },
       });
-      toast.success("Removed.");
+      toast.success(t("Removed."));
       void load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not remove.");
+      toast.error(err instanceof Error ? tx(err.message) : t("Could not remove."));
     }
   };
 
@@ -97,10 +99,10 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
       <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-xl">Co-admins</h2>
+          <h2 className="font-display text-xl">{t("Co-admins")}</h2>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Co-admins can manage guests and RSVPs, but can't add or remove other admins.
+          {t("Co-admins can manage guests and RSVPs, but can't add or remove other admins.")}
         </p>
       </section>
 
@@ -109,14 +111,14 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
           onSubmit={invite}
           className="rounded-2xl border border-border bg-card p-5 shadow-soft space-y-3"
         >
-          <Label htmlFor="inv-email">Invite by email</Label>
+          <Label htmlFor="inv-email">{t("Invite by email")}</Label>
           <div className="flex gap-2">
             <Input
               id="inv-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="friend@example.com"
+              placeholder={t("friend@example.com")}
               maxLength={255}
               required
             />
@@ -126,13 +128,13 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  Invite
+                  {t("Invite")}
                 </>
               )}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Existing accounts get access immediately. New ones receive an invite email.
+            {t("Existing accounts get access immediately. New ones receive an invite email.")}
           </p>
         </form>
       )}
@@ -148,7 +150,7 @@ export function AdminsSection({ weddingId }: { weddingId: string }) {
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{m.email ?? m.user_id}</p>
                 <p className="text-xs text-muted-foreground">
-                  {m.role === "primary_admin" ? "Primary admin" : "Co-admin"}
+                  {m.role === "primary_admin" ? t("Primary admin") : t("Co-admin")}
                 </p>
               </div>
               {isPrimary && m.role !== "primary_admin" && (

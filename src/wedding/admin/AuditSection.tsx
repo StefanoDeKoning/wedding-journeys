@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { describeAction } from "@/wedding/audit";
+import { useI18n, type useT } from "@/i18n";
 import type { Json } from "@/integrations/supabase/types";
 
 interface AuditRow {
@@ -23,6 +24,7 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
+  const { t, tx, locale } = useI18n();
 
   useEffect(() => {
     void (async () => {
@@ -44,15 +46,15 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
     return rows.filter((r) => {
       const blob = [
         r.actor_label ?? "",
-        describeAction(r.action),
+        tx(describeAction(r.action)),
         r.action,
-        detailsLabel(r.details) ?? "",
+        detailsLabel(r.details, t) ?? "",
       ]
         .join(" ")
         .toLowerCase();
       return blob.includes(q);
     });
-  }, [rows, query]);
+  }, [rows, query, t, tx]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
@@ -63,10 +65,10 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
       <div>
         <h2 className="font-display text-lg flex items-center gap-2">
           <ScrollText className="w-4 h-4 text-primary" />
-          Recent activity
+          {t("Recent activity")}
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Showing the latest {rows.length} admin actions across this wedding.
+          {t("Showing the latest {count} admin actions across this wedding.", { count: rows.length })}
         </p>
       </div>
 
@@ -78,7 +80,7 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
             setQuery(e.target.value);
             setPage(0);
           }}
-          placeholder="Search by user, action or detail…"
+          placeholder={t("Search by user, action or detail…")}
           className="pl-9"
         />
       </div>
@@ -89,7 +91,7 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
         </div>
       ) : filtered.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
-          No activity matches your search.
+          {t("No activity matches your search.")}
         </div>
       ) : (
         <>
@@ -97,24 +99,24 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-left text-xs text-muted-foreground">
                 <tr>
-                  <th className="px-3 py-2 font-medium">User</th>
-                  <th className="px-3 py-2 font-medium">Action</th>
-                  <th className="px-3 py-2 font-medium hidden sm:table-cell">Detail</th>
-                  <th className="px-3 py-2 font-medium whitespace-nowrap">When</th>
+                  <th className="px-3 py-2 font-medium">{t("User")}</th>
+                  <th className="px-3 py-2 font-medium">{t("Action")}</th>
+                  <th className="px-3 py-2 font-medium hidden sm:table-cell">{t("Detail")}</th>
+                  <th className="px-3 py-2 font-medium whitespace-nowrap">{t("When")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {paged.map((r) => (
                   <tr key={r.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-3 py-2 font-medium">{r.actor_label ?? "Someone"}</td>
+                    <td className="px-3 py-2 font-medium">{r.actor_label ?? t("Someone")}</td>
                     <td className="px-3 py-2 text-muted-foreground">
-                      {describeAction(r.action)}
+                      {tx(describeAction(r.action))}
                     </td>
                     <td className="px-3 py-2 text-muted-foreground hidden sm:table-cell">
-                      {detailsLabel(r.details) ?? "—"}
+                      {detailsLabel(r.details, t) ?? "—"}
                     </td>
                     <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
-                      {new Date(r.created_at).toLocaleString()}
+                      {new Date(r.created_at).toLocaleString(locale)}
                     </td>
                   </tr>
                 ))}
@@ -125,7 +127,7 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
           {totalPages > 1 && (
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>
-                Page {safePage + 1} of {totalPages}
+                {t("Page {page} of {pages}", { page: safePage + 1, pages: totalPages })}
               </span>
               <div className="flex gap-2">
                 <Button
@@ -134,7 +136,7 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
                   disabled={safePage === 0}
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                 >
-                  Previous
+                  {t("Previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -142,7 +144,7 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
                   disabled={safePage >= totalPages - 1}
                   onClick={() => setPage((p) => p + 1)}
                 >
-                  Next
+                  {t("Next")}
                 </Button>
               </div>
             </div>
@@ -153,12 +155,12 @@ export function AuditSection({ weddingId }: { weddingId: string }) {
   );
 }
 
-function detailsLabel(d: Json): string | null {
+function detailsLabel(d: Json, t: ReturnType<typeof useT>): string | null {
   if (!d || typeof d !== "object" || Array.isArray(d)) return null;
   const obj = d as Record<string, unknown>;
   if (typeof obj.name === "string") return obj.name;
   if (typeof obj.title === "string") return obj.title;
-  if (typeof obj.uploader === "string") return `by ${obj.uploader}`;
+  if (typeof obj.uploader === "string") return t("by {name}", { name: obj.uploader });
   if (typeof obj.status === "string") return `→ ${obj.status}`;
   return null;
 }

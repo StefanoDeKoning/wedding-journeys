@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { HardDrive, Loader2, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBytes } from "@/routes/$slug.admin.index";
+import { useT } from "@/i18n";
 
 interface UploaderRow {
   uploader_name: string;
@@ -15,6 +16,7 @@ export function StorageSection({ weddingId }: { weddingId: string }) {
   const [photoCount, setPhotoCount] = useState(0);
   const [byUploader, setByUploader] = useState<UploaderRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useT();
 
   useEffect(() => {
     void (async () => {
@@ -48,15 +50,15 @@ export function StorageSection({ weddingId }: { weddingId: string }) {
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-3 gap-3">
-        <InfoCard label="Storage used" value={formatBytes(used)} />
-        <InfoCard label="Storage limit" value={formatBytes(limit)} />
-        <InfoCard label="Files uploaded" value={String(photoCount)} />
+        <InfoCard label={t("Storage used")} value={formatBytes(used)} />
+        <InfoCard label={t("Storage limit")} value={formatBytes(limit)} />
+        <InfoCard label={t("Files uploaded")} value={String(photoCount)} />
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
         <div className="flex items-center gap-2 mb-3">
           <HardDrive className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-lg">Storage usage</h2>
+          <h2 className="font-display text-lg">{t("Storage usage")}</h2>
         </div>
         <div className="h-3 rounded-full bg-muted overflow-hidden">
           <div
@@ -67,19 +69,19 @@ export function StorageSection({ weddingId }: { weddingId: string }) {
         <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2">
           <p className="text-sm">
             <span className="font-display text-2xl">{formatBytes(used)}</span>
-            <span className="text-muted-foreground"> of {formatBytes(limit)}</span>
+            <span className="text-muted-foreground"> {t("of {limit}", { limit: formatBytes(limit) })}</span>
           </p>
-          <p className="text-xs text-muted-foreground">{pct.toFixed(1)}% full</p>
+          <p className="text-xs text-muted-foreground">{t("{pct}% full", { pct: pct.toFixed(1) })}</p>
         </div>
         {danger && (
           <p className="mt-3 text-xs text-destructive">
-            You're close to your storage limit. Consider hiding or deleting older photos.
+            {t("You're close to your storage limit. Consider hiding or deleting older photos.")}
           </p>
         )}
       </div>
 
       <div>
-        <h3 className="font-display text-lg mb-3">By uploader</h3>
+        <h3 className="font-display text-lg mb-3">{t("By uploader")}</h3>
         {loading ? (
           <div className="py-8 text-center text-muted-foreground">
             <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -87,7 +89,7 @@ export function StorageSection({ weddingId }: { weddingId: string }) {
         ) : byUploader.length === 0 ? (
           <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
             <Camera className="w-6 h-6 mx-auto mb-2 opacity-40" />
-            No photos uploaded yet.
+            {t("No photos uploaded yet.")}
           </div>
         ) : (
           <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
@@ -96,7 +98,7 @@ export function StorageSection({ weddingId }: { weddingId: string }) {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{u.uploader_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {u.count} photo{u.count === 1 ? "" : "s"}
+                    {u.count === 1 ? t("1 photo") : t("{count} photos", { count: u.count })}
                   </p>
                 </div>
                 <p className="text-sm tabular-nums">{formatBytes(u.bytes)}</p>
