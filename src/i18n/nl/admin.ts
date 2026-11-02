@@ -47,7 +47,7 @@ const nl = {
   "{done} of {total} done": "{done} van {total} klaar",
   Total: "Totaal",
   Completed: "Afgerond",
-  Remaining: "Te gaan",
+  Remaining: "Resterend",
   "{used} of {limit} used": "{used} van {limit} gebruikt",
 } satisfies Record<string, string>;
 export default nl;

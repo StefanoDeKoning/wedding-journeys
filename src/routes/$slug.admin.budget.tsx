@@ -48,6 +48,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/$slug/admin/budget")({
   component: BudgetPage,
@@ -109,8 +110,8 @@ const emptyForm: FormState = {
   vendor_notes: "",
 };
 
-function formatCurrency(n: number): string {
-  return new Intl.NumberFormat(undefined, {
+function formatMoney(n: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -127,14 +128,17 @@ function BudgetPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<BudgetItem | null>(null);
+  const { t, tx, locale } = useI18n();
+  const formatCurrency = (n: number) => formatMoney(n, locale);
 
   useEffect(() => {
     if (!wedding) return;
     void loadAll(wedding.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wedding]);
 
   const loadAll = async (weddingId: string) => {
-    const [i, t] = await Promise.all([
+    const [i, td] = await Promise.all([
       supabase
         .from("budget_items" as never)
         .select("*")
@@ -146,11 +150,11 @@ function BudgetPage() {
         .eq("wedding_id", weddingId),
     ]);
     if (i.error) {
-      toast.error(i.error.message);
+      toast.error(tx(i.error.message));
       return;
     }
     setItems(((i.data ?? []) as unknown) as BudgetItem[]);
-    setTodos(((t.data ?? []) as unknown) as TodoLite[]);
+    setTodos(((td.data ?? []) as unknown) as TodoLite[]);
   };
 
   const totals = useMemo(() => {
@@ -190,22 +194,22 @@ function BudgetPage() {
   const submit = async () => {
     if (!wedding) return;
     if (!form.name.trim()) {
-      toast.error("Name is required");
+      toast.error(t("Name is required"));
       return;
     }
     const est = Number(form.estimated_cost || 0);
     if (Number.isNaN(est) || est < 0) {
-      toast.error("Estimated cost must be a positive number");
+      toast.error(t("Estimated cost must be a positive number"));
       return;
     }
     const act = form.actual_cost.trim() === "" ? null : Number(form.actual_cost);
     if (act !== null && (Number.isNaN(act) || act < 0)) {
-      toast.error("Paid must be a positive number");
+      toast.error(t("Paid must be a positive number"));
       return;
     }
     const paid = Number(form.paid_amount || 0);
     if (Number.isNaN(paid) || paid < 0) {
-      toast.error("Settled must be a positive number");
+      toast.error(t("Settled must be a positive number"));
       return;
     }
     setSaving(true);
@@ -236,10 +240,10 @@ function BudgetPage() {
     }
     setSaving(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success(form.id ? "Item updated" : "Item added");
+    toast.success(form.id ? t("Item updated") : t("Item added"));
     setOpen(false);
     setForm(emptyForm);
     void loadAll(wedding.id);
@@ -247,13 +251,13 @@ function BudgetPage() {
 
   const remove = async (id: string) => {
     if (!wedding) return;
-    if (!confirm("Delete this budget item?")) return;
+    if (!confirm(t("Delete this budget item?"))) return;
     const { error } = await supabase.from("budget_items" as never).delete().eq("id", id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success("Item deleted");
+    toast.success(t("Item deleted"));
     setSelected(null);
     void loadAll(wedding.id);
   };
@@ -270,48 +274,48 @@ function BudgetPage() {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard icon={Wallet} label="Total budget" value={formatCurrency(totals.estimated)} />
-        <SummaryCard icon={CheckCircle2} label="Paid" value={formatCurrency(totals.paid)} tone="success" />
+        <SummaryCard icon={Wallet} label={t("Total budget")} value={formatCurrency(totals.estimated)} />
+        <SummaryCard icon={CheckCircle2} label={t("Paid")} value={formatCurrency(totals.paid)} tone="success" />
         <SummaryCard
           icon={PiggyBank}
-          label="Remaining"
+          label={t("Remaining")}
           value={formatCurrency(Math.max(0, totals.remaining))}
           tone={totals.remaining < 0 ? "danger" : undefined}
         />
-        <SummaryCard icon={Receipt} label="Budget items" value={String(totals.count)} />
+        <SummaryCard icon={Receipt} label={t("Budget items")} value={String(totals.count)} />
       </div>
 
       {/* Items */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-lg">Budget items</h2>
+          <h2 className="font-display text-lg">{t("Budget items")}</h2>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={openNew}>
                 <Plus className="w-3.5 h-3.5" />
-                Add item
+                {t("Add item")}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{form.id ? "Edit budget item" : "New budget item"}</DialogTitle>
+                <DialogTitle>{form.id ? t("Edit budget item") : t("New budget item")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">{t("Name")}</Label>
                     <Input
                       id="name"
-                      placeholder="e.g. Photographer"
+                      placeholder={t("e.g. Photographer")}
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="cat">Category</Label>
+                    <Label htmlFor="cat">{t("Category")}</Label>
                     <Input
                       id="cat"
-                      placeholder="e.g. Ceremony"
+                      placeholder={t("e.g. Ceremony")}
                       value={form.category}
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
                     />
@@ -319,7 +323,7 @@ function BudgetPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="est">Estimated</Label>
+                    <Label htmlFor="est">{t("Estimated")}</Label>
                     <Input
                       id="est"
                       type="number"
@@ -330,7 +334,7 @@ function BudgetPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="paid">Paid</Label>
+                    <Label htmlFor="paid">{t("Paid")}</Label>
                     <Input
                       id="paid"
                       type="number"
@@ -342,7 +346,7 @@ function BudgetPage() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="notes">Notes</Label>
+                  <Label htmlFor="notes">{t("Notes")}</Label>
                   <Textarea
                     id="notes"
                     rows={2}
@@ -356,7 +360,7 @@ function BudgetPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Briefcase className="w-4 h-4 text-primary" />
-                      <p className="font-medium text-sm">Vendor information (optional)</p>
+                      <p className="font-medium text-sm">{t("Vendor information (optional)")}</p>
                     </div>
                     {showVendor ? (
                       <Button
@@ -376,11 +380,11 @@ function BudgetPage() {
                           });
                         }}
                       >
-                        <X className="w-3.5 h-3.5" /> Remove
+                        <X className="w-3.5 h-3.5" /> {t("Remove")}
                       </Button>
                     ) : (
                       <Button type="button" size="sm" variant="outline" onClick={() => setShowVendor(true)}>
-                        <Plus className="w-3.5 h-3.5" /> Add vendor
+                        <Plus className="w-3.5 h-3.5" /> {t("Add vendor")}
                       </Button>
                     )}
                   </div>
@@ -389,7 +393,7 @@ function BudgetPage() {
                     <div className="mt-4 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label>Vendor name</Label>
+                          <Label>{t("Vendor name")}</Label>
                           <Input
                             value={form.vendor_name}
                             onChange={(e) => setForm({ ...form, vendor_name: e.target.value })}
@@ -397,7 +401,7 @@ function BudgetPage() {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label>Contact person</Label>
+                          <Label>{t("Contact person")}</Label>
                           <Input
                             value={form.vendor_contact_name}
                             onChange={(e) =>
@@ -408,7 +412,7 @@ function BudgetPage() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label>Email</Label>
+                          <Label>{t("Email")}</Label>
                           <Input
                             type="email"
                             value={form.vendor_email}
@@ -416,7 +420,7 @@ function BudgetPage() {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label>Phone</Label>
+                          <Label>{t("Phone")}</Label>
                           <Input
                             value={form.vendor_phone}
                             onChange={(e) => setForm({ ...form, vendor_phone: e.target.value })}
@@ -424,7 +428,7 @@ function BudgetPage() {
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Website</Label>
+                        <Label>{t("Website")}</Label>
                         <Input
                           placeholder="https://"
                           value={form.vendor_website}
@@ -432,7 +436,7 @@ function BudgetPage() {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Vendor notes</Label>
+                        <Label>{t("Vendor notes")}</Label>
                         <Textarea
                           rows={2}
                           value={form.vendor_notes}
@@ -445,11 +449,11 @@ function BudgetPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
+                  {t("Cancel")}
                 </Button>
                 <Button onClick={submit} disabled={saving}>
                   {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  {form.id ? "Save changes" : "Add item"}
+                  {form.id ? t("Save changes") : t("Add item")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -458,18 +462,18 @@ function BudgetPage() {
 
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            No budget items yet. Add your first one to get started.
+            {t("No budget items yet. Add your first one to get started.")}
           </p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Estimated</TableHead>
-                  <TableHead className="text-right">Paid</TableHead>
-                  <TableHead className="text-right">Remaining</TableHead>
+                  <TableHead>{t("Item")}</TableHead>
+                  <TableHead>{t("Category")}</TableHead>
+                  <TableHead className="text-right">{t("Estimated")}</TableHead>
+                  <TableHead className="text-right">{t("Paid")}</TableHead>
+                  <TableHead className="text-right">{t("Remaining")}</TableHead>
                   <TableHead className="w-[60px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -478,7 +482,7 @@ function BudgetPage() {
                   const est = Number(item.estimated_cost ?? 0);
                   const paid = Number(item.paid_amount ?? 0);
                   const remaining = est - paid;
-                  const linkedTodos = todos.filter((t) => t.budget_item_id === item.id);
+                  const linkedTodos = todos.filter((td) => td.budget_item_id === item.id);
                   return (
                     <TableRow
                       key={item.id}
@@ -495,8 +499,10 @@ function BudgetPage() {
                           )}
                           {linkedTodos.length > 0 && (
                             <span className="inline-flex items-center gap-1">
-                              <ListTodo className="w-3 h-3" /> {linkedTodos.length} task
-                              {linkedTodos.length === 1 ? "" : "s"}
+                              <ListTodo className="w-3 h-3" />{" "}
+                              {linkedTodos.length === 1
+                                ? t("1 task")
+                                : t("{count} tasks", { count: linkedTodos.length })}
                             </span>
                           )}
                         </div>
@@ -542,7 +548,7 @@ function BudgetPage() {
           {selected && (
             <DetailView
               item={selected}
-              todos={todos.filter((t) => t.budget_item_id === selected.id)}
+              todos={todos.filter((td) => td.budget_item_id === selected.id)}
               onEdit={() => {
                 openEdit(selected);
                 setSelected(null);
@@ -567,6 +573,8 @@ function DetailView({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const { t, locale } = useI18n();
+  const formatCurrency = (n: number) => formatMoney(n, locale);
   const est = Number(item.estimated_cost ?? 0);
   const paid = Number(item.paid_amount ?? 0);
   const remaining = est - paid;
@@ -584,15 +592,15 @@ function DetailView({
         {/* Budget details */}
         <section>
           <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-            Budget details
+            {t("Budget details")}
           </h3>
           <div className="rounded-xl border border-border divide-y divide-border">
-            <Row label="Estimated" value={formatCurrency(est)} />
-            <Row label="Paid" value={formatCurrency(paid)} />
+            <Row label={t("Estimated")} value={formatCurrency(est)} />
+            <Row label={t("Paid")} value={formatCurrency(paid)} />
 
 
             <Row
-              label="Remaining"
+              label={t("Remaining")}
               value={formatCurrency(remaining)}
               danger={remaining < 0}
             />
@@ -606,7 +614,7 @@ function DetailView({
         {item.vendor_name ? (
           <section>
             <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              Vendor
+              {t("Vendor")}
             </h3>
             <div className="rounded-xl border border-border p-4 space-y-2">
               <div className="flex items-center gap-2 font-medium">
@@ -653,10 +661,10 @@ function DetailView({
         ) : (
           <section>
             <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-              Vendor
+              {t("Vendor")}
             </h3>
             <p className="text-sm text-muted-foreground rounded-xl border border-dashed border-border p-4 text-center">
-              No vendor attached. Edit this item to add one.
+              {t("No vendor attached. Edit this item to add one.")}
             </p>
           </section>
         )}
@@ -664,19 +672,19 @@ function DetailView({
         {/* Linked todos */}
         <section>
           <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-            Linked tasks
+            {t("Linked tasks")}
           </h3>
           {todos.length === 0 ? (
             <p className="text-sm text-muted-foreground rounded-xl border border-dashed border-border p-4 text-center">
-              No linked tasks. Create tasks in the ToDo planner and link them to this item.
+              {t("No linked tasks. Create tasks in the ToDo planner and link them to this item.")}
             </p>
           ) : (
             <ul className="rounded-xl border border-border divide-y divide-border">
-              {todos.map((t) => (
-                <li key={t.id} className="flex items-center gap-2 px-4 py-2 text-sm">
+              {todos.map((td) => (
+                <li key={td.id} className="flex items-center gap-2 px-4 py-2 text-sm">
                   <ListTodo className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className={t.status === "done" ? "line-through text-muted-foreground" : ""}>
-                    {t.title}
+                  <span className={td.status === "done" ? "line-through text-muted-foreground" : ""}>
+                    {td.title}
                   </span>
                 </li>
               ))}
@@ -686,10 +694,10 @@ function DetailView({
 
         <div className="flex gap-2 pt-2">
           <Button onClick={onEdit} className="flex-1">
-            <Pencil className="w-3.5 h-3.5" /> Edit
+            <Pencil className="w-3.5 h-3.5" /> {t("Edit")}
           </Button>
           <Button variant="outline" onClick={onDelete}>
-            <Trash2 className="w-3.5 h-3.5" /> Delete
+            <Trash2 className="w-3.5 h-3.5" /> {t("Delete")}
           </Button>
         </div>
       </div>

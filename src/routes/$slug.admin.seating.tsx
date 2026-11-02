@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react";
 import jsPDF from "jspdf";
+import { useI18n, useT, type MessageKey } from "@/i18n";
 import { useWedding } from "@/wedding/useWedding";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -65,10 +66,21 @@ interface SeatAssignment {
 
 const UNASSIGNED = "__unassigned__";
 
+function guestTypeKey(gt: string): MessageKey | null {
+  if (gt === "day" || gt === "evening") return gt;
+  if (gt === "full_day") return "full day";
+  return null;
+}
+
 function AdminSeating() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [loading, setLoading] = useState(true);
+  const { t, tx } = useI18n();
+  const typeLabel = (gt: string) => {
+    const key = guestTypeKey(gt);
+    return key ? t(key) : gt;
+  };
   const [tables, setTables] = useState<SeatingTable[]>([]);
   const [guests, setGuests] = useState<AttendingGuest[]>([]);
   const [assignments, setAssignments] = useState<SeatAssignment[]>([]);
@@ -104,9 +116,9 @@ function AdminSeating() {
         .eq("wedding_id", wedding.id),
     ]);
 
-    if (tablesRes.error) toast.error(tablesRes.error.message);
-    if (rsvpRes.error) toast.error(rsvpRes.error.message);
-    if (assignmentsRes.error) toast.error(assignmentsRes.error.message);
+    if (tablesRes.error) toast.error(tx(tablesRes.error.message));
+    if (rsvpRes.error) toast.error(tx(rsvpRes.error.message));
+    if (assignmentsRes.error) toast.error(tx(assignmentsRes.error.message));
 
     setTables((tablesRes.data ?? []) as SeatingTable[]);
     type RsvpRow = { guests: AttendingGuest };
@@ -161,11 +173,11 @@ function AdminSeating() {
   const saveTable = async () => {
     const name = tableDialog.name.trim();
     if (!name) {
-      toast.error("Name required.");
+      toast.error(t("Name required."));
       return;
     }
     if (tableDialog.seats < 1 || tableDialog.seats > 30) {
-      toast.error("Seats must be between 1 and 30.");
+      toast.error(t("Seats must be between 1 and 30."));
       return;
     }
     if (tableDialog.editing) {
@@ -174,7 +186,7 @@ function AdminSeating() {
         .update({ name, seat_count: tableDialog.seats })
         .eq("id", tableDialog.editing.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -184,7 +196,7 @@ function AdminSeating() {
         targetId: tableDialog.editing.id,
         details: { name, seat_count: tableDialog.seats },
       });
-      toast.success("Table updated.");
+      toast.success(t("Table updated."));
     } else {
       const position = tables.length;
       const { data, error } = await supabase
@@ -193,7 +205,7 @@ function AdminSeating() {
         .select("id")
         .maybeSingle();
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -203,27 +215,27 @@ function AdminSeating() {
         targetId: data?.id,
         details: { name, seat_count: tableDialog.seats },
       });
-      toast.success("Table added.");
+      toast.success(t("Table added."));
     }
     setTableDialog({ open: false, editing: null, name: "", seats: 8 });
     void load();
   };
 
-  const deleteTable = async (t: SeatingTable) => {
-    if (!confirm(`Delete "${t.name}"? Guests at this table will be unassigned.`)) return;
-    const { error } = await supabase.from("seating_tables").delete().eq("id", t.id);
+  const deleteTable = async (tbl: SeatingTable) => {
+    if (!confirm(t('Delete "{name}"? Guests at this table will be unassigned.', { name: tbl.name }))) return;
+    const { error } = await supabase.from("seating_tables").delete().eq("id", tbl.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void logAudit({
       weddingId: wedding.id,
       action: "table.removed",
       targetType: "seating_table",
-      targetId: t.id,
-      details: { name: t.name },
+      targetId: tbl.id,
+      details: { name: tbl.name },
     });
-    toast.success("Deleted.");
+    toast.success(t("Deleted."));
     void load();
   };
 
@@ -232,7 +244,7 @@ function AdminSeating() {
     if (!table) return;
     const occupants = guestsByTable.get(tableId) ?? [];
     if (occupants.length >= table.seat_count) {
-      toast.error(`"${table.name}" is full (${table.seat_count} seats).`);
+      toast.error(t('"{name}" is full ({count} seats).', { name: table.name, count: table.seat_count }));
       return;
     }
     const seat_index = nextFreeSeat(occupants.length, table.seat_count);
@@ -244,7 +256,7 @@ function AdminSeating() {
         .update({ table_id: tableId, seat_index })
         .eq("id", existing.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
     } else {
@@ -255,7 +267,7 @@ function AdminSeating() {
         seat_index,
       });
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
     }
@@ -274,7 +286,7 @@ function AdminSeating() {
     if (!a) return;
     const { error } = await supabase.from("seat_assignments").delete().eq("id", a.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void logAudit({
@@ -300,27 +312,27 @@ function AdminSeating() {
 
   const exportCsv = () => {
     const rows: Array<Record<string, unknown>> = [];
-    for (const t of tables) {
-      const occ = guestsByTable.get(t.id) ?? [];
+    for (const tbl of tables) {
+      const occ = guestsByTable.get(tbl.id) ?? [];
       if (occ.length === 0) {
-        rows.push({ table: t.name, seats: t.seat_count, guest: "(empty)" });
+        rows.push({ [t("Table")]: tbl.name, [t("Seats")]: tbl.seat_count, [t("Guest")]: t("(empty)") });
       } else {
         for (const g of occ) {
           rows.push({
-            table: t.name,
-            seats: t.seat_count,
-            guest: `${g.first_name} ${g.last_name}`,
-            guest_type: g.guest_type,
+            [t("Table")]: tbl.name,
+            [t("Seats")]: tbl.seat_count,
+            [t("Guest")]: `${g.first_name} ${g.last_name}`,
+            [t("Guest type")]: typeLabel(g.guest_type),
           });
         }
       }
     }
     for (const g of unassigned) {
       rows.push({
-        table: "(unassigned)",
-        seats: "",
-        guest: `${g.first_name} ${g.last_name}`,
-        guest_type: g.guest_type,
+        [t("Table")]: t("(unassigned)"),
+        [t("Seats")]: "",
+        [t("Guest")]: `${g.first_name} ${g.last_name}`,
+        [t("Guest type")]: typeLabel(g.guest_type),
       });
     }
     downloadCsv(`${wedding.slug}-seating.csv`, toCsv(rows));
@@ -335,7 +347,7 @@ function AdminSeating() {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text("Seating plan", marginX, y);
+    doc.text(t("Seating plan"), marginX, y);
     y += 10;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(11);
@@ -351,16 +363,16 @@ function AdminSeating() {
       }
     };
 
-    for (const t of tables) {
-      const occ = guestsByTable.get(t.id) ?? [];
+    for (const tbl of tables) {
+      const occ = guestsByTable.get(tbl.id) ?? [];
       ensureSpace(40 + occ.length * 14);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
-      doc.text(`${t.name}`, marginX, y);
+      doc.text(`${tbl.name}`, marginX, y);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(110);
-      doc.text(`${occ.length} / ${t.seat_count} seats`, pageWidth - marginX, y, {
+      doc.text(t("{used} / {total} seats", { used: occ.length, total: tbl.seat_count }), pageWidth - marginX, y, {
         align: "right",
       });
       doc.setTextColor(0);
@@ -372,7 +384,7 @@ function AdminSeating() {
       if (occ.length === 0) {
         doc.setTextColor(150);
         doc.setFont("helvetica", "italic");
-        doc.text("(empty)", marginX, y);
+        doc.text(t("(empty)"), marginX, y);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(0);
         y += 18;
@@ -383,7 +395,7 @@ function AdminSeating() {
           doc.text(`${i + 1}.  ${g.first_name} ${g.last_name}`, marginX + 4, y);
           doc.setTextColor(150);
           doc.setFontSize(9);
-          doc.text(g.guest_type, pageWidth - marginX, y, { align: "right" });
+          doc.text(typeLabel(g.guest_type), pageWidth - marginX, y, { align: "right" });
           doc.setTextColor(0);
           y += 14;
         }
@@ -396,7 +408,7 @@ function AdminSeating() {
       ensureSpace(40 + unassigned.length * 14);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(13);
-      doc.text("Unassigned", marginX, y);
+      doc.text(t("Unassigned"), marginX, y);
       y += 16;
       doc.setDrawColor(220);
       doc.line(marginX, y, pageWidth - marginX, y);
@@ -406,7 +418,7 @@ function AdminSeating() {
         doc.text(`• ${g.first_name} ${g.last_name}`, marginX + 4, y);
         doc.setTextColor(150);
         doc.setFontSize(9);
-        doc.text(g.guest_type, pageWidth - marginX, y, { align: "right" });
+        doc.text(typeLabel(g.guest_type), pageWidth - marginX, y, { align: "right" });
         doc.setTextColor(0);
         y += 14;
       }
@@ -420,12 +432,12 @@ function AdminSeating() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-muted-foreground">
-            Drag guests from the left into a table. Only guests who RSVP'd "yes" appear here.
+            {t('Drag guests from the left into a table. Only guests who RSVP\'d "yes" appear here.')}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={openCreateTable} className="rounded-full bg-primary hover:bg-primary/90">
-            <Plus className="w-4 h-4 mr-1.5" /> Add table
+            <Plus className="w-4 h-4 mr-1.5" /> {t("Add table")}
           </Button>
           <Button
             variant="outline"
@@ -461,7 +473,7 @@ function AdminSeating() {
               {tables.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
                   <Armchair className="w-8 h-8 mx-auto opacity-40 mb-3" />
-                  No tables yet. Add your first table to get started.
+                  {t("No tables yet. Add your first table to get started.")}
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -491,27 +503,27 @@ function AdminSeating() {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>
-              {tableDialog.editing ? "Edit table" : "Add table"}
+              {tableDialog.editing ? t("Edit table") : t("Add table")}
             </DialogTitle>
             <DialogDescription>
-              Give the table a friendly name and number of seats.
+              {t("Give the table a friendly name and number of seats.")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="t-name" className="text-xs">Name</Label>
+              <Label htmlFor="t-name" className="text-xs">{t("Name")}</Label>
               <Input
                 id="t-name"
                 value={tableDialog.name}
                 onChange={(e) =>
                   setTableDialog((s) => ({ ...s, name: e.target.value }))
                 }
-                placeholder="Table 1"
+                placeholder={t("Table 1")}
                 maxLength={60}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="t-seats" className="text-xs">Seats</Label>
+              <Label htmlFor="t-seats" className="text-xs">{t("Seats")}</Label>
               <Input
                 id="t-seats"
                 type="number"
@@ -534,10 +546,10 @@ function AdminSeating() {
                 setTableDialog({ open: false, editing: null, name: "", seats: 8 })
               }
             >
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button onClick={saveTable} className="bg-primary hover:bg-primary/90">
-              Save
+              {t("Save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -556,6 +568,7 @@ function nextFreeSeat(currentCount: number, max: number): number {
 
 function UnassignedColumn({ guests }: { guests: AttendingGuest[] }) {
   const { isOver, setNodeRef } = useDroppable({ id: UNASSIGNED });
+  const t = useT();
   return (
     <div
       ref={setNodeRef}
@@ -565,14 +578,14 @@ function UnassignedColumn({ guests }: { guests: AttendingGuest[] }) {
     >
       <div className="flex items-center gap-2 mb-3">
         <Users className="w-4 h-4 text-primary" />
-        <h2 className="font-display text-base">Unassigned</h2>
+        <h2 className="font-display text-base">{t("Unassigned")}</h2>
         <span className="text-xs text-muted-foreground ml-auto">
           {guests.length}
         </span>
       </div>
       {guests.length === 0 ? (
         <p className="text-xs text-muted-foreground py-6 text-center">
-          Everyone has a seat ✨
+          {t("Everyone has a seat ✨")}
         </p>
       ) : (
         <ul className="space-y-1.5 max-h-[60vh] overflow-y-auto pr-1">
@@ -588,6 +601,8 @@ function UnassignedColumn({ guests }: { guests: AttendingGuest[] }) {
 function DraggableGuest({ guest }: { guest: AttendingGuest }) {
   const { attributes, listeners, setNodeRef, isDragging, transform } =
     useDraggable({ id: guest.id });
+  const t = useT();
+  const typeKey = guestTypeKey(guest.guest_type);
   const style = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
     : undefined;
@@ -607,7 +622,7 @@ function DraggableGuest({ guest }: { guest: AttendingGuest }) {
         {guest.first_name} {guest.last_name}
       </span>
       <span className="text-[10px] text-muted-foreground">
-        {guest.guest_type}
+        {typeKey ? t(typeKey) : guest.guest_type}
       </span>
     </li>
   );
@@ -627,6 +642,7 @@ function TableCard({
   onUnseat: (guestId: string) => void;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: table.id });
+  const t = useT();
   const free = table.seat_count - occupants.length;
   const full = free <= 0;
   return (
@@ -647,8 +663,8 @@ function TableCard({
             {table.name}
           </h3>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            {occupants.length} / {table.seat_count} seats
-            {full && " · full"}
+            {t("{used} / {total} seats", { used: occupants.length, total: table.seat_count })}
+            {full && ` · ${t("full")}`}
           </p>
         </div>
         <div className="flex gap-1">
@@ -656,7 +672,7 @@ function TableCard({
             type="button"
             onClick={onEdit}
             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
-            aria-label="Edit"
+            aria-label={t("Edit")}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
@@ -664,7 +680,7 @@ function TableCard({
             type="button"
             onClick={onDelete}
             className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            aria-label="Delete"
+            aria-label={t("Delete")}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -672,7 +688,7 @@ function TableCard({
       </div>
       {occupants.length === 0 ? (
         <p className="text-xs text-muted-foreground py-6 text-center border border-dashed border-border rounded-lg">
-          Drop a guest here
+          {t("Drop a guest here")}
         </p>
       ) : (
         <ul className="space-y-1.5">
@@ -691,7 +707,7 @@ function TableCard({
                 type="button"
                 onClick={() => onUnseat(g.id)}
                 className="p-1 rounded text-muted-foreground hover:text-destructive"
-                aria-label="Remove"
+                aria-label={t("Remove")}
               >
                 <X className="w-3 h-3" />
               </button>

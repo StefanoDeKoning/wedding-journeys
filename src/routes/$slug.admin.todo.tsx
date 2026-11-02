@@ -34,8 +34,10 @@ import {
 import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
 
+import { tHead, useI18n, type MessageKey } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/admin/todo")({
-  head: () => ({ meta: [{ title: "ToDo Planner" }] }),
+  head: () => ({ meta: [{ title: tHead("ToDo Planner") }] }),
   component: AdminTodo,
 });
 
@@ -94,10 +96,11 @@ function AdminTodo() {
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     if (!wedding) return;
-    const [t, b] = await Promise.all([
+    const [tk, b] = await Promise.all([
       supabase
         .from("todo_tasks")
         .select("*")
@@ -109,11 +112,11 @@ function AdminTodo() {
         .eq("wedding_id", wedding.id)
         .order("name", { ascending: true }),
     ]);
-    if (t.error) {
-      toast.error(t.error.message);
+    if (tk.error) {
+      toast.error(tx(tk.error.message));
       return;
     }
-    setTasks((t.data ?? []) as Task[]);
+    setTasks((tk.data ?? []) as Task[]);
     setBudgets(((b.data ?? []) as unknown) as BudgetLite[]);
   };
 
@@ -173,7 +176,7 @@ function AdminTodo() {
       .update({ status: next })
       .eq("id", task.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       void load();
       return;
     }
@@ -190,17 +193,17 @@ function AdminTodo() {
     setCreating(true);
   };
 
-  const openEdit = (t: Task) => {
+  const openEdit = (task: Task) => {
     setDraft({
-      title: t.title,
-      description: t.description ?? "",
-      category: t.category,
-      deadline: t.deadline ?? "",
-      priority: t.priority,
-      status: t.status,
-      budget_item_id: t.budget_item_id ?? "",
+      title: task.title,
+      description: task.description ?? "",
+      category: task.category,
+      deadline: task.deadline ?? "",
+      priority: task.priority,
+      status: task.status,
+      budget_item_id: task.budget_item_id ?? "",
     });
-    setEditing(t);
+    setEditing(task);
     setCreating(false);
   };
 
@@ -212,7 +215,7 @@ function AdminTodo() {
   const save = async () => {
     if (!wedding) return;
     if (!draft.title.trim()) {
-      toast.error("Title is required");
+      toast.error(t("Title is required"));
       return;
     }
     setSaving(true);
@@ -231,7 +234,7 @@ function AdminTodo() {
         .update(payload)
         .eq("id", editing.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         setSaving(false);
         return;
       }
@@ -242,22 +245,22 @@ function AdminTodo() {
         created_from_template: false,
       });
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         setSaving(false);
         return;
       }
     }
     setSaving(false);
     closeDialog();
-    toast.success(editing ? "Task updated" : "Task added");
+    toast.success(editing ? t("Task updated") : t("Task added"));
     void load();
   };
 
-  const remove = async (t: Task) => {
-    if (!confirm(`Delete "${t.title}"?`)) return;
-    const { error } = await supabase.from("todo_tasks").delete().eq("id", t.id);
+  const remove = async (task: Task) => {
+    if (!confirm(t('Delete "{title}"?', { title: task.title }))) return;
+    const { error } = await supabase.from("todo_tasks").delete().eq("id", task.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void load();
@@ -271,10 +274,10 @@ function AdminTodo() {
     });
     setSeeding(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success(`Added ${data ?? 0} tasks from templates`);
+    toast.success(t("Added {count} tasks from templates", { count: data ?? 0 }));
     void load();
   };
 
@@ -292,9 +295,9 @@ function AdminTodo() {
       <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
         <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
           <div>
-            <p className="font-script text-xl text-primary">your planner</p>
+            <p className="font-script text-xl text-primary">{t("your planner")}</p>
             <h2 className="font-display text-2xl">
-              {done} / {total} tasks completed
+              {t("{done} / {total} tasks completed", { done, total })}
             </h2>
           </div>
           <div className="flex gap-2">
@@ -309,20 +312,20 @@ function AdminTodo() {
               ) : (
                 <Sparkles className="w-4 h-4" />
               )}
-              Add missing template tasks
+              {t("Add missing template tasks")}
             </Button>
             <Button size="sm" onClick={openCreate}>
-              <Plus className="w-4 h-4" /> New task
+              <Plus className="w-4 h-4" /> {t("New task")}
             </Button>
           </div>
         </div>
         <Progress value={pct} className="h-3" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-sm">
-          <Stat label="Total" value={total} />
-          <Stat label="In progress" value={inProgress} />
-          <Stat label="Done" value={done} />
+          <Stat label={t("Total")} value={total} />
+          <Stat label={t("In progress")} value={inProgress} />
+          <Stat label={t("Done")} value={done} />
           <Stat
-            label="Overdue"
+            label={t("Overdue")}
             value={overdue}
             tone={overdue > 0 ? "danger" : "muted"}
           />
@@ -333,21 +336,21 @@ function AdminTodo() {
       <div className="flex flex-wrap items-center gap-3">
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as "all" | Status)}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t("Status")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="todo">To do</SelectItem>
-            <SelectItem value="in_progress">In progress</SelectItem>
-            <SelectItem value="done">Done</SelectItem>
+            <SelectItem value="all">{t("All statuses")}</SelectItem>
+            <SelectItem value="todo">{t("To do")}</SelectItem>
+            <SelectItem value="in_progress">{t("In progress")}</SelectItem>
+            <SelectItem value="done">{t("Done")}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder={t("Category")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">{t("All categories")}</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c} value={c}>
                 {c}
@@ -357,11 +360,11 @@ function AdminTodo() {
         </Select>
         <Select value={sortBy} onValueChange={(v) => setSortBy(v as "deadline" | "priority")}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Sort" />
+            <SelectValue placeholder={t("Sort")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="deadline">Sort by deadline</SelectItem>
-            <SelectItem value="priority">Sort by priority</SelectItem>
+            <SelectItem value="deadline">{t("Sort by deadline")}</SelectItem>
+            <SelectItem value="priority">{t("Sort by priority")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -369,7 +372,7 @@ function AdminTodo() {
       {/* Grouped list */}
       {grouped.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-          No tasks yet. Add one or load template tasks.
+          {t("No tasks yet. Add one or load template tasks.")}
         </div>
       ) : (
         <div className="space-y-6">
@@ -377,14 +380,14 @@ function AdminTodo() {
             <section key={category}>
               <h3 className="font-display text-lg mb-2">{category}</h3>
               <div className="rounded-2xl border border-border bg-card divide-y divide-border shadow-soft">
-                {list.map((t) => (
+                {list.map((task) => (
                   <TaskRow
-                    key={t.id}
-                    task={t}
-                    budget={budgets.find((b) => b.id === t.budget_item_id) ?? null}
-                    onToggle={() => toggleDone(t)}
-                    onEdit={() => openEdit(t)}
-                    onDelete={() => remove(t)}
+                    key={task.id}
+                    task={task}
+                    budget={budgets.find((b) => b.id === task.budget_item_id) ?? null}
+                    onToggle={() => toggleDone(task)}
+                    onEdit={() => openEdit(task)}
+                    onDelete={() => remove(task)}
                   />
                 ))}
               </div>
@@ -400,22 +403,22 @@ function AdminTodo() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit task" : "New task"}</DialogTitle>
+            <DialogTitle>{editing ? t("Edit task") : t("New task")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <Input
-              placeholder="Title"
+              placeholder={t("Title")}
               value={draft.title}
               onChange={(e) => setDraft({ ...draft, title: e.target.value })}
             />
             <Textarea
-              placeholder="Description (optional)"
+              placeholder={t("Description (optional)")}
               value={draft.description}
               onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             />
             <div className="grid grid-cols-2 gap-3">
               <Input
-                placeholder="Category"
+                placeholder={t("Category")}
                 value={draft.category}
                 onChange={(e) => setDraft({ ...draft, category: e.target.value })}
               />
@@ -434,9 +437,9 @@ function AdminTodo() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low priority</SelectItem>
-                  <SelectItem value="medium">Medium priority</SelectItem>
-                  <SelectItem value="high">High priority</SelectItem>
+                  <SelectItem value="low">{t("Low priority")}</SelectItem>
+                  <SelectItem value="medium">{t("Medium priority")}</SelectItem>
+                  <SelectItem value="high">{t("High priority")}</SelectItem>
                 </SelectContent>
               </Select>
               <Select
@@ -447,9 +450,9 @@ function AdminTodo() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todo">To do</SelectItem>
-                  <SelectItem value="in_progress">In progress</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="todo">{t("To do")}</SelectItem>
+                  <SelectItem value="in_progress">{t("In progress")}</SelectItem>
+                  <SelectItem value="done">{t("Done")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -460,10 +463,10 @@ function AdminTodo() {
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="No budget item" />
+                <SelectValue placeholder={t("No budget item")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none__">No budget item</SelectItem>
+                <SelectItem value="__none__">{t("No budget item")}</SelectItem>
                 {budgets.map((b) => (
                   <SelectItem key={b.id} value={b.id}>
                     {b.name}
@@ -474,11 +477,11 @@ function AdminTodo() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button onClick={save} disabled={saving}>
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-              Save
+              {t("Save")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -486,6 +489,8 @@ function AdminTodo() {
     </div>
   );
 }
+
+const PRIORITY_LABEL: Record<Priority, MessageKey> = { low: "low", medium: "medium", high: "high" };
 
 function Stat({
   label,
@@ -523,6 +528,7 @@ function TaskRow({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const { t, locale } = useI18n();
   const isOverdue =
     task.status !== "done" && task.deadline && new Date(task.deadline) < new Date();
   const priorityColor =
@@ -555,11 +561,11 @@ function TaskRow({
           <span
             className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${priorityColor}`}
           >
-            {task.priority}
+            {t(PRIORITY_LABEL[task.priority])}
           </span>
           {task.status === "in_progress" && (
             <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-              in progress
+              {t("in progress")}
             </span>
           )}
         </div>
@@ -578,10 +584,10 @@ function TaskRow({
               ) : (
                 <CalendarDays className="w-3 h-3" />
               )}
-              {new Date(task.deadline).toLocaleDateString()}
+              {new Date(task.deadline).toLocaleDateString(locale)}
             </span>
           ) : (
-            <span>No deadline</span>
+            <span>{t("No deadline")}</span>
           )}
           {budget && (
             <span className="inline-flex items-center gap-1">

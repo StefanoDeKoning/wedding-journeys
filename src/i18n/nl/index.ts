@@ -14,6 +14,7 @@ import rsvp from "./rsvp";
 import guestPages from "./guestPages";
 import admin from "./admin";
 import adminGuests from "./adminGuests";
+import adminPlanning from "./adminPlanning";
 
 export const NL = {
   ...core,
@@ -25,6 +26,7 @@ export const NL = {
   ...guestPages,
   ...admin,
   ...adminGuests,
+  ...adminPlanning,
 };
 
 export type MessageKey = keyof typeof NL;
