@@ -16,11 +16,13 @@ import {
 import { useWedding } from "@/wedding/useWedding";
 import { Loader2 } from "lucide-react";
 
+import { tHead, useT } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/admin")({
   head: () => ({
     meta: [
-      { title: "Admin" },
-      { name: "description", content: "Manage your wedding." },
+      { title: tHead("Admin") },
+      { name: "description", content: tHead("Manage your wedding.") },
     ],
   }),
   component: AdminLayout,
@@ -39,11 +41,12 @@ const tabs = [
   { to: "/$slug/admin/photos" as const, label: "Photos", icon: ImageIcon, exact: false },
   { to: "/$slug/admin/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false },
   { to: "/$slug/admin/settings" as const, label: "Settings", icon: SettingsIcon, exact: false },
-];
+] as const;
 
 function AdminLayout() {
   const { slug } = Route.useParams();
   const { loading, isAdmin, wedding } = useWedding(slug);
+  const t = useT();
 
   if (loading) {
     return (
@@ -62,23 +65,23 @@ function AdminLayout() {
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-10">
       <header className="mb-6">
-        <p className="font-script text-2xl text-primary">behind the scenes</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">Admin dashboard</h1>
+        <p className="font-script text-2xl text-primary">{t("behind the scenes")}</p>
+        <h1 className="mt-1 font-display text-3xl sm:text-4xl">{t("Admin dashboard")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Manage guests, seating, timeline and more for{" "}
+          {t("Manage guests, seating, timeline and more for")}{" "}
           <span className="text-foreground font-medium">{wedding.wedding_name ?? slug}</span>.
         </p>
       </header>
 
       <nav className="flex gap-1 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 mb-6 border-b border-border scrollbar-thin">
-        {tabs.map((t) => {
-          const Icon = t.icon;
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
           return (
             <Link
-              key={t.to}
-              to={t.to}
+              key={tab.to}
+              to={tab.to}
               params={{ slug }}
-              activeOptions={{ exact: t.exact }}
+              activeOptions={{ exact: tab.exact }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
               activeProps={{
                 className:
@@ -86,7 +89,7 @@ function AdminLayout() {
               }}
             >
               <Icon className="w-3.5 h-3.5" />
-              {t.label}
+              {t(tab.label)}
             </Link>
           );
         })}

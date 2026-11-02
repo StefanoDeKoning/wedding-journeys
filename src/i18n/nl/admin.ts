@@ -1,0 +1,53 @@
+/** Couple admin: layout, overview and shared admin wording. Admins are addressed as "je"/"jullie". */
+const nl = {
+  // Layout
+  "Manage your wedding.": "Beheer jullie bruiloft.",
+  Overview: "Overzicht",
+  "Guests & RSVP": "Gasten & RSVP",
+  ToDo: "Taken",
+  Photos: "Foto's",
+  Settings: "Instellingen",
+  "Admin dashboard": "Beheerdashboard",
+  "Manage guests, seating, timeline and more for": "Beheer gasten, tafelschikking, tijdlijn en meer voor",
+
+  // Overview
+  "Wedding dashboard — OurJourney": "Bruiloftdashboard — OurJourney",
+  "Manage your wedding and release the timeline to guests.":
+    "Beheer jullie bruiloft en geef de tijdlijn vrij voor gasten.",
+  "Manage your wedding and timeline availability.": "Beheer jullie bruiloft en de beschikbaarheid van de tijdlijn.",
+  "Could not update status": "De status kon niet worden bijgewerkt",
+  "Website published": "Website gepubliceerd",
+  "Website unpublished": "Website offline gehaald",
+  "Timeline available to guests": "Tijdlijn beschikbaar voor gasten",
+  "Timeline hidden from guests": "Tijdlijn verborgen voor gasten",
+  "Could not save timeline availability. Please try again.":
+    "De beschikbaarheid van de tijdlijn kon niet worden opgeslagen. Probeer het opnieuw.",
+  "Website status": "Status van de website",
+  Published: "Gepubliceerd",
+  Draft: "Concept",
+  "Your wedding website is live and visible to guests.": "Jullie trouwwebsite is online en zichtbaar voor gasten.",
+  "Your wedding website is private. Only you can see it.": "Jullie trouwwebsite is privé. Alleen jullie kunnen hem zien.",
+  "Open website": "Website openen",
+  "Unpublish website": "Website offline halen",
+  "Available to guests": "Beschikbaar voor gasten",
+  "Not available": "Niet beschikbaar",
+  "Make unavailable": "Niet meer beschikbaar maken",
+  "Make available": "Beschikbaar maken",
+  Guests: "Gasten",
+  "{yes} yes · {no} no · {none} no reply": "{yes} ja · {no} nee · {none} geen antwoord",
+  RSVPs: "RSVP's",
+  "{count} still pending": "{count} nog open",
+  "{count} need review": "{count} te beoordelen",
+  "All moderated": "Alles beoordeeld",
+  "Curated by guests": "Samengesteld door gasten",
+  "Planning progress": "Voortgang van de planning",
+  Manage: "Beheren",
+  "No tasks yet.": "Nog geen taken.",
+  "Add your first task": "Voeg je eerste taak toe",
+  "{done} of {total} done": "{done} van {total} klaar",
+  Total: "Totaal",
+  Completed: "Afgerond",
+  Remaining: "Te gaan",
+  "{used} of {limit} used": "{used} van {limit} gebruikt",
+} satisfies Record<string, string>;
+export default nl;

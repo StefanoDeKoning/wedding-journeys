@@ -20,13 +20,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { setWeddingStatus } from "@/auth/wedding.functions";
 import { Button } from "@/components/ui/button";
 
+import { tHead, useI18n } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/admin/")({
   head: () => ({
     meta: [
-      { title: "Wedding dashboard — OurJourney" },
-      { name: "description", content: "Manage your wedding and release the timeline to guests." },
-      { property: "og:title", content: "Wedding dashboard — OurJourney" },
-      { property: "og:description", content: "Manage your wedding and timeline availability." },
+      { title: tHead("Wedding dashboard — OurJourney") },
+      { name: "description", content: tHead("Manage your wedding and release the timeline to guests.") },
+      { property: "og:title", content: tHead("Wedding dashboard — OurJourney") },
+      { property: "og:description", content: tHead("Manage your wedding and timeline availability.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -57,6 +59,7 @@ function AdminOverview() {
   const [timelineAvailable, setTimelineAvailable] = useState<boolean | null>(null);
   const [savingTimeline, setSavingTimeline] = useState(false);
   const [timelineError, setTimelineError] = useState<string | null>(null);
+  const { t, tx } = useI18n();
 
   useEffect(() => {
     if (!wedding) return;
@@ -125,10 +128,10 @@ function AdminOverview() {
     setPublishing(false);
     if (!res.ok) {
       setLocalStatus(localStatus);
-      toast.error(res.error ?? "Could not update status");
+      toast.error(res.error ? tx(res.error) : t("Could not update status"));
       return;
     }
-    toast.success(next === "published" ? "Website published" : "Website unpublished");
+    toast.success(next === "published" ? t("Website published") : t("Website unpublished"));
     void refresh();
   };
 
@@ -146,9 +149,9 @@ function AdminOverview() {
         .single();
       if (error || !data) throw new Error("Could not save timeline availability. Please try again.");
       setTimelineAvailable(data.timeline_available);
-      toast.success(next ? "Timeline available to guests" : "Timeline hidden from guests");
+      toast.success(next ? t("Timeline available to guests") : t("Timeline hidden from guests"));
     } catch {
-      const message = "Could not save timeline availability. Please try again.";
+      const message = t("Could not save timeline availability. Please try again.");
       setTimelineError(message);
       toast.error(message);
     } finally {
@@ -192,7 +195,7 @@ function AdminOverview() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-display text-lg">Website status</h2>
+                <h2 className="font-display text-lg">{t("Website status")}</h2>
                 <span
                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
                     isPublished
@@ -200,13 +203,13 @@ function AdminOverview() {
                       : "bg-amber-500/15 text-amber-700"
                   }`}
                 >
-                  {isPublished ? "Published" : "Draft"}
+                  {isPublished ? t("Published") : t("Draft")}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
                 {isPublished
-                  ? "Your wedding website is live and visible to guests."
-                  : "Your wedding website is private. Only you can see it."}
+                  ? t("Your wedding website is live and visible to guests.")
+                  : t("Your wedding website is private. Only you can see it.")}
               </p>
               {isPublished && (
                 <Link
@@ -223,7 +226,7 @@ function AdminOverview() {
             {isPublished && (
               <Button asChild variant="outline" size="sm">
                 <Link to="/$slug" params={{ slug }}>
-                  Open website
+                  {t("Open website")}
                 </Link>
               </Button>
             )}
@@ -234,7 +237,7 @@ function AdminOverview() {
               size="sm"
             >
               {publishing && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              {isPublished ? "Unpublish website" : "Publish website"}
+              {isPublished ? t("Unpublish website") : t("Publish website")}
             </Button>
           </div>
         </div>
@@ -244,10 +247,10 @@ function AdminOverview() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 id="timeline-availability-title" className="flex items-center gap-2 font-display text-lg">
-              <CalendarHeart className="h-4 w-4 text-primary" /> Timeline
+              <CalendarHeart className="h-4 w-4 text-primary" /> {t("Timeline")}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground" role="status">
-              {timelineAvailable ? "Available to guests" : "Not available"}
+              {timelineAvailable ? t("Available to guests") : t("Not available")}
             </p>
           </div>
           <Button
@@ -257,7 +260,7 @@ function AdminOverview() {
             onClick={handleTimelineAvailability}
           >
             {savingTimeline && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-            {timelineAvailable ? "Make unavailable" : "Make available"}
+            {timelineAvailable ? t("Make unavailable") : t("Make available")}
           </Button>
         </div>
         {timelineError && <p role="alert" className="mt-2 text-sm text-destructive">{timelineError}</p>}
@@ -266,33 +269,41 @@ function AdminOverview() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={Users}
-          label="Guests"
+          label={t("Guests")}
           value={stats.guests}
-          hint={`${stats.rsvpYes} yes · ${stats.rsvpNo} no · ${stats.rsvpNone} no reply`}
+          hint={t("{yes} yes · {no} no · {none} no reply", {
+            yes: stats.rsvpYes,
+            no: stats.rsvpNo,
+            none: stats.rsvpNone,
+          })}
           to="/$slug/admin/rsvp"
           slug={slug}
         />
         <StatCard
           icon={ListChecks}
-          label="RSVPs"
+          label={t("RSVPs")}
           value={stats.rsvpYes + stats.rsvpNo}
-          hint={`${stats.rsvpNone} still pending`}
+          hint={t("{count} still pending", { count: stats.rsvpNone })}
           to="/$slug/admin/rsvp"
           slug={slug}
         />
         <StatCard
           icon={ImageIcon}
-          label="Photos"
+          label={t("Photos")}
           value={stats.photos}
-          hint={stats.pendingPhotos > 0 ? `${stats.pendingPhotos} need review` : "All moderated"}
+          hint={
+            stats.pendingPhotos > 0
+              ? t("{count} need review", { count: stats.pendingPhotos })
+              : t("All moderated")
+          }
           to="/$slug/admin/photos"
           slug={slug}
         />
         <StatCard
           icon={Music}
-          label="Song requests"
+          label={t("Song requests")}
           value={stats.songs}
-          hint="Curated by guests"
+          hint={t("Curated by guests")}
           to="/$slug/playlist"
           slug={slug}
         />
@@ -303,26 +314,26 @@ function AdminOverview() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <ListTodo className="w-4 h-4 text-primary" />
-            <h2 className="font-display text-lg">Planning progress</h2>
+            <h2 className="font-display text-lg">{t("Planning progress")}</h2>
           </div>
           <Link
             to="/$slug/admin/todo"
             params={{ slug }}
             className="text-xs text-primary hover:underline inline-flex items-center gap-1"
           >
-            Manage <ArrowRight className="w-3 h-3" />
+            {t("Manage")} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
 
         {stats.todoTotal === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No tasks yet.{" "}
+            {t("No tasks yet.")}{" "}
             <Link
               to="/$slug/admin/todo"
               params={{ slug }}
               className="text-primary hover:underline"
             >
-              Add your first task
+              {t("Add your first task")}
             </Link>
             .
           </p>
@@ -330,7 +341,7 @@ function AdminOverview() {
           <>
             <div className="flex items-center justify-between mb-2 text-sm">
               <span className="text-muted-foreground">
-                {stats.todoDone} of {stats.todoTotal} done
+                {t("{done} of {total} done", { done: stats.todoDone, total: stats.todoTotal })}
               </span>
               <span className="font-medium">{todoPct}%</span>
             </div>
@@ -341,9 +352,9 @@ function AdminOverview() {
               />
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
-              <MiniStat label="Total" value={stats.todoTotal} />
-              <MiniStat label="Completed" value={stats.todoDone} />
-              <MiniStat label="Remaining" value={todoRemaining} />
+              <MiniStat label={t("Total")} value={stats.todoTotal} />
+              <MiniStat label={t("Completed")} value={stats.todoDone} />
+              <MiniStat label={t("Remaining")} value={todoRemaining} />
             </div>
           </>
         )}
@@ -353,14 +364,14 @@ function AdminOverview() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <HardDrive className="w-4 h-4 text-primary" />
-            <h2 className="font-display text-lg">Storage</h2>
+            <h2 className="font-display text-lg">{t("Storage")}</h2>
           </div>
           <Link
             to="/$slug/admin/settings"
             params={{ slug }}
             className="text-xs text-primary hover:underline inline-flex items-center gap-1"
           >
-            Manage <ArrowRight className="w-3 h-3" />
+            {t("Manage")} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
         <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -370,7 +381,10 @@ function AdminOverview() {
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          {formatBytes(stats.storageUsed)} of {formatBytes(stats.storageLimit)} used
+          {t("{used} of {limit} used", {
+            used: formatBytes(stats.storageUsed),
+            limit: formatBytes(stats.storageLimit),
+          })}
         </p>
       </div>
     </div>
