@@ -1,5 +1,6 @@
 import { Clock, EyeOff, Trash2 } from "lucide-react";
 import { MediaCard } from "@/design-system";
+import { useT } from "@/i18n";
 
 export interface GalleryPhoto {
   id: string;
@@ -26,12 +27,17 @@ export function PhotoTile({
   onView?: () => void;
   onDelete?: () => void;
 }) {
-  const caption = photo.caption ?? (photo.uploader_name ? `By ${photo.uploader_name}` : undefined);
+  const t = useT();
+  const caption =
+    photo.caption ?? (photo.uploader_name ? t("By {name}", { name: photo.uploader_name }) : undefined);
 
   return (
     <MediaCard
       src={url}
-      alt={photo.caption ?? (photo.uploader_name ? `Photo by ${photo.uploader_name}` : "Wedding photo")}
+      alt={
+        photo.caption ??
+        (photo.uploader_name ? t("Photo by {name}", { name: photo.uploader_name }) : t("Wedding photo"))
+      }
       onClick={onView}
       className={photo.status === "hidden" ? "opacity-50" : undefined}
       caption={caption}
@@ -43,7 +49,7 @@ export function PhotoTile({
             ) : (
               <EyeOff aria-hidden="true" className="w-2.5 h-2.5" />
             )}
-            {photo.status}
+            {photo.status === "pending" ? t("pending") : t("hidden")}
           </span>
         ) : undefined
       }
@@ -53,8 +59,8 @@ export function PhotoTile({
             type="button"
             onClick={onDelete}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-background/95 shadow-elev-1 hover:bg-destructive hover:text-destructive-foreground focus-ring-elegant"
-            aria-label="Delete photo"
-            title="Delete"
+            aria-label={t("Delete photo")}
+            title={t("Delete")}
           >
             <Trash2 aria-hidden="true" className="h-3.5 w-3.5" />
           </button>

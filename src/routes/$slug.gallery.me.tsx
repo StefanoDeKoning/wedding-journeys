@@ -17,11 +17,13 @@ import {
   ConfirmDialog,
 } from "@/design-system";
 
+import { tHead, useI18n } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/gallery/me")({
   head: () => ({
     meta: [
-      { title: "My photos" },
-      { name: "description", content: "Photos you uploaded to this wedding." },
+      { title: tHead("My photos") },
+      { name: "description", content: tHead("Photos you uploaded to this wedding.") },
     ],
   }),
   component: MyPhotosPage,
@@ -37,6 +39,7 @@ interface Photo {
 
 function MyPhotosPage() {
   const { slug } = Route.useParams();
+  const { t, tx } = useI18n();
   const { wedding, guest } = useWeddingContext();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
@@ -52,7 +55,7 @@ function MyPhotosPage() {
       .eq("wedding_id", wedding.id)
       .eq("guest_id", guest.id)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     const list = (data ?? []) as Photo[];
     setPhotos(list);
     setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
@@ -68,10 +71,10 @@ function MyPhotosPage() {
     await supabase.storage.from("wedding-photos").remove([path]);
     const { error } = await supabase.from("photos").delete().eq("id", id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success("Deleted.");
+    toast.success(t("Deleted."));
     void load();
   };
 
@@ -80,14 +83,13 @@ function MyPhotosPage() {
       <PageCanvas density="quiet">
         <Section size="hero" width="prose">
           <ThemedCard className="text-center">
-            <h1 className="type-section-title">Sign in as a guest</h1>
+            <h1 className="type-section-title">{t("Sign in as a guest")}</h1>
             <p className="type-body mt-2 text-muted-foreground">
-              Your personal photo page is only available when you're signed in with your
-              invitation code.
+              {t("Your personal photo page is only available when you're signed in with your invitation code.")}
             </p>
             <ThemedButton asChild variant="secondary" className="mt-6">
               <Link to="/$slug/gallery" params={{ slug }}>
-                <ArrowLeft aria-hidden="true" className="w-4 h-4" /> Back to gallery
+                <ArrowLeft aria-hidden="true" className="w-4 h-4" /> {t("Back to gallery")}
               </Link>
             </ThemedButton>
           </ThemedCard>
@@ -104,15 +106,15 @@ function MyPhotosPage() {
           params={{ slug }}
           className="type-caption inline-flex items-center hover-gild focus-ring-elegant"
         >
-          <ArrowLeft aria-hidden="true" className="w-3.5 h-3.5 mr-1" /> Back to gallery
+          <ArrowLeft aria-hidden="true" className="w-3.5 h-3.5 mr-1" /> {t("Back to gallery")}
         </Link>
       </Section>
 
       <Container width="wide">
         <Hero
-          script="your moments"
-          title={`${guest.first_name}'s photos`}
-          subtitle="Everything you've uploaded — visible only to you and the couple."
+          script={t("your moments")}
+          title={t("{name}'s photos", { name: guest.first_name })}
+          subtitle={t("Everything you've uploaded — visible only to you and the couple.")}
         />
       </Container>
 
@@ -124,12 +126,12 @@ function MyPhotosPage() {
         ) : photos.length === 0 ? (
           <EmptyState
             motif="gold-leaf"
-            title="You haven't uploaded any photos yet"
-            description="Share a moment from the day — it'll appear here."
+            title={t("You haven't uploaded any photos yet")}
+            description={t("Share a moment from the day — it'll appear here.")}
             action={
               <ThemedButton asChild>
                 <Link to="/$slug/gallery" params={{ slug }}>
-                  Upload your first photo
+                  {t("Upload your first photo")}
                 </Link>
               </ThemedButton>
             }
@@ -152,8 +154,8 @@ function MyPhotosPage() {
       <ConfirmDialog
         open={pendingDelete !== null}
         onOpenChange={(open) => !open && setPendingDelete(null)}
-        title="Delete this photo?"
-        description="This removes it permanently — it can't be undone."
+        title={t("Delete this photo?")}
+        description={t("This removes it permanently — it can't be undone.")}
         onConfirm={() => {
           if (pendingDelete) void remove(pendingDelete.id, pendingDelete.path);
           setPendingDelete(null);

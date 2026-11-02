@@ -19,11 +19,13 @@ import {
   ConfirmDialog,
 } from "@/design-system";
 
+import { tHead, useI18n } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/guestbook")({
   head: () => ({
     meta: [
-      { title: "Guestbook" },
-      { name: "description", content: "Leave a message for the couple." },
+      { title: tHead("Guestbook") },
+      { name: "description", content: tHead("Leave a message for the couple.") },
     ],
   }),
   component: () => (
@@ -48,6 +50,7 @@ function GuestbookPage() {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     setLoading(true);
@@ -56,7 +59,7 @@ function GuestbookPage() {
       .select("id, guest_id, author_name, message, created_at")
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     setMessages((data ?? []) as Message[]);
     setLoading(false);
   };
@@ -69,11 +72,11 @@ function GuestbookPage() {
   const post = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!guest) {
-      toast.error("Only signed-in guests can sign the guestbook.");
+      toast.error(t("Only signed-in guests can sign the guestbook."));
       return;
     }
     if (!text.trim()) {
-      toast.error("Write a little something first.");
+      toast.error(t("Write a little something first."));
       return;
     }
     setSubmitting(true);
@@ -85,21 +88,21 @@ function GuestbookPage() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     setText("");
-    toast.success("Thank you for the kind words!");
+    toast.success(t("Thank you for the kind words!"));
     void load();
   };
 
   const remove = async (id: string) => {
     const { error } = await supabase.from("guestbook_messages").delete().eq("id", id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success("Removed.");
+    toast.success(t("Removed."));
     void load();
   };
 
@@ -107,9 +110,9 @@ function GuestbookPage() {
     <PageCanvas density="regular">
       <Container width="prose">
         <Hero
-          script="a wall of wishes"
-          title="Guestbook"
-          subtitle="Leave the couple a note, a memory, or your best wishes for the road ahead."
+          script={t("a wall of wishes")}
+          title={t("Guestbook")}
+          subtitle={t("Leave the couple a note, a memory, or your best wishes for the road ahead.")}
         />
       </Container>
 
@@ -120,20 +123,20 @@ function GuestbookPage() {
               <ThemedTextarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Wishing you both a lifetime of love and laughter…"
+                placeholder={t("Wishing you both a lifetime of love and laughter…")}
                 rows={4}
                 maxLength={1000}
                 disabled={submitting}
               />
               <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
-                {submitting ? "Sending…" : "Sign the guestbook"}
+                {submitting ? t("Sending…") : t("Sign the guestbook")}
               </ThemedButton>
             </form>
           </FormPanel>
         ) : (
           <ThemedCard className="mx-auto max-w-prose text-center">
             <p className="type-body text-muted-foreground">
-              Sign in with your invitation code to leave a message.
+              {t("Sign in with your invitation code to leave a message.")}
             </p>
           </ThemedCard>
         )}
@@ -142,8 +145,8 @@ function GuestbookPage() {
       <ConfirmDialog
         open={pendingDeleteId !== null}
         onOpenChange={(open) => !open && setPendingDeleteId(null)}
-        title="Delete this message?"
-        description="This can't be undone."
+        title={t("Delete this message?")}
+        description={t("This can't be undone.")}
         onConfirm={() => {
           if (pendingDeleteId) void remove(pendingDeleteId);
           setPendingDeleteId(null);
@@ -152,8 +155,12 @@ function GuestbookPage() {
 
       <Section size="spacious" width="content">
         <SectionHeader
-          eyebrow="from the heart"
-          title={`${messages.length} message${messages.length === 1 ? "" : "s"} so far`}
+          eyebrow={t("from the heart")}
+          title={
+            messages.length === 1
+              ? t("1 message so far")
+              : t("{count} messages so far", { count: messages.length })
+          }
         />
 
         <div className="mt-block">
@@ -164,8 +171,8 @@ function GuestbookPage() {
           ) : messages.length === 0 ? (
             <EmptyState
               motif="rose"
-              title="Be the first to leave a message"
-              description="Your note will appear here for the couple to treasure."
+              title={t("Be the first to leave a message")}
+              description={t("Your note will appear here for the couple to treasure.")}
             />
           ) : (
             <div className="grid gap-gutter sm:grid-cols-2">
@@ -187,7 +194,7 @@ function GuestbookPage() {
                         <p className="type-body text-muted-foreground whitespace-pre-line">{m.message}</p>
                         <p className="type-caption mt-3">
                           {m.author_name}
-                          {mine && " · you"}
+                          {mine && ` · ${t("you")}`}
                         </p>
                       </div>
                       {canDelete && (
@@ -195,7 +202,7 @@ function GuestbookPage() {
                           type="button"
                           onClick={() => setPendingDeleteId(m.id)}
                           className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:text-destructive focus-ring-elegant"
-                          aria-label="Delete message"
+                          aria-label={t("Delete message")}
                         >
                           <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />
                         </button>

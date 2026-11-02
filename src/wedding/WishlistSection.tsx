@@ -3,6 +3,7 @@ import { Gift, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { safeHttpUrl } from "@/lib/safeUrl";
 import { Section, SectionHeader, WishCard, ThemedButton } from "@/design-system";
+import { useT } from "@/i18n";
 
 export interface WishlistItem {
   id: string;
@@ -17,6 +18,7 @@ export interface WishlistItem {
 export function WishlistSection({ weddingId }: { weddingId: string }) {
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const t = useT();
 
   useEffect(() => {
     let cancelled = false;
@@ -42,10 +44,10 @@ export function WishlistSection({ weddingId }: { weddingId: string }) {
   return (
     <Section size="regular" width="wide">
       <SectionHeader
-        eyebrow="a small favor"
-        script="our wishlist"
-        title="Gift ideas"
-        description="Your presence is the greatest gift. If you'd still like to spoil us, here are a few ideas."
+        eyebrow={t("a small favor")}
+        script={t("our wishlist")}
+        title={t("Gift ideas")}
+        description={t("Your presence is the greatest gift. If you'd still like to spoil us, here are a few ideas.")}
       />
 
       <div className="mt-block grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
@@ -62,7 +64,7 @@ export function WishlistSection({ weddingId }: { weddingId: string }) {
                 <ThemedButton asChild variant="gilded" size="sm">
                   <a href={safeHttpUrl(item.external_url)!} target="_blank" rel="noreferrer noopener">
                     <ExternalLink aria-hidden="true" className="w-3.5 h-3.5" />
-                    View gift
+                    {t("View gift")}
                   </a>
                 </ThemedButton>
               )

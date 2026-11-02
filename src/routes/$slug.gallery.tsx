@@ -28,13 +28,15 @@ import {
   ConfirmDialog,
 } from "@/design-system";
 
+import { tHead, useI18n, type MessageKey } from "@/i18n";
+
 const MAX_BYTES = 20 * 1024 * 1024; // 20 MB
 
 export const Route = createFileRoute("/$slug/gallery")({
   head: () => ({
     meta: [
-      { title: "Gallery" },
-      { name: "description", content: "Photos from the day." },
+      { title: tHead("Gallery") },
+      { name: "description", content: tHead("Photos from the day.") },
     ],
   }),
   component: () => (
@@ -67,6 +69,7 @@ function GalleryPage() {
   const [qrOpen, setQrOpen] = useState(false);
   const [viewId, setViewId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<{ id: string; path: string } | null>(null);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     setLoading(true);
@@ -77,7 +80,7 @@ function GalleryPage() {
       )
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     const list = (data ?? []) as Photo[];
     setPhotos(list);
     setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
@@ -90,7 +93,7 @@ function GalleryPage() {
   }, [wedding.id]);
 
   // Upload window: from ceremony start until +48h after reception (or ceremony)
-  const uploadWindow = useMemo(() => {
+  const uploadWindow = useMemo((): { open: boolean; label: MessageKey | "" } => {
     const now = Date.now();
     const start = wedding.ceremony_at ? new Date(wedding.ceremony_at).getTime() : null;
     const endRef = wedding.reception_at ?? wedding.ceremony_at;
@@ -118,7 +121,7 @@ function GalleryPage() {
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     if (!guest) {
-      toast.error("Only signed-in guests can upload photos.");
+      toast.error(t("Only signed-in guests can upload photos."));
       return;
     }
 
@@ -128,12 +131,12 @@ function GalleryPage() {
 
     for (const file of Array.from(files)) {
       if (!file.type.startsWith("image/")) {
-        toast.error(`${file.name}: only image files are allowed.`);
+        toast.error(t("{file}: only image files are allowed.", { file: file.name }));
         failed++;
         continue;
       }
       if (file.size > MAX_BYTES) {
-        toast.error(`${file.name}: exceeds 20MB limit.`);
+        toast.error(t("{file}: exceeds 20MB limit.", { file: file.name }));
         failed++;
         continue;
       }
@@ -149,7 +152,7 @@ function GalleryPage() {
           contentType: file.type,
         });
       if (upErr) {
-        toast.error(`${file.name}: ${upErr.message}`);
+        toast.error(`${file.name}: ${tx(upErr.message)}`);
         failed++;
         continue;
       }
@@ -163,7 +166,7 @@ function GalleryPage() {
         status: "approved",
       });
       if (dbErr) {
-        toast.error(`${file.name}: ${dbErr.message}`);
+        toast.error(`${file.name}: ${tx(dbErr.message)}`);
         failed++;
         continue;
       }
@@ -174,11 +177,13 @@ function GalleryPage() {
     setCaption("");
     if (fileInput.current) fileInput.current.value = "";
     if (uploaded > 0) {
-      toast.success(`${uploaded} photo${uploaded === 1 ? "" : "s"} uploaded!`);
+      toast.success(
+        uploaded === 1 ? t("1 photo uploaded!") : t("{count} photos uploaded!", { count: uploaded }),
+      );
       void load();
     }
     if (failed > 0 && uploaded === 0) {
-      toast.error("No photos uploaded.");
+      toast.error(t("No photos uploaded."));
     }
   };
 
@@ -192,10 +197,10 @@ function GalleryPage() {
     }
     const { error } = await supabase.from("photos").delete().eq("id", id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success("Deleted.");
+    toast.success(t("Deleted."));
     void load();
   };
 
@@ -208,11 +213,11 @@ function GalleryPage() {
     <PageCanvas density="regular">
       <Container width="prose">
         <Hero
-          script="the day in pictures"
-          title="Gallery"
-          subtitle="Share your photos with us — every angle, every smile."
+          script={t("the day in pictures")}
+          title={t("Gallery")}
+          subtitle={t("Share your photos with us — every angle, every smile.")}
           extra={
-            uploadWindow.label && <p className="type-caption text-center italic">{uploadWindow.label}</p>
+            uploadWindow.label && <p className="type-caption text-center italic">{t(uploadWindow.label)}</p>
           }
         />
       </Container>
@@ -224,7 +229,7 @@ function GalleryPage() {
               <ThemedInput
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="Add an optional caption…"
+                placeholder={t("Add an optional caption…")}
                 maxLength={200}
                 disabled={!guest || uploading}
               />
@@ -244,12 +249,12 @@ function GalleryPage() {
                 {uploading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Uploading…
+                    {t("Uploading…")}
                   </>
                 ) : (
                   <>
                     <Upload className="w-4 h-4" />
-                    Upload photos (max 20MB each)
+                    {t("Upload photos (max 20MB each)")}
                   </>
                 )}
               </ThemedButton>
@@ -257,13 +262,13 @@ function GalleryPage() {
             <div className="flex gap-2">
               <ThemedButton variant="secondary" onClick={() => setQrOpen(true)}>
                 <QrCode className="w-4 h-4" />
-                QR code
+                {t("QR code")}
               </ThemedButton>
               {guest && (
                 <ThemedButton variant="secondary" asChild>
                   <Link to="/$slug/gallery/me" params={{ slug }}>
                     <User className="w-4 h-4" />
-                    My photos
+                    {t("My photos")}
                   </Link>
                 </ThemedButton>
               )}
@@ -271,14 +276,14 @@ function GalleryPage() {
           </div>
           {!guest && (
             <p className="mt-3 type-caption text-center">
-              Sign in as a guest to upload your own photos.
+              {t("Sign in as a guest to upload your own photos.")}
             </p>
           )}
         </FormPanel>
       </Section>
 
       <Section size="spacious" width="wide">
-        <SectionHeader eyebrow="every angle" title="Moments captured" align="center" />
+        <SectionHeader eyebrow={t("every angle")} title={t("Moments captured")} align="center" />
         <div className="mt-block">
           {loading ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -287,8 +292,8 @@ function GalleryPage() {
           ) : visiblePhotos.length === 0 ? (
             <EmptyState
               motif="gold-leaf"
-              title="No photos yet"
-              description="Be the first to share a moment from the day."
+              title={t("No photos yet")}
+              description={t("Be the first to share a moment from the day.")}
             />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -311,10 +316,9 @@ function GalleryPage() {
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Scan to upload photos</DialogTitle>
+            <DialogTitle>{t("Scan to upload photos")}</DialogTitle>
             <DialogDescription>
-              Show this QR code at the wedding so guests can jump straight to the
-              upload page.
+              {t("Show this QR code at the wedding so guests can jump straight to the upload page.")}
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center gap-4 py-4">
@@ -339,14 +343,14 @@ function GalleryPage() {
       <Dialog open={!!viewPhoto} onOpenChange={(open) => !open && setViewId(null)}>
         <DialogContent className="max-w-3xl p-2 sm:p-2">
           <DialogHeader className="sr-only">
-            <DialogTitle>{viewPhoto?.caption ?? "Photo"}</DialogTitle>
-            <DialogDescription>Full-size photo</DialogDescription>
+            <DialogTitle>{viewPhoto?.caption ?? t("Photo")}</DialogTitle>
+            <DialogDescription>{t("Full-size photo")}</DialogDescription>
           </DialogHeader>
           {viewPhoto && (
             <figure>
               <img
                 src={urls[viewPhoto.storage_path] ?? ""}
-                alt={viewPhoto.caption ?? `Photo by ${viewPhoto.uploader_name}`}
+                alt={viewPhoto.caption ?? t("Photo by {name}", { name: viewPhoto.uploader_name })}
                 className="max-h-[75vh] w-full rounded-card object-contain"
               />
               {viewPhoto.caption && (
@@ -362,8 +366,8 @@ function GalleryPage() {
       <ConfirmDialog
         open={pendingDelete !== null}
         onOpenChange={(open) => !open && setPendingDelete(null)}
-        title="Delete this photo?"
-        description="This removes it permanently — it can't be undone."
+        title={t("Delete this photo?")}
+        description={t("This removes it permanently — it can't be undone.")}
         onConfirm={() => {
           if (pendingDelete) void remove(pendingDelete.id, pendingDelete.path);
           setPendingDelete(null);

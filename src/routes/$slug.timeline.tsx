@@ -17,13 +17,15 @@ import {
   EmptyState,
 } from "@/design-system";
 
+import { tHead, useT } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/timeline")({
   head: () => ({
     meta: [
-      { title: "Wedding timeline — OurJourney" },
-      { name: "description", content: "The schedule for your OurJourney wedding celebration." },
-      { property: "og:title", content: "Wedding timeline — OurJourney" },
-      { property: "og:description", content: "The schedule for your wedding celebration." },
+      { title: tHead("Wedding timeline — OurJourney") },
+      { name: "description", content: tHead("The schedule for your OurJourney wedding celebration.") },
+      { property: "og:title", content: tHead("Wedding timeline — OurJourney") },
+      { property: "og:description", content: tHead("The schedule for your wedding celebration.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -47,6 +49,7 @@ interface TEvent {
 
 function TimelinePage() {
   const { wedding, guest, isAdmin } = useWeddingContext();
+  const t = useT();
   const timelineVisible = canViewTimeline(wedding.timeline_available, isAdmin);
   const [events, setEvents] = useState<TEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,13 +116,13 @@ function TimelinePage() {
       <PageCanvas density="regular">
         <Container width="prose">
           <Hero
-            script="how the day unfolds"
-            title="Coming soon"
-            subtitle="The timeline will be shared soon. Come back a little later!"
+            script={t("how the day unfolds")}
+            title={t("Coming soon")}
+            subtitle={t("The timeline will be shared soon. Come back a little later!")}
           />
         </Container>
         <Section size="compact">
-          <EmptyState motif="olive-branch" title="Wedding timeline" />
+          <EmptyState motif="olive-branch" title={t("Wedding timeline")} />
         </Section>
       </PageCanvas>
     );
@@ -129,11 +132,11 @@ function TimelinePage() {
     <PageCanvas density="regular">
       <Container width="prose">
         <Hero
-          script="how the day unfolds"
-          title="Wedding timeline"
+          script={t("how the day unfolds")}
+          title={t("Wedding timeline")}
           subtitle={
             isEvening &&
-            "You're invited from the evening onwards — but you're welcome to arrive a little earlier."
+            t("You're invited from the evening onwards — but you're welcome to arrive a little earlier.")
           }
         />
       </Container>
@@ -141,9 +144,10 @@ function TimelinePage() {
       {isAdmin && wedding.timeline_available !== true && (
         <Container width="prose">
           <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">Preview for you as admin.</span> Guests
-            see a "Coming soon" screen until you turn on "Show timeline to guests" in the admin
-            timeline settings.
+            <span className="font-medium text-foreground">{t("Preview for you as admin.")}</span>{" "}
+            {t(
+              'Guests see a "Coming soon" screen until you turn on "Show timeline to guests" in the admin timeline settings.',
+            )}
           </div>
         </Container>
       )}
@@ -158,8 +162,8 @@ function TimelinePage() {
         <Section size="compact">
           <EmptyState
             motif="olive-branch"
-            title="The schedule is being prepared"
-            description="Check back soon — the day's timeline will appear here."
+            title={t("The schedule is being prepared")}
+            description={t("Check back soon — the day's timeline will appear here.")}
           />
         </Section>
       ) : (
@@ -201,6 +205,7 @@ function TimelineChapter({
   isAdmin: boolean;
 }) {
   const picture = resolveTimelinePicture(e.illustration, e.category, e.title);
+  const t = useT();
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] lg:items-start lg:gap-x-6">
@@ -221,8 +226,8 @@ function TimelineChapter({
                 {e.event_time.slice(0, 5)}
               </span>
               <h3 className="type-card-title">{e.title}</h3>
-              {isNext && <Badge tone="primary">Up next</Badge>}
-              {isAdmin && !e.is_visible && <Badge tone="neutral">Hidden from guests</Badge>}
+              {isNext && <Badge tone="primary">{t("Up next")}</Badge>}
+              {isAdmin && !e.is_visible && <Badge tone="neutral">{t("Hidden from guests")}</Badge>}
             </div>
             {e.description && <p className="type-body mt-2 text-muted-foreground">{e.description}</p>}
             {e.location && (
@@ -234,7 +239,7 @@ function TimelineChapter({
           {picture && (
             <img
               src={picture.url}
-              alt={picture.alt}
+              alt={t(picture.alt)}
               loading="lazy"
               width={944}
               height={704}

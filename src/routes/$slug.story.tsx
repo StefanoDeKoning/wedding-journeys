@@ -17,12 +17,13 @@ import {
 import { DecorMotifArt } from "@/design-system/decor/Illustrations";
 import { resolveStoryImages } from "@/wedding/storyImage";
 import type { DecorMotif } from "@/theme/types";
+import { tHead, useI18n, useT } from "@/i18n";
 
 export const Route = createFileRoute("/$slug/story")({
   head: () => ({
     meta: [
-      { title: "Our Story" },
-      { name: "description", content: "How it all began." },
+      { title: tHead("Our Story") },
+      { name: "description", content: tHead("How it all began.") },
     ],
   }),
   component: () => (
@@ -43,9 +44,9 @@ interface Chapter {
   image_url: string | null;
 }
 
-function formatChapterDate(iso: string | null) {
+function formatChapterDate(iso: string | null, locale: string) {
   if (!iso) return null;
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
   });
@@ -56,6 +57,7 @@ function StoryPage() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [images, setImages] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const t = useT();
 
   useEffect(() => {
     let cancelled = false;
@@ -83,9 +85,9 @@ function StoryPage() {
     <PageCanvas density="regular">
       <Container width="prose">
         <Hero
-          script="before happily ever after"
-          title="Our story"
-          subtitle="Every love story is beautiful, but ours is our favourite."
+          script={t("before happily ever after")}
+          title={t("Our story")}
+          subtitle={t("Every love story is beautiful, but ours is our favourite.")}
         />
       </Container>
 
@@ -99,8 +101,8 @@ function StoryPage() {
         <Section size="compact">
           <EmptyState
             motif="flourish"
-            title="The story is being written"
-            description="Check back soon — the couple is still adding chapters."
+            title={t("The story is being written")}
+            description={t("Check back soon — the couple is still adding chapters.")}
           />
         </Section>
       ) : (
@@ -120,7 +122,8 @@ function StoryPage() {
 }
 
 function StoryChapter({ chapter, imageSrc }: { chapter: Chapter; imageSrc?: string }) {
-  const dateLabel = formatChapterDate(chapter.event_date);
+  const { locale } = useI18n();
+  const dateLabel = formatChapterDate(chapter.event_date, locale);
   const motif = (chapter.illustration_motif as DecorMotif) ?? "flourish";
 
   return (

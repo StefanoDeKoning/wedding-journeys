@@ -31,11 +31,13 @@ import {
 } from "@/design-system";
 import { cn } from "@/lib/utils";
 
+import { tHead, useI18n } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/playlist")({
   head: () => ({
     meta: [
-      { title: "Song requests" },
-      { name: "description", content: "Suggest or vote for a song for the dance floor." },
+      { title: tHead("Song requests") },
+      { name: "description", content: tHead("Suggest or vote for a song for the dance floor.") },
     ],
   }),
   component: () => (
@@ -67,6 +69,7 @@ function PlaylistPage() {
   const [submitting, setSubmitting] = useState(false);
   const [votingId, setVotingId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     setLoading(true);
@@ -78,7 +81,7 @@ function PlaylistPage() {
       .eq("wedding_id", wedding.id)
       .order("vote_count", { ascending: false })
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     setSongs((data ?? []) as Song[]);
 
     if (guest) {
@@ -108,19 +111,19 @@ function PlaylistPage() {
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!guest) {
-      toast.error("Only guests can submit songs.");
+      toast.error(t("Only guests can submit songs."));
       return;
     }
     if (!title.trim() || !artist.trim()) {
-      toast.error("Song title and artist are required.");
+      toast.error(t("Song title and artist are required."));
       return;
     }
     if (remaining <= 0) {
-      toast.error("You've used all 3 of your song requests.");
+      toast.error(t("You've used all 3 of your song requests."));
       return;
     }
     if (spotify.trim() && !/^https?:\/\/(open\.)?spotify\.com\//i.test(spotify.trim())) {
-      toast.error("Spotify link must start with https://open.spotify.com/");
+      toast.error(t("Spotify link must start with https://open.spotify.com/"));
       return;
     }
     setSubmitting(true);
@@ -134,24 +137,24 @@ function PlaylistPage() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     setTitle("");
     setArtist("");
     setSpotify("");
-    toast.success("Song added to the request list!");
+    toast.success(t("Song added to the request list!"));
     void load();
   };
 
   const toggleVote = async (songId: string) => {
     if (!guest) {
-      toast.error("Only guests can vote.");
+      toast.error(t("Only guests can vote."));
       return;
     }
     const voted = myVotes.includes(songId);
     if (!voted && remaining <= 0) {
-      toast.error("You've used all 3 of your song requests — remove a vote to free one up.");
+      toast.error(t("You've used all 3 of your song requests — remove a vote to free one up."));
       return;
     }
     setVotingId(songId);
@@ -163,10 +166,10 @@ function PlaylistPage() {
         .eq("guest_id", guest.id);
       setVotingId(null);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
-      toast.success("Vote removed.");
+      toast.success(t("Vote removed."));
     } else {
       const { error } = await supabase.from("playlist_votes").insert({
         wedding_id: wedding.id,
@@ -175,10 +178,10 @@ function PlaylistPage() {
       });
       setVotingId(null);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
-      toast.success("Voted!");
+      toast.success(t("Voted!"));
     }
     void load();
   };
@@ -186,10 +189,10 @@ function PlaylistPage() {
   const remove = async (id: string) => {
     const { error } = await supabase.from("playlist_songs").delete().eq("id", id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
-    toast.success("Removed.");
+    toast.success(t("Removed."));
     void load();
   };
 
@@ -197,12 +200,12 @@ function PlaylistPage() {
     <PageCanvas density="regular">
       <Container width="prose">
         <Hero
-          script="help us fill the floor"
-          title="Song requests"
+          script={t("help us fill the floor")}
+          title={t("Song requests")}
           subtitle={
             <>
-              You have <span className="text-foreground font-medium">3 requests</span> in total —
-              use them to suggest songs or to vote for songs other guests suggested.
+              {t("You have")} <span className="text-foreground font-medium">{t("3 requests")}</span>{" "}
+              {t("in total — use them to suggest songs or to vote for songs other guests suggested.")}
             </>
           }
         />
@@ -214,12 +217,14 @@ function PlaylistPage() {
             <form onSubmit={add} className="space-y-4">
               <p className="type-caption">
                 {remaining > 0
-                  ? `${remaining} of 3 request${remaining === 1 ? "" : "s"} left`
-                  : "You've used all 3 of your requests."}
+                  ? remaining === 1
+                    ? t("1 of 3 requests left")
+                    : t("{count} of 3 requests left", { count: remaining })
+                  : t("You've used all 3 of your requests.")}
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="title">Song title</Label>
+                  <Label htmlFor="title">{t("Song title")}</Label>
                   <ThemedInput
                     id="title"
                     value={title}
@@ -230,7 +235,7 @@ function PlaylistPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="artist">Artist</Label>
+                  <Label htmlFor="artist">{t("Artist")}</Label>
                   <ThemedInput
                     id="artist"
                     value={artist}
@@ -242,7 +247,7 @@ function PlaylistPage() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="spotify">Spotify link (optional)</Label>
+                <Label htmlFor="spotify">{t("Spotify link (optional)")}</Label>
                 <ThemedInput
                   id="spotify"
                   value={spotify}
@@ -253,7 +258,7 @@ function PlaylistPage() {
                 />
               </div>
               <ThemedButton type="submit" size="lg" disabled={submitting || remaining <= 0} className="w-full">
-                <Plus aria-hidden="true" className="w-4 h-4" /> Suggest this song
+                <Plus aria-hidden="true" className="w-4 h-4" /> {t("Suggest this song")}
               </ThemedButton>
             </form>
           </FormPanel>
@@ -262,8 +267,8 @@ function PlaylistPage() {
 
       <Section size="spacious" width="content">
         <SectionHeader
-          eyebrow="vote for your favourites"
-          title={`Top requests (${songs.length})`}
+          eyebrow={t("vote for your favourites")}
+          title={t("Top requests ({count})", { count: songs.length })}
           align="center"
         />
         <div className="mt-block">
@@ -272,12 +277,12 @@ function PlaylistPage() {
               <Loader2 className="w-5 h-5 animate-spin mx-auto" />
             </div>
           ) : songs.length === 0 ? (
-            <EmptyState motif="music-note" title="No songs yet" description="Be the first to request one!" />
+            <EmptyState motif="music-note" title={t("No songs yet")} description={t("Be the first to request one!")} />
           ) : (
             <ThemedCard variant="veil">
               <div className="flex items-center gap-2 mb-4">
                 <Trophy aria-hidden="true" className="w-4 h-4 text-primary" />
-                <h2 className="type-card-title">Most wanted on the dance floor</h2>
+                <h2 className="type-card-title">{t("Most wanted on the dance floor")}</h2>
               </div>
               <ol className="space-y-3">
                 {songs.map((s, i) => {
@@ -297,12 +302,12 @@ function PlaylistPage() {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{s.title}</p>
                           <p className="type-caption truncate">
-                            {s.artist} · suggested by {s.submitted_by_name}
-                            {mine && " · you"}
+                            {s.artist} · {t("suggested by {name}", { name: s.submitted_by_name })}
+                            {mine && ` · ${t("you")}`}
                           </p>
                         </div>
                         <Badge tone="primary">
-                          {s.vote_count} {s.vote_count === 1 ? "vote" : "votes"}
+                          {s.vote_count} {s.vote_count === 1 ? t("vote") : t("votes")}
                         </Badge>
                         {guest && (
                           <button
@@ -310,7 +315,7 @@ function PlaylistPage() {
                             onClick={() => void toggleVote(s.id)}
                             disabled={votingId === s.id || (!voted && remaining <= 0)}
                             aria-pressed={voted}
-                            aria-label={voted ? "Remove your vote" : "Vote for this song"}
+                            aria-label={voted ? t("Remove your vote") : t("Vote for this song")}
                             className={cn(
                               "rounded-full p-2 focus-ring-elegant transition-colors disabled:opacity-40",
                               voted
@@ -334,7 +339,7 @@ function PlaylistPage() {
                             target="_blank"
                             rel="noreferrer"
                             className="text-muted-foreground hover:text-primary focus-ring-elegant rounded-full p-1"
-                            aria-label="Open in Spotify"
+                            aria-label={t("Open in Spotify")}
                           >
                             <ExternalLink aria-hidden="true" className="w-4 h-4" />
                           </a>
@@ -344,7 +349,7 @@ function PlaylistPage() {
                             type="button"
                             onClick={() => setPendingDeleteId(s.id)}
                             className="text-muted-foreground hover:text-destructive focus-ring-elegant rounded-full p-1"
-                            aria-label="Remove"
+                            aria-label={t("Remove")}
                           >
                             <Trash2 aria-hidden="true" className="w-4 h-4" />
                           </button>
@@ -362,7 +367,7 @@ function PlaylistPage() {
       <ConfirmDialog
         open={pendingDeleteId !== null}
         onOpenChange={(open) => !open && setPendingDeleteId(null)}
-        title="Remove this song request?"
+        title={t("Remove this song request?")}
         onConfirm={() => {
           if (pendingDeleteId) void remove(pendingDeleteId);
           setPendingDeleteId(null);

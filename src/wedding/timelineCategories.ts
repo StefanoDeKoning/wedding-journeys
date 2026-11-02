@@ -7,12 +7,14 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { DecorMotif } from "@/theme/types";
+import type { MessageKey } from "@/i18n";
 
 export type TimelineCategory = "ceremony" | "reception" | "dinner" | "party" | "custom";
 
 export const TIMELINE_CATEGORIES: {
   value: TimelineCategory;
-  label: string;
+  /** English source text; translate with t() when rendering. */
+  label: MessageKey;
   Icon: LucideIcon;
   /** Theme-token-backed Tailwind utility for the icon dot accent — never a
    * literal palette color, so category colors shift with the active theme. */

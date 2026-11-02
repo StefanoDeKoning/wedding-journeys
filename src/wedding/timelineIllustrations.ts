@@ -5,6 +5,7 @@ import barbecue from "@/assets/tl-barbecue.png.asset.json";
 import dancing from "@/assets/tl-dancing.png.asset.json";
 import pizza from "@/assets/tl-pizza.png.asset.json";
 import bouquet from "@/assets/tl-bouquet.png.asset.json";
+import type { MessageKey } from "@/i18n";
 
 /** Picture keys an admin can attach to a timeline event card. */
 export type TimelinePicture =
@@ -18,9 +19,10 @@ export type TimelinePicture =
 
 export const TIMELINE_PICTURES: {
   value: TimelinePicture;
-  label: string;
+  /** English source text; translate with t() when rendering. */
+  label: MessageKey;
   url: string;
-  alt: string;
+  alt: MessageKey;
 }[] = [
   {
     value: "ceremony-tree",
