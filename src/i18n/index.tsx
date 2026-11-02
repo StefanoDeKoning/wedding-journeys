@@ -1,61 +1,117 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useRouter } from "@tanstack/react-router";
+import { NL, type MessageKey } from "./nl";
 
 /**
  * Lightweight i18n. Source strings in code are English; `t("English")`
  * returns the Dutch translation when the language is "nl".
- * Dutch dictionaries live in src/i18n/nl/*.ts (each default-exports a
- * Record<english, dutch>) and are merged automatically.
+ * Dutch dictionaries live in src/i18n/nl/*.ts and are registered in
+ * src/i18n/nl/index.ts. `t()` only accepts registered strings, so a missing
+ * Dutch entry is a type error.
  * Interpolation: t("Hi {name}", { name }) — same {placeholders} in the Dutch value.
+ * Runtime strings (server errors, zod messages) go through `tx()`, which
+ * falls back to the English text and warns in development.
  */
 export type Lang = "nl" | "en";
+export type { MessageKey };
 export const DEFAULT_LANG: Lang = "nl";
 const STORAGE_KEY = "ourjourney-lang";
+const DICT: Record<string, string> = NL;
 
-const modules = import.meta.glob<{ default: Record<string, string> }>("./nl/*.ts", { eager: true });
-const NL: Record<string, string> = Object.assign({}, ...Object.values(modules).map((m) => m.default));
+type Vars = Record<string, string | number>;
 
-function interpolate(s: string, vars?: Record<string, string | number>) {
+function interpolate(s: string, vars?: Vars) {
   if (!vars) return s;
   return s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
 }
 
-export function translate(lang: Lang, en: string, vars?: Record<string, string | number>) {
-  const s = lang === "nl" ? (NL[en] ?? en) : en;
-  return interpolate(s, vars);
+export function translate(lang: Lang, en: MessageKey, vars?: Vars) {
+  return interpolate(lang === "nl" ? DICT[en] : en, vars);
+}
+
+/** Translate a string only known at runtime (e.g. a server error message). */
+export function translateDynamic(lang: Lang, en: string, vars?: Vars) {
+  if (lang === "nl" && !(en in DICT)) {
+    if (import.meta.env.DEV) console.warn(`[i18n] Missing Dutch translation: "${en}"`);
+    return interpolate(en, vars);
+  }
+  return interpolate(lang === "nl" ? DICT[en] : en, vars);
+}
+
+/** BCP 47 locale for dates and numbers. English uses British conventions. */
+export function localeFor(lang: Lang) {
+  return lang === "nl" ? "nl-NL" : "en-GB";
+}
+
+/** Preferred browser language: nl → Dutch, en → English, anything else → Dutch. */
+function detectBrowserLang(): Lang {
+  const preferred = (navigator.languages?.[0] ?? navigator.language ?? "").toLowerCase();
+  if (preferred.startsWith("en")) return "en";
+  return "nl";
+}
+
+function readStoredLang(): Lang | null {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored === "en" || stored === "nl" ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
+// Route `head()` functions run outside React; they read the active language here.
+let currentLang: Lang = DEFAULT_LANG;
+
+/** Translate for route `head()` (tab title, meta description). */
+export function tHead(en: MessageKey, vars?: Vars) {
+  return translate(currentLang, en, vars);
 }
 
 type Ctx = {
   lang: Lang;
+  locale: string;
   setLang: (l: Lang) => void;
   toggle: () => void;
-  t: (en: string, vars?: Record<string, string | number>) => string;
+  t: (en: MessageKey, vars?: Vars) => string;
+  tx: (en: string, vars?: Vars) => string;
 };
 
 const I18nContext = createContext<Ctx | null>(null);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "en" || stored === "nl") setLangState(stored);
+    setLangState(readStoredLang() ?? detectBrowserLang());
   }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;
-  }, [lang]);
+    if (currentLang !== lang) {
+      currentLang = lang;
+      // Re-run route head() so the tab title and description follow the language.
+      void router.invalidate();
+    }
+  }, [lang, router]);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
-    window.localStorage.setItem(STORAGE_KEY, l);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, l);
+    } catch {
+      // Storage unavailable (private mode): the choice lasts for this page view.
+    }
   }, []);
 
   const value = useMemo<Ctx>(
     () => ({
       lang,
+      locale: localeFor(lang),
       setLang,
       toggle: () => setLang(lang === "nl" ? "en" : "nl"),
       t: (en, vars) => translate(lang, en, vars),
+      tx: (en, vars) => translateDynamic(lang, en, vars),
     }),
     [lang, setLang],
   );
@@ -68,9 +124,11 @@ export function useI18n(): Ctx {
   if (ctx) return ctx;
   return {
     lang: DEFAULT_LANG,
+    locale: localeFor(DEFAULT_LANG),
     setLang: () => {},
     toggle: () => {},
     t: (en, vars) => translate(DEFAULT_LANG, en, vars),
+    tx: (en, vars) => translateDynamic(DEFAULT_LANG, en, vars),
   };
 }
 
