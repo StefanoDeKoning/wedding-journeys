@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import {
-import { LanguageToggle } from "@/i18n/LanguageToggle";
   Mail,
   BookHeart,
   CalendarHeart,
@@ -14,6 +13,7 @@ import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { ThemedButton } from "@/design-system";
 import { cn } from "@/lib/utils";
+import { LanguageToggle } from "@/i18n/LanguageToggle";
 
 const TAB_BASE =
   "type-nav flex min-h-11 items-center gap-2 rounded-full whitespace-nowrap px-4 py-2 border border-transparent " +
