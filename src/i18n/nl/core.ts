@@ -34,6 +34,7 @@ const nl = {
   "Sign in": "Inloggen",
   "Guest invitation": "Uitnodiging voor gasten",
   "Made with warmth.": "Met liefde gemaakt.",
+  Notifications: "Meldingen",
 
   // Section names used across the site
   Invitation: "Uitnodiging",
