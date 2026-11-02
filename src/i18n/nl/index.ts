@@ -10,6 +10,7 @@ import marketing from "./marketing";
 import auth from "./auth";
 import messages from "./messages";
 import guest from "./guest";
+import rsvp from "./rsvp";
 
 export const NL = {
   ...core,
@@ -17,6 +18,7 @@ export const NL = {
   ...auth,
   ...messages,
   ...guest,
+  ...rsvp,
 };
 
 export type MessageKey = keyof typeof NL;

@@ -29,20 +29,21 @@ import {
   Badge,
   Hero,
 } from "@/design-system";
+import { tHead, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/$slug/")({
   head: ({ params }) => ({
     meta: [
-      { title: `Invitation — ${params.slug}` },
-      { name: "description", content: "Your private digital wedding invitation." },
+      { title: tHead("Invitation — {slug}", { slug: params.slug }) },
+      { name: "description", content: tHead("Your private digital wedding invitation.") },
     ],
   }),
   component: InvitationPage,
 });
 
-function formatLongDate(iso: string | null) {
+function formatLongDate(iso: string | null, locale: string) {
   if (!iso) return "";
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -50,9 +51,9 @@ function formatLongDate(iso: string | null) {
   });
 }
 
-function formatTime(iso: string | null) {
+function formatTime(iso: string | null, locale: string) {
   if (!iso) return "";
-  return new Date(iso).toLocaleTimeString(undefined, {
+  return new Date(iso).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -62,6 +63,7 @@ function InvitationPage() {
   const { slug } = Route.useParams();
   const { wedding, guest } = useWeddingContext();
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const { t, locale } = useI18n();
 
 
   const isEvening = guest?.guest_type === "evening";
@@ -78,13 +80,13 @@ function InvitationPage() {
 
 
 
-  const recipientFirst = guest?.first_name ?? "Friend";
+  const recipientFirst = guest?.first_name ?? t("Friend");
   const recipientLast = guest?.last_name ?? "";
 
   const coupleSignature =
     wedding.bride_name && wedding.groom_name
       ? `${wedding.bride_name} & ${wedding.groom_name}`
-      : (wedding.wedding_name ?? "The happy couple");
+      : (wedding.wedding_name ?? t("The happy couple"));
 
   const mapsUrl = safeHttpUrl(wedding.maps_url);
 
@@ -94,7 +96,7 @@ function InvitationPage() {
       <Container width="content">
         <Hero
           compact
-          script="together with the people they love"
+          script={t("together with the people they love")}
           title={
             <>
               {wedding.bride_name}
@@ -108,7 +110,7 @@ function InvitationPage() {
                 {wedding.wedding_date && (
                   <span className="flex items-center gap-2">
                     <CalendarDays aria-hidden="true" className="w-4 h-4 text-primary" />
-                    {formatLongDate(wedding.wedding_date)}
+                    {formatLongDate(wedding.wedding_date, locale)}
                   </span>
                 )}
                 {wedding.location_name && (
@@ -141,37 +143,37 @@ function InvitationPage() {
       {/* Practical info — alternating, asymmetric rhythm rather than matched cards */}
       <Section size="spacious" width="content">
         <SectionHeader
-          eyebrow="save these moments"
-          script="the details"
-          title="When and where to find us"
+          eyebrow={t("save these moments")}
+          script={t("the details")}
+          title={t("When and where to find us")}
           align="center"
         />
 
         <div className="mt-block grid gap-stack lg:grid-cols-2 lg:gap-block">
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-left h-full">
             <Badge tone="primary">
-              <CalendarDays aria-hidden="true" className="w-3 h-3" /> When
+              <CalendarDays aria-hidden="true" className="w-3 h-3" /> {t("When")}
             </Badge>
             <p className="type-card-title mt-4">
-              {wedding.wedding_date ? formatLongDate(wedding.wedding_date) : "Date to be announced"}
+              {wedding.wedding_date ? formatLongDate(wedding.wedding_date, locale) : t("Date to be announced")}
             </p>
             <div className="mt-4 space-y-2 type-body text-muted-foreground">
               {wedding.ceremony_at && (
                 <p className="flex items-center gap-2">
                   <Clock aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
-                  Ceremony at {formatTime(wedding.ceremony_at)}
+                  {t("Ceremony at {time}", { time: formatTime(wedding.ceremony_at, locale) })}
                 </p>
               )}
               {wedding.reception_at && (
                 <p className="flex items-center gap-2">
                   <Clock aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
-                  Reception from {formatTime(wedding.reception_at)}
+                  {t("Reception from {time}", { time: formatTime(wedding.reception_at, locale) })}
                 </p>
               )}
             </div>
             {isEvening && (
               <p className="type-caption mt-4 text-primary">
-                You're invited to the evening celebration.
+                {t("You're invited to the evening celebration.")}
               </p>
             )}
             {target && (
@@ -180,8 +182,8 @@ function InvitationPage() {
                   target={target}
                   label={
                     isEvening
-                      ? "until the evening celebration begins"
-                      : "until the celebration begins"
+                      ? t("until the evening celebration begins")
+                      : t("until the celebration begins")
                   }
                   showSeconds={false}
                 />
@@ -192,9 +194,9 @@ function InvitationPage() {
 
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-right h-full">
             <Badge tone="leaf">
-              <MapPin aria-hidden="true" className="w-3 h-3" /> Where
+              <MapPin aria-hidden="true" className="w-3 h-3" /> {t("Where")}
             </Badge>
-            <p className="type-card-title mt-4">{wedding.location_name || "Venue to be announced"}</p>
+            <p className="type-card-title mt-4">{wedding.location_name || t("Venue to be announced")}</p>
             {wedding.location_address && (
               <p className="mt-3 type-body text-muted-foreground whitespace-pre-line">
                 {wedding.location_address}
@@ -207,7 +209,7 @@ function InvitationPage() {
                 rel="noreferrer"
                 className="type-nav mt-5 inline-flex items-center gap-1.5 text-primary hover-gild focus-ring-elegant"
               >
-                Open in Google Maps →
+                {t("Open in Google Maps →")}
               </a>
             )}
           </ThemedCard>
@@ -218,14 +220,14 @@ function InvitationPage() {
           wedding.ceremony_master_email) && (
           <ThemedCard variant="veil" className="mt-block animate-ds-reveal-left">
             <Badge tone="primary">
-              <HelpCircle aria-hidden="true" className="w-3 h-3" /> Questions?
+              <HelpCircle aria-hidden="true" className="w-3 h-3" /> {t("Questions?")}
             </Badge>
             <p className="type-card-title mt-4">
-              {wedding.ceremony_master_name || "Our ceremony master"}
+              {wedding.ceremony_master_name || t("Our ceremony master")}
             </p>
             <p className="type-caption mt-1">
-              {wedding.ceremony_master_role || "Ceremony master"} — happy to help with anything
-              about the day.
+              {wedding.ceremony_master_role || t("Ceremony master")}{" "}
+              {t("— happy to help with anything about the day.")}
             </p>
             <div className="mt-4 space-y-2 type-body">
               {wedding.ceremony_master_phone && (
@@ -256,17 +258,17 @@ function InvitationPage() {
 
         <div className="mt-block flex flex-col sm:flex-row gap-gutter justify-center">
           <ThemedButton size="lg" onClick={() => setRsvpOpen(true)}>
-            <ListChecks className="w-4 h-4" /> Reply with your wishes
+            <ListChecks className="w-4 h-4" /> {t("Reply with your wishes")}
           </ThemedButton>
           <ThemedButton asChild variant="gilded" size="lg">
             <Link to="/$slug/timeline" params={{ slug }}>
-              <Heart className="w-4 h-4" /> See the day
+              <Heart className="w-4 h-4" /> {t("See the day")}
             </Link>
           </ThemedButton>
           {wedding.playlist_enabled && (
             <ThemedButton asChild variant="gilded" size="lg">
               <Link to="/$slug/playlist" params={{ slug }}>
-                <Music className="w-4 h-4" /> Song requests
+                <Music className="w-4 h-4" /> {t("Song requests")}
               </Link>
             </ThemedButton>
           )}

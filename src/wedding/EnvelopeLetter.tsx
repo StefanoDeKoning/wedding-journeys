@@ -1,7 +1,7 @@
 import "./letter-paper.css";
 import { useEffect, useId, useState } from "react";
 import { WaxSeal, initialsFromCouple, type WaxSealMotif } from "./WaxSeal";
-import { renderInvitationText } from "./invitationTemplate";
+import { DEFAULT_INVITATION_TEMPLATE, renderInvitationText } from "./invitationTemplate";
 import { cn } from "@/lib/utils";
 import { useT } from "@/i18n";
 
@@ -168,11 +168,13 @@ export function EnvelopeLetter({
   sealInitials,
 }: EnvelopeLetterProps) {
   const [stage, setStage] = useState<Stage>("closed");
+  const t = useT();
   const filterId = `paper-${useId().replace(/:/g, "")}`;
   const letterBody = renderInvitationText(
     invitationTemplate,
     recipientFirstName,
     recipientLastName,
+    t(DEFAULT_INVITATION_TEMPLATE),
   );
 
   // The wax seal always carries the couple's initials, e.g. "B & S".
@@ -191,7 +193,6 @@ export function EnvelopeLetter({
   }, [stage]);
 
   const opened = stage === "open";
-  const t = useT();
 
   return (
     <div className="relative w-full">

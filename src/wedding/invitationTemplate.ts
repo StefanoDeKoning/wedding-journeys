@@ -17,8 +17,10 @@ export function renderInvitationText(
   template: string | null | undefined,
   firstName: string,
   lastName: string,
+  /** Text used when the couple has not written their own (e.g. the translated default). */
+  fallback: string = DEFAULT_INVITATION_TEMPLATE,
 ): string {
-  const text = template && template.trim().length > 0 ? template : DEFAULT_INVITATION_TEMPLATE;
+  const text = template && template.trim().length > 0 ? template : fallback;
   return text
     .replace(/\{\s*FirstName\s*\}/gi, firstName)
     .replace(/\{\s*LastName\s*\}/gi, lastName);
