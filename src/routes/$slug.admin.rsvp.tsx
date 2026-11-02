@@ -64,13 +64,14 @@ import { dietaryLabel, DIETARY_OPTIONS, type DietaryValue } from "@/wedding/diet
 import { buildInvitationLink } from "@/wedding/invitationLink";
 import { Link as LinkIcon } from "lucide-react";
 import jsPDF from "jspdf";
+import { tHead, useI18n, useT, type MessageKey } from "@/i18n";
 
 
 export const Route = createFileRoute("/$slug/admin/rsvp")({
   head: () => ({
     meta: [
-      { title: "Guests & RSVP" },
-      { name: "description", content: "Manage guests, groups and RSVP responses." },
+      { title: tHead("Guests & RSVP") },
+      { name: "description", content: tHead("Manage guests, groups and RSVP responses.") },
     ],
   }),
   component: AdminRsvpOverview,
@@ -120,6 +121,7 @@ function AdminRsvpOverview() {
   const [filterGroup, setFilterGroup] = useState<string>("all");
   const [editing, setEditing] = useState<Guest | null>(null);
   const [adding, setAdding] = useState(false);
+  const { t, tx, locale } = useI18n();
 
   const load = async () => {
     if (!wedding) return;
@@ -241,10 +243,10 @@ function AdminRsvpOverview() {
   }, [rows, search, filterGroup]);
 
   const removeGuest = async (g: Guest) => {
-    if (!confirm(`Remove ${g.first_name} ${g.last_name}?`)) return;
+    if (!confirm(t("Remove {name}?", { name: `${g.first_name} ${g.last_name}` }))) return;
     const { error } = await supabase.from("guests").delete().eq("id", g.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -256,28 +258,28 @@ function AdminRsvpOverview() {
         details: { name: `${g.first_name} ${g.last_name}` },
       });
     }
-    toast.success("Guest removed.");
+    toast.success(t("Guest removed."));
     void load();
   };
 
   const buildExportRows = () =>
     rows.map(({ g, r, group, attendees }) => ({
-      first_name: g.first_name,
-      last_name: g.last_name,
-      invitation_code: g.invitation_code,
-      email: g.email ?? "",
-      rsvp_status: r?.status ?? "no reply",
-      attendance: r?.attendance ?? "",
-      guest_type: guestTypeLabel(g.guest_type),
-      age_type: g.age_type,
-      plus_one_allowed: g.plus_one_allowed ? "yes" : "no",
-      plus_one_name: r?.plus_one_name ?? "",
-      group: group?.name ?? "",
-      attendees,
-      dietary_tags: ((r?.dietary_tags ?? []) as DietaryValue[]).map(dietaryLabel).join("; "),
-      dietary_other: r?.dietary_other ?? "",
-      comments: r?.comments ?? "",
-      notes: g.notes ?? "",
+      [t("First name")]: g.first_name,
+      [t("Last name")]: g.last_name,
+      [t("Invitation code")]: g.invitation_code,
+      [t("Email")]: g.email ?? "",
+      [t("RSVP")]: t(rsvpStatusLabel(r?.status ?? null)),
+      [t("Attendance")]: r?.attendance ? t(attendanceShortLabel(r.attendance)) : "",
+      [t("Guest type")]: t(guestTypeLabel(g.guest_type)),
+      [t("Age")]: t(ageLabel(g.age_type)),
+      [t("+1 allowed")]: g.plus_one_allowed ? t("Yes") : t("No"),
+      [t("+1 name")]: r?.plus_one_name ?? "",
+      [t("Group")]: group?.name ?? "",
+      [t("Attendees")]: attendees,
+      [t("Dietary")]: ((r?.dietary_tags ?? []) as DietaryValue[]).map((v) => tx(dietaryLabel(v))).join("; "),
+      [t("Other dietary notes")]: r?.dietary_other ?? "",
+      [t("Comments")]: r?.comments ?? "",
+      [t("Internal notes")]: g.notes ?? "",
     }));
 
   const exportCsv = () => {
@@ -288,10 +290,10 @@ function AdminRsvpOverview() {
   const exportInvitationLinks = () => {
     if (!wedding) return;
     const rows = guests.map((g) => ({
-      first_name: g.first_name,
-      last_name: g.last_name,
-      invitation_code: g.invitation_code,
-      invitation_link: buildInvitationLink(wedding.slug, g.invitation_code),
+      [t("First name")]: g.first_name,
+      [t("Last name")]: g.last_name,
+      [t("Invitation code")]: g.invitation_code,
+      [t("Invitation link")]: buildInvitationLink(wedding.slug, g.invitation_code),
     }));
     downloadCsv(`${wedding.slug}-invitation-links.csv`, toCsv(rows));
   };
@@ -301,9 +303,9 @@ function AdminRsvpOverview() {
     const link = buildInvitationLink(wedding.slug, code);
     try {
       await navigator.clipboard.writeText(link);
-      toast.success("Invitation link copied.");
+      toast.success(t("Invitation link copied."));
     } catch {
-      toast.error("Could not copy link.");
+      toast.error(t("Could not copy link."));
     }
   };
 
@@ -318,13 +320,23 @@ function AdminRsvpOverview() {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text(`${wedding.wedding_name ?? wedding.slug} — Guest list`, margin, y);
+    doc.text(t("{name} — Guest list", { name: wedding.wedding_name ?? wedding.slug }), margin, y);
     y += 18;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(120);
     doc.text(
-      `${stats.total} guests · ${stats.yes} attending · ${stats.no} declined · ${stats.noResponse} no reply · ${stats.plusOnes} plus-ones · ${stats.yes + stats.plusOnes} attendees`,
+      t(
+        "{total} guests · {yes} attending · {no} declined · {none} no reply · {plusOnes} plus-ones · {attendees} attendees",
+        {
+          total: stats.total,
+          yes: stats.yes,
+          no: stats.no,
+          none: stats.noResponse,
+          plusOnes: stats.plusOnes,
+          attendees: stats.yes + stats.plusOnes,
+        },
+      ),
       margin,
       y,
     );
@@ -332,15 +344,15 @@ function AdminRsvpOverview() {
     doc.setTextColor(0);
 
     const headers = [
-      "Name",
-      "Code",
-      "RSVP",
-      "Type",
-      "Age",
+      t("Name"),
+      t("Code"),
+      t("RSVP"),
+      t("Type"),
+      t("Age"),
       "+1",
-      "Group",
-      "Attendees",
-      "Dietary",
+      t("Group"),
+      t("Attendees"),
+      t("Dietary"),
     ];
     const colWidths = [110, 60, 55, 55, 38, 70, 90, 50, 240];
 
@@ -373,10 +385,10 @@ function AdminRsvpOverview() {
       const plusOneStr = g.plus_one_allowed
         ? hasPlusOne
           ? `+ ${r?.plus_one_name}`
-          : "allowed"
-        : "no";
+          : t("allowed")
+        : t("no");
       const dietary = [
-        ...((r?.dietary_tags ?? []) as DietaryValue[]).map(dietaryLabel),
+        ...((r?.dietary_tags ?? []) as DietaryValue[]).map((v) => tx(dietaryLabel(v))),
         r?.dietary_other ?? "",
       ]
         .filter(Boolean)
@@ -384,9 +396,9 @@ function AdminRsvpOverview() {
       drawRow([
         `${g.first_name} ${g.last_name}`,
         g.invitation_code,
-        r?.status === "yes" ? "Attending" : r?.status === "no" ? "Declined" : "No reply",
-        guestTypeLabel(g.guest_type),
-        g.age_type,
+        t(rsvpStatusLabel(r?.status ?? null)),
+        t(guestTypeLabel(g.guest_type)),
+        t(ageLabel(g.age_type)),
         plusOneStr,
         group?.name ?? "",
         String(attendees),
@@ -401,7 +413,11 @@ function AdminRsvpOverview() {
       doc.setFontSize(8);
       doc.setTextColor(150);
       doc.text(
-        `Page ${i} of ${pages} · Generated ${new Date().toLocaleDateString()}`,
+        t("Page {page} of {pages} · Generated {date}", {
+          page: i,
+          pages,
+          date: new Date().toLocaleDateString(locale),
+        }),
         pageWidth - margin,
         pageHeight - 16,
         { align: "right" },
@@ -427,19 +443,21 @@ function AdminRsvpOverview() {
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="font-script text-xl text-primary">replies so far</p>
-            <h2 className="font-display text-2xl">RSVP progress</h2>
+            <p className="font-script text-xl text-primary">{t("replies so far")}</p>
+            <h2 className="font-display text-2xl">{t("RSVP progress")}</h2>
           </div>
           <div className="text-right">
             <p className="font-display text-4xl text-primary">{stats.pct}%</p>
             <p className="text-xs text-muted-foreground">
-              {stats.responded} of {stats.total} guests
+              {t("{responded} of {total} guests", { responded: stats.responded, total: stats.total })}
             </p>
           </div>
         </div>
         <Progress value={stats.pct} className="h-3" />
         <p className="mt-3 text-xs text-muted-foreground">
-          {stats.noResponse} guest{stats.noResponse === 1 ? "" : "s"} still to reply.
+          {stats.noResponse === 1
+            ? t("1 guest still to reply.")
+            : t("{count} guests still to reply.", { count: stats.noResponse })}
         </p>
       </section>
 
@@ -448,9 +466,9 @@ function AdminRsvpOverview() {
 
       {/* Stats cards */}
       <section className="grid gap-4 sm:grid-cols-3">
-        <StatCard icon={CheckCircle2} label="Attending" value={stats.yes} tone="primary" />
-        <StatCard icon={XCircle} label="Declined" value={stats.no} tone="muted" />
-        <StatCard icon={CircleDashed} label="No response" value={stats.noResponse} tone="muted" />
+        <StatCard icon={CheckCircle2} label={t("Attending")} value={stats.yes} tone="primary" />
+        <StatCard icon={XCircle} label={t("Declined")} value={stats.no} tone="muted" />
+        <StatCard icon={CircleDashed} label={t("No response")} value={stats.noResponse} tone="muted" />
       </section>
 
       {/* Attendees / plus-ones */}
@@ -458,24 +476,26 @@ function AdminRsvpOverview() {
         <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-primary" />
-            <h3 className="font-display text-lg">Total attendees</h3>
+            <h3 className="font-display text-lg">{t("Total attendees")}</h3>
           </div>
           <p className="font-display text-4xl">{stats.yes + stats.plusOnes}</p>
           <p className="text-xs text-muted-foreground mt-2">
-            {stats.yes} guest{stats.yes === 1 ? "" : "s"} + {stats.plusOnes} plus-one
-            {stats.plusOnes === 1 ? "" : "s"}
+            {stats.yes === 1 ? t("1 guest") : t("{count} guests", { count: stats.yes })} +{" "}
+            {stats.plusOnes === 1 ? t("1 plus-one") : t("{count} plus-ones", { count: stats.plusOnes })}
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
           <div className="flex items-center gap-2 mb-2">
             <UserPlus className="w-4 h-4 text-primary" />
-            <h3 className="font-display text-lg">Plus-ones confirmed</h3>
+            <h3 className="font-display text-lg">{t("Plus-ones confirmed")}</h3>
           </div>
           <p className="font-display text-4xl">{stats.plusOnes}</p>
           <p className="text-xs text-muted-foreground mt-2">
-            {guests.filter((g) => g.plus_one_allowed).length} guest
-            {guests.filter((g) => g.plus_one_allowed).length === 1 ? "" : "s"} allowed to bring
-            someone.
+            {guests.filter((g) => g.plus_one_allowed).length === 1
+              ? t("1 guest allowed to bring someone.")
+              : t("{count} guests allowed to bring someone.", {
+                  count: guests.filter((g) => g.plus_one_allowed).length,
+                })}
           </p>
         </div>
       </section>
@@ -485,9 +505,9 @@ function AdminRsvpOverview() {
         <div className="flex flex-col gap-3 p-5 border-b border-border">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
-              <h3 className="font-display text-lg">Guest list</h3>
+              <h3 className="font-display text-lg">{t("Guest list")}</h3>
               <p className="text-xs text-muted-foreground">
-                Add, edit and track every guest in one place.
+                {t("Add, edit and track every guest in one place.")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -502,9 +522,9 @@ function AdminRsvpOverview() {
                 size="sm"
                 onClick={exportInvitationLinks}
                 className="rounded-full"
-                title="Download personal invitation links for every guest"
+                title={t("Download personal invitation links for every guest")}
               >
-                <LinkIcon className="w-3.5 h-3.5 mr-1.5" /> Invitation links
+                <LinkIcon className="w-3.5 h-3.5 mr-1.5" /> {t("Invitation links")}
               </Button>
 
               <Button
@@ -512,7 +532,7 @@ function AdminRsvpOverview() {
                 onClick={() => setAdding(true)}
                 className="rounded-full bg-primary hover:bg-primary/90"
               >
-                <Plus className="w-3.5 h-3.5 mr-1.5" /> Add guest
+                <Plus className="w-3.5 h-3.5 mr-1.5" /> {t("Add guest")}
               </Button>
             </div>
           </div>
@@ -522,17 +542,17 @@ function AdminRsvpOverview() {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search name, code, email…"
+                placeholder={t("Search name, code, email…")}
                 className="pl-9"
               />
             </div>
             <Select value={filterGroup} onValueChange={setFilterGroup}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="All groups" />
+                <SelectValue placeholder={t("All groups")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All groups</SelectItem>
-                <SelectItem value="none">No group</SelectItem>
+                <SelectItem value="all">{t("All groups")}</SelectItem>
+                <SelectItem value="none">{t("No group")}</SelectItem>
                 {groups.map((g) => (
                   <SelectItem key={g.id} value={g.id}>
                     {g.name}
@@ -547,14 +567,14 @@ function AdminRsvpOverview() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Invitation code</TableHead>
-                <TableHead>RSVP</TableHead>
-                <TableHead>+1 allowed</TableHead>
-                <TableHead>+1 confirmed</TableHead>
-                <TableHead className="text-center">Attendees</TableHead>
-                <TableHead>Dietary notes</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t("Name")}</TableHead>
+                <TableHead>{t("Invitation code")}</TableHead>
+                <TableHead>{t("RSVP")}</TableHead>
+                <TableHead>{t("+1 allowed")}</TableHead>
+                <TableHead>{t("+1 confirmed")}</TableHead>
+                <TableHead className="text-center">{t("Attendees")}</TableHead>
+                <TableHead>{t("Dietary notes")}</TableHead>
+                <TableHead className="text-right">{t("Actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -562,14 +582,14 @@ function AdminRsvpOverview() {
                 <TableRow>
                   <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                     {guests.length === 0
-                      ? "No guests yet — add your first one."
-                      : "No guests match your filters."}
+                      ? t("No guests yet — add your first one.")
+                      : t("No guests match your filters.")}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredRows.map(({ g, r, group, hasPlusOne, attendees }) => {
                   const dietary = [
-                    ...((r?.dietary_tags ?? []) as DietaryValue[]).map(dietaryLabel),
+                    ...((r?.dietary_tags ?? []) as DietaryValue[]).map((v) => tx(dietaryLabel(v))),
                     r?.dietary_other ?? "",
                   ]
                     .filter(Boolean)
@@ -581,8 +601,8 @@ function AdminRsvpOverview() {
                           {g.first_name} {g.last_name}
                         </div>
                         <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                          <span>{guestTypeLabel(g.guest_type)}</span>
-                          {g.age_type === "child" && <span>· child</span>}
+                          <span>{t(guestTypeLabel(g.guest_type))}</span>
+                          {g.age_type === "child" && <span>· {t("child")}</span>}
                           {group && (
                             <span
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full"
@@ -606,10 +626,10 @@ function AdminRsvpOverview() {
                       <TableCell>
                         {g.plus_one_allowed ? (
                           <Badge variant="secondary" className="bg-primary/10 text-primary border-0">
-                            Yes
+                            {t("Yes")}
                           </Badge>
                         ) : (
-                          <span className="text-xs text-muted-foreground">No</span>
+                          <span className="text-xs text-muted-foreground">{t("No")}</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -629,7 +649,7 @@ function AdminRsvpOverview() {
                             variant="ghost"
                             size="sm"
                             onClick={() => void copyInvitationLink(g.invitation_code)}
-                            title="Copy invitation link"
+                            title={t("Copy invitation link")}
                           >
                             <LinkIcon className="w-3.5 h-3.5" />
                           </Button>
@@ -680,6 +700,7 @@ function AdminRsvpOverview() {
 
 function CopyableCode({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
+  const t = useT();
   return (
     <button
       type="button"
@@ -689,7 +710,7 @@ function CopyableCode({ code }: { code: string }) {
         setTimeout(() => setCopied(false), 1500);
       }}
       className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border"
-      title="Copy invitation code"
+      title={t("Copy invitation code")}
     >
       {copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
       {code}
@@ -724,21 +745,22 @@ function StatCard({
 }
 
 function RsvpBadge({ status }: { status: "yes" | "no" | null }) {
+  const t = useT();
   if (status === "yes")
     return (
       <Badge className="bg-primary/15 text-primary border-0 hover:bg-primary/20">
-        <CheckCircle2 className="w-3 h-3 mr-1" /> Attending
+        <CheckCircle2 className="w-3 h-3 mr-1" /> {t("Attending")}
       </Badge>
     );
   if (status === "no")
     return (
       <Badge variant="secondary" className="border-0">
-        <XCircle className="w-3 h-3 mr-1" /> Declined
+        <XCircle className="w-3 h-3 mr-1" /> {t("Declined")}
       </Badge>
     );
   return (
     <Badge variant="outline" className="text-muted-foreground">
-      <CircleDashed className="w-3 h-3 mr-1" /> No reply
+      <CircleDashed className="w-3 h-3 mr-1" /> {t("No reply")}
     </Badge>
   );
 }
@@ -753,6 +775,7 @@ function DeadlineCard({
   const initial = initialDeadline ? initialDeadline.slice(0, 10) : "";
   const [date, setDate] = useState(initial);
   const [saving, setSaving] = useState(false);
+  const t = useT();
   const dirty = date !== initial;
   const passed = !!initialDeadline && new Date(initialDeadline).getTime() < Date.now();
 
@@ -765,10 +788,10 @@ function DeadlineCard({
       .eq("id", weddingId);
     setSaving(false);
     if (error) {
-      toast.error("Could not save deadline.");
+      toast.error(t("Could not save deadline."));
       return;
     }
-    toast.success(date ? "Deadline saved." : "Deadline cleared.");
+    toast.success(date ? t("Deadline saved.") : t("Deadline cleared."));
   };
 
   return (
@@ -779,13 +802,13 @@ function DeadlineCard({
             <Calendar className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-display text-lg">Respond before</h3>
+            <h3 className="font-display text-lg">{t("Respond before")}</h3>
             <p className="text-xs text-muted-foreground">
-              After this date, guests can no longer submit or change their RSVP.
+              {t("After this date, guests can no longer submit or change their RSVP.")}
             </p>
             {passed && (
               <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-                Deadline has passed — RSVP is closed for guests.
+                {t("Deadline has passed — RSVP is closed for guests.")}
               </p>
             )}
           </div>
@@ -799,7 +822,7 @@ function DeadlineCard({
           />
           <Button onClick={save} disabled={!dirty || saving} size="sm" className="rounded-full">
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1.5" />}
-            Save
+            {t("Save")}
           </Button>
         </div>
       </div>
@@ -809,12 +832,28 @@ function DeadlineCard({
 
 /* ----------------------------- helpers ----------------------------- */
 
-function guestTypeLabel(t: GuestType): string {
-  if (t === "full_day") return "full day";
-  return t;
+function guestTypeLabel(gt: GuestType): MessageKey {
+  if (gt === "full_day") return "full day";
+  return gt;
 }
 
-function answerLabel(a: "yes" | "no" | null): string {
+function ageLabel(a: AgeType): MessageKey {
+  return a === "child" ? "Child" : "Adult";
+}
+
+function rsvpStatusLabel(s: "yes" | "no" | null): MessageKey {
+  if (s === "yes") return "Attending";
+  if (s === "no") return "Declined";
+  return "No reply";
+}
+
+function attendanceShortLabel(a: "day" | "evening" | "both"): MessageKey {
+  if (a === "day") return "Day";
+  if (a === "evening") return "Evening";
+  return "Both";
+}
+
+function answerLabel(a: "yes" | "no" | null): MessageKey {
   if (a === "yes") return "Joyfully yes";
   if (a === "no") return "Sadly no";
   return "Awaiting reply";
@@ -822,7 +861,7 @@ function answerLabel(a: "yes" | "no" | null): string {
 
 function attendanceOptionsFor(
   gt: GuestType,
-): { value: "day" | "evening" | "both"; label: string }[] {
+): { value: "day" | "evening" | "both"; label: MessageKey }[] {
   if (gt === "day") return [{ value: "day", label: "Day only" }];
   if (gt === "evening") return [{ value: "evening", label: "Evening only" }];
   return [
@@ -881,14 +920,15 @@ function GuestDialog({
   const [rsvpComments, setRsvpComments] = useState(rsvp?.comments ?? "");
 
   const [saving, setSaving] = useState(false);
+  const { t, tx } = useI18n();
 
   const save = async () => {
     if (!firstName.trim() || !lastName.trim()) {
-      toast.error("First and last name are required.");
+      toast.error(t("First and last name are required."));
       return;
     }
     if (code.trim().length < 4) {
-      toast.error("Invitation code is too short.");
+      toast.error(t("Invitation code is too short."));
       return;
     }
     setSaving(true);
@@ -929,7 +969,7 @@ function GuestDialog({
       }
       if (!insertedId) {
         setSaving(false);
-        toast.error(lastError?.message ?? "Could not save guest.");
+        toast.error(lastError?.message ? tx(lastError.message) : t("Could not save guest."));
         return;
       }
       savedId = insertedId;
@@ -958,7 +998,7 @@ function GuestDialog({
         .eq("id", guest.id);
       if (error) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -992,7 +1032,7 @@ function GuestDialog({
         );
         if (rErr) {
           setSaving(false);
-          toast.error(rErr.message);
+          toast.error(tx(rErr.message));
           return;
         }
         void logAudit({
@@ -1006,7 +1046,7 @@ function GuestDialog({
     }
 
     setSaving(false);
-    toast.success(isNew ? "Guest added." : "Guest updated.");
+    toast.success(isNew ? t("Guest added.") : t("Guest updated."));
     onSaved();
   };
 
@@ -1014,31 +1054,31 @@ function GuestDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isNew ? "Add a guest" : "Edit guest"}</DialogTitle>
+          <DialogTitle>{isNew ? t("Add a guest") : t("Edit guest")}</DialogTitle>
           <DialogDescription>
-            Manage details, group, and RSVP for this guest.
+            {t("Manage details, group, and RSVP for this guest.")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="fn">First name</Label>
+              <Label htmlFor="fn">{t("First name")}</Label>
               <Input id="fn" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={80} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ln">Last name</Label>
+              <Label htmlFor="ln">{t("Last name")}</Label>
               <Input id="ln" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={80} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="em">Email (optional)</Label>
+              <Label htmlFor="em">{t("Email (optional)")}</Label>
               <Input id="em" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cd">Invitation code</Label>
+              <Label htmlFor="cd">{t("Invitation code")}</Label>
               <div className="flex gap-2">
                 <Input
                   id="cd"
@@ -1048,7 +1088,7 @@ function GuestDialog({
                   maxLength={32}
                 />
                 <Button type="button" variant="outline" size="sm" onClick={() => setCode(generateCode())}>
-                  New
+                  {t("New")}
                 </Button>
               </div>
             </div>
@@ -1056,30 +1096,30 @@ function GuestDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Guest type</Label>
+              <Label>{t("Guest type")}</Label>
               <Select value={guestType} onValueChange={(v) => setGuestType(v as GuestType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="day">Day only</SelectItem>
-                  <SelectItem value="evening">Evening only</SelectItem>
-                  <SelectItem value="full_day">Full day (both)</SelectItem>
+                  <SelectItem value="day">{t("Day only")}</SelectItem>
+                  <SelectItem value="evening">{t("Evening only")}</SelectItem>
+                  <SelectItem value="full_day">{t("Full day (both)")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Age</Label>
+              <Label>{t("Age")}</Label>
               <Select value={ageType} onValueChange={(v) => setAgeType(v as AgeType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="adult">Adult</SelectItem>
-                  <SelectItem value="child">Child</SelectItem>
+                  <SelectItem value="adult">{t("Adult")}</SelectItem>
+                  <SelectItem value="child">{t("Child")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Group</Label>
+            <Label>{t("Group")}</Label>
             <GroupPicker
               weddingId={weddingId}
               groups={groups}
@@ -1090,7 +1130,7 @@ function GuestDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="nt">Internal notes</Label>
+            <Label htmlFor="nt">{t("Internal notes")}</Label>
             <Textarea id="nt" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} maxLength={500} />
           </div>
 
@@ -1101,17 +1141,18 @@ function GuestDialog({
               className="mt-0.5"
             />
             <div className="space-y-0.5">
-              <p className="text-sm font-medium">Allow plus-one</p>
+              <p className="text-sm font-medium">{t("Allow plus-one")}</p>
               <p className="text-xs text-muted-foreground">
-                If enabled, this guest can bring a companion when they RSVP.
+                {t("If enabled, this guest can bring a companion when they RSVP.")}
               </p>
             </div>
           </label>
 
           {rsvpStatus !== "none" && plusOne && !plusOneAllowed && (
             <p className="text-xs text-amber-600 dark:text-amber-400">
-              A plus-one name is set but this guest isn't allowed to bring one. Either enable
-              "Allow plus-one" above or clear the plus-one field below.
+              {t(
+                'A plus-one name is set but this guest isn\'t allowed to bring one. Either enable "Allow plus-one" above or clear the plus-one field below.',
+              )}
             </p>
           )}
 
@@ -1129,13 +1170,13 @@ function GuestDialog({
                       : "border-border bg-background hover:border-primary/40"
                   }`}
                 >
-                  {v === "none" ? "No reply" : answerLabel(v)}
+                  {v === "none" ? t("No reply") : t(answerLabel(v))}
                 </button>
               ))}
             </div>
             {rsvpStatus === "yes" && (
               <div className="space-y-1.5">
-                <Label className="text-xs">Attending</Label>
+                <Label className="text-xs">{t("Attending")}</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {attendanceOptionsFor(guestType).map((opt) => {
                     const active = attendance === opt.value;
@@ -1150,7 +1191,7 @@ function GuestDialog({
                             : "border-border bg-background hover:border-primary/40"
                         }`}
                       >
-                        {opt.label}
+                        {t(opt.label)}
                       </button>
                     );
                   })}
@@ -1163,7 +1204,7 @@ function GuestDialog({
                   <Input
                     value={plusOne}
                     onChange={(e) => setPlusOne(e.target.value)}
-                    placeholder="Plus-one name (optional)"
+                    placeholder={t("Plus-one name (optional)")}
                     maxLength={120}
                   />
                 )}
@@ -1182,12 +1223,12 @@ function GuestDialog({
                           onCheckedChange={() =>
                             setTags((prev) =>
                               prev.includes(opt.value)
-                                ? prev.filter((t) => t !== opt.value)
+                                ? prev.filter((x) => x !== opt.value)
                                 : [...prev, opt.value],
                             )
                           }
                         />
-                        {opt.label}
+                        {t(opt.label)}
                       </label>
                     );
                   })}
@@ -1195,13 +1236,13 @@ function GuestDialog({
                 <Input
                   value={dietaryOther}
                   onChange={(e) => setDietaryOther(e.target.value)}
-                  placeholder="Other dietary notes"
+                  placeholder={t("Other dietary notes")}
                   maxLength={200}
                 />
                 <Textarea
                   value={rsvpComments}
                   onChange={(e) => setRsvpComments(e.target.value)}
-                  placeholder="Comments from guest"
+                  placeholder={t("Comments from guest")}
                   rows={2}
                   maxLength={1000}
                 />
@@ -1211,9 +1252,9 @@ function GuestDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>{t("Cancel")}</Button>
           <Button onClick={save} disabled={saving} className="bg-primary hover:bg-primary/90">
-            {saving ? "Saving…" : isNew ? "Add guest" : "Save changes"}
+            {saving ? t("Saving…") : isNew ? t("Add guest") : t("Save changes")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1245,6 +1286,7 @@ function GroupPicker({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [busy, setBusy] = useState(false);
+  const { t, tx } = useI18n();
 
   const current = groups.find((g) => g.id === value) ?? null;
 
@@ -1260,7 +1302,7 @@ function GroupPicker({
       .single();
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void logAudit({
@@ -1285,7 +1327,7 @@ function GroupPicker({
       .eq("id", id);
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void logAudit({
@@ -1301,12 +1343,12 @@ function GroupPicker({
   };
 
   const deleteGroup = async (g: Group) => {
-    if (!confirm(`Delete group "${g.name}"? Guests in this group will become ungrouped.`)) return;
+    if (!confirm(t('Delete group "{name}"? Guests in this group will become ungrouped.', { name: g.name }))) return;
     setBusy(true);
     const { error } = await supabase.from("guest_groups").delete().eq("id", g.id);
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void logAudit({
@@ -1336,7 +1378,7 @@ function GroupPicker({
               {current.name}
             </span>
           ) : (
-            <span className="text-muted-foreground">No group</span>
+            <span className="text-muted-foreground">{t("No group")}</span>
           )}
           <Tag className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
@@ -1353,7 +1395,7 @@ function GroupPicker({
               value === null ? "bg-muted font-medium" : ""
             }`}
           >
-            No group
+            {t("No group")}
           </button>
           {groups.map((g) => (
             <div
@@ -1442,7 +1484,7 @@ function GroupPicker({
             onKeyDown={(e) => {
               if (e.key === "Enter") void createGroup();
             }}
-            placeholder="New group name"
+            placeholder={t("New group name")}
             className="h-8 text-xs"
             maxLength={80}
           />
