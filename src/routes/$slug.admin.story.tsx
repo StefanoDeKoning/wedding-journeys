@@ -44,12 +44,13 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { DecorMotif } from "@/theme/types";
+import { useI18n, useT, type MessageKey } from "@/i18n";
 
 export const Route = createFileRoute("/$slug/admin/story")({
   component: AdminStory,
 });
 
-const STORY_MOTIFS: { value: DecorMotif; label: string }[] = [
+const STORY_MOTIFS: { value: DecorMotif; label: MessageKey }[] = [
   { value: "rose", label: "Rose" },
   { value: "peony", label: "Peony" },
   { value: "bouquet", label: "Bouquet" },
@@ -83,6 +84,7 @@ function AdminStory() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Chapter | null>(null);
   const [adding, setAdding] = useState(false);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     if (!wedding) return;
@@ -92,7 +94,7 @@ function AdminStory() {
       .select("id, position, chapter_label, title, body, event_date, illustration_motif, image_url")
       .eq("wedding_id", wedding.id)
       .order("position");
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     setChapters((data ?? []) as Chapter[]);
     setLoading(false);
   };
@@ -103,10 +105,10 @@ function AdminStory() {
   }, [wedding?.id]);
 
   const remove = async (c: Chapter) => {
-    if (!confirm(`Delete "${c.title}"?`)) return;
+    if (!confirm(t('Delete "{title}"?', { title: c.title }))) return;
     const { error } = await supabase.from("story_chapters").delete().eq("id", c.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -119,7 +121,7 @@ function AdminStory() {
       });
     }
     void removeStoryImage(c.image_url);
-    toast.success("Chapter removed.");
+    toast.success(t("Chapter removed."));
     void load();
   };
 
@@ -138,7 +140,7 @@ function AdminStory() {
     );
     const results = await Promise.all(updates);
     if (results.some((r) => r.error)) {
-      toast.error("Could not save order.");
+      toast.error(t("Could not save order."));
       void load();
     }
   };
@@ -149,14 +151,14 @@ function AdminStory() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
-          Tell your story in chapters. Drag to reorder — guests see them in this sequence.
+          {t("Tell your story in chapters. Drag to reorder — guests see them in this sequence.")}
         </p>
         <Button
           size="sm"
           onClick={() => setAdding(true)}
           className="rounded-full bg-primary hover:bg-primary/90"
         >
-          <Plus className="w-3.5 h-3.5 mr-1.5" /> Add chapter
+          <Plus className="w-3.5 h-3.5 mr-1.5" /> {t("Add chapter")}
         </Button>
       </div>
 
@@ -166,7 +168,7 @@ function AdminStory() {
         </div>
       ) : chapters.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
-          No chapters yet — add the first moment of your story.
+          {t("No chapters yet — add the first moment of your story.")}
         </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -212,6 +214,7 @@ function SortableRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: chapter.id,
   });
+  const t = useT();
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -224,7 +227,7 @@ function SortableRow({
         {...attributes}
         {...listeners}
         className="text-muted-foreground hover:text-foreground cursor-grab touch-none"
-        aria-label="Drag to reorder"
+        aria-label={t("Drag to reorder")}
       >
         <GripVertical className="w-4 h-4" />
       </button>
@@ -276,6 +279,7 @@ function ChapterDialog({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { t, tx } = useI18n();
 
   useEffect(() => {
     let cancelled = false;
@@ -290,7 +294,7 @@ function ChapterDialog({
   const onPickFile = async (file: File | undefined) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast.error("Please choose an image file.");
+      toast.error(t("Please choose an image file."));
       return;
     }
     setUploading(true);
@@ -299,16 +303,16 @@ function ChapterDialog({
       const previous = imageValue;
       setImageValue(path);
       if (previous && previous !== chapter?.image_url) void removeStoryImage(previous);
-      toast.success("Picture uploaded.");
+      toast.success(t("Picture uploaded."));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed.");
+      toast.error(e instanceof Error ? tx(e.message) : t("Upload failed."));
     }
     setUploading(false);
   };
 
   const save = async () => {
     if (!title.trim() || !body.trim()) {
-      toast.error("Title and story text are required.");
+      toast.error(t("Title and story text are required."));
       return;
     }
     setSaving(true);
@@ -328,7 +332,7 @@ function ChapterDialog({
         .single();
       if (error) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -342,7 +346,7 @@ function ChapterDialog({
       const { error } = await supabase.from("story_chapters").update(payload).eq("id", chapter.id);
       if (error) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -354,7 +358,7 @@ function ChapterDialog({
       });
     }
     setSaving(false);
-    toast.success(isNew ? "Chapter added." : "Chapter updated.");
+    toast.success(isNew ? t("Chapter added.") : t("Chapter updated."));
     onSaved();
   };
 
@@ -362,32 +366,32 @@ function ChapterDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{isNew ? "Add chapter" : "Edit chapter"}</DialogTitle>
+          <DialogTitle>{isNew ? t("Add chapter") : t("Edit chapter")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="cl">Chapter label (optional)</Label>
-              <Input id="cl" value={chapterLabel} onChange={(e) => setChapterLabel(e.target.value)} placeholder="Chapter One" maxLength={60} />
+              <Label htmlFor="cl">{t("Chapter label (optional)")}</Label>
+              <Input id="cl" value={chapterLabel} onChange={(e) => setChapterLabel(e.target.value)} placeholder={t("Chapter One")} maxLength={60} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ed">Date (optional)</Label>
+              <Label htmlFor="ed">{t("Date (optional)")}</Label>
               <Input id="ed" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="ti">Title</Label>
+            <Label htmlFor="ti">{t("Title")}</Label>
             <Input id="ti" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="bd">Story text</Label>
+            <Label htmlFor="bd">{t("Story text")}</Label>
             <Textarea id="bd" value={body} onChange={(e) => setBody(e.target.value)} rows={5} maxLength={2000} />
           </div>
           <div className="space-y-1.5">
-            <Label>Chapter picture</Label>
+            <Label>{t("Chapter picture")}</Label>
             {imagePreview ? (
               <div className="relative overflow-hidden rounded-lg border border-border">
-                <img src={imagePreview} alt="Chapter" className="h-40 w-full object-cover" />
+                <img src={imagePreview} alt={t("Chapter")} className="h-40 w-full object-cover" />
                 <Button
                   type="button"
                   variant="secondary"
@@ -399,7 +403,7 @@ function ChapterDialog({
                     setImagePreview(null);
                   }}
                 >
-                  <Trash2 className="w-3.5 h-3.5 mr-1" /> Remove
+                  <Trash2 className="w-3.5 h-3.5 mr-1" /> {t("Remove")}
                 </Button>
               </div>
             ) : (
@@ -409,7 +413,7 @@ function ChapterDialog({
                 ) : (
                   <>
                     <ImagePlus className="w-4 h-4" />
-                    <span>Upload a picture</span>
+                    <span>{t("Upload a picture")}</span>
                   </>
                 )}
                 <input
@@ -423,21 +427,21 @@ function ChapterDialog({
             )}
           </div>
           <div className="space-y-1.5">
-            <Label>Illustration (fallback when no picture)</Label>
+            <Label>{t("Illustration (fallback when no picture)")}</Label>
             <Select value={motif} onValueChange={setMotif}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {STORY_MOTIFS.map((m) => (
-                  <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                  <SelectItem key={m.value} value={m.value}>{t(m.label)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>{t("Cancel")}</Button>
           <Button onClick={save} disabled={saving} className="bg-primary hover:bg-primary/90">
-            {saving ? "Saving…" : isNew ? "Add" : "Save"}
+            {saving ? t("Saving…") : isNew ? t("Add") : t("Save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -23,11 +23,14 @@ interface Song {
   created_at: string;
 }
 
+import { useI18n } from "@/i18n";
+
 function AdminPlaylist() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     if (!wedding) return;
@@ -38,7 +41,7 @@ function AdminPlaylist() {
       .eq("wedding_id", wedding.id)
       .order("vote_count", { ascending: false })
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     setSongs((data ?? []) as Song[]);
     setLoading(false);
   };
@@ -49,10 +52,10 @@ function AdminPlaylist() {
   }, [wedding?.id]);
 
   const remove = async (s: Song) => {
-    if (!confirm(`Remove "${s.title}" from the playlist?`)) return;
+    if (!confirm(t('Remove "{title}" from the playlist?', { title: s.title }))) return;
     const { error } = await supabase.from("playlist_songs").delete().eq("id", s.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -64,7 +67,7 @@ function AdminPlaylist() {
         details: { title: s.title, artist: s.artist },
       });
     }
-    toast.success("Removed.");
+    toast.success(t("Removed."));
     void load();
   };
 
@@ -75,10 +78,12 @@ function AdminPlaylist() {
       <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-2">
           <Music className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-xl">Guest playlist</h2>
+          <h2 className="font-display text-xl">{t("Guest playlist")}</h2>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          {songs.length} song{songs.length === 1 ? "" : "s"} suggested by your guests.
+          {songs.length === 1
+            ? t("1 song suggested by your guests.")
+            : t("{count} songs suggested by your guests.", { count: songs.length })}
         </p>
       </section>
 
@@ -88,7 +93,7 @@ function AdminPlaylist() {
         </div>
       ) : songs.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
-          No song requests yet.
+          {t("No song requests yet.")}
         </div>
       ) : (
         <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
@@ -100,11 +105,11 @@ function AdminPlaylist() {
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{s.title}</p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {s.artist} · suggested by {s.submitted_by_name}
+                  {s.artist} · {t("suggested by {name}", { name: s.submitted_by_name })}
                 </p>
               </div>
               <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                {s.vote_count} vote{s.vote_count === 1 ? "" : "s"}
+                {s.vote_count} {s.vote_count === 1 ? t("vote") : t("votes")}
               </span>
               {safeHttpUrl(s.spotify_url) && (
                 <Button asChild variant="ghost" size="sm">

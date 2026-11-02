@@ -50,6 +50,8 @@ import {
   type TimelineCategory,
 } from "@/wedding/timelineCategories";
 
+import { useI18n, useT } from "@/i18n";
+
 export const Route = createFileRoute("/$slug/admin/timeline")({
   component: AdminTimeline,
 });
@@ -78,6 +80,7 @@ function AdminTimeline() {
   const [adding, setAdding] = useState(false);
   const [timelineAvailable, setTimelineAvailable] = useState<boolean | null>(null);
   const [savingAvailability, setSavingAvailability] = useState(false);
+  const { t, tx } = useI18n();
 
   const load = async () => {
     if (!wedding) return;
@@ -88,7 +91,7 @@ function AdminTimeline() {
       .eq("wedding_id", wedding.id)
       .order("position")
       .order("event_time");
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     setEvents((data ?? []) as Event[]);
     setLoading(false);
   };
@@ -102,10 +105,10 @@ function AdminTimeline() {
   }, [wedding?.id]);
 
   const remove = async (e: Event) => {
-    if (!confirm(`Delete "${e.title}"?`)) return;
+    if (!confirm(t('Delete "{title}"?', { title: e.title }))) return;
     const { error } = await supabase.from("timeline_events").delete().eq("id", e.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -117,7 +120,7 @@ function AdminTimeline() {
         details: { title: e.title },
       });
     }
-    toast.success("Event removed.");
+    toast.success(t("Event removed."));
     void load();
   };
 
@@ -129,7 +132,7 @@ function AdminTimeline() {
       .update({ is_visible: next })
       .eq("id", e.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       void load();
     }
   };
@@ -150,7 +153,7 @@ function AdminTimeline() {
     );
     const results = await Promise.all(updates);
     if (results.some((r) => r.error)) {
-      toast.error("Could not save order.");
+      toast.error(t("Could not save order."));
       void load();
     }
   };
@@ -167,11 +170,11 @@ function AdminTimeline() {
       .single();
     setSavingAvailability(false);
     if (error || !data) {
-      toast.error("Could not save timeline availability. Please try again.");
+      toast.error(t("Could not save timeline availability. Please try again."));
       return;
     }
     setTimelineAvailable(data.timeline_available);
-    toast.success(next ? "Timeline available to guests" : "Timeline hidden from guests");
+    toast.success(next ? t("Timeline available to guests") : t("Timeline hidden from guests"));
   };
 
   if (!wedding) return null;
@@ -180,13 +183,13 @@ function AdminTimeline() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
         <div className="min-w-0">
-          <p className="font-medium">Show timeline to guests</p>
+          <p className="font-medium">{t("Show timeline to guests")}</p>
           <p className="text-sm text-muted-foreground">
             {timelineAvailable === null
-              ? "Loading…"
+              ? t("Loading…")
               : timelineAvailable
-                ? "Guests can see the timeline now."
-                : "Guests see a \"Coming soon\" screen until you turn this on."}
+                ? t("Guests can see the timeline now.")
+                : t('Guests see a "Coming soon" screen until you turn this on.')}
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
@@ -200,14 +203,14 @@ function AdminTimeline() {
       </div>
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">
-          Build your wedding day. Drag to reorder, hide events from guests anytime.
+          {t("Build your wedding day. Drag to reorder, hide events from guests anytime.")}
         </p>
         <Button
           size="sm"
           onClick={() => setAdding(true)}
           className="rounded-full bg-primary hover:bg-primary/90"
         >
-          <Plus className="w-3.5 h-3.5 mr-1.5" /> Add event
+          <Plus className="w-3.5 h-3.5 mr-1.5" /> {t("Add event")}
         </Button>
       </div>
 
@@ -217,7 +220,7 @@ function AdminTimeline() {
         </div>
       ) : events.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
-          No events yet — add your first.
+          {t("No events yet — add your first.")}
         </div>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
@@ -271,6 +274,7 @@ function SortableRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: event.id,
   });
+  const t = useT();
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -292,7 +296,7 @@ function SortableRow({
         {...attributes}
         {...listeners}
         className="text-muted-foreground hover:text-foreground cursor-grab touch-none"
-        aria-label="Drag to reorder"
+        aria-label={t("Drag to reorder")}
       >
         <GripVertical className="w-4 h-4" />
       </button>
@@ -304,7 +308,7 @@ function SortableRow({
       {picture ? (
         <img
           src={picture.url}
-          alt={picture.alt}
+          alt={t(picture.alt)}
           loading="lazy"
           width={944}
           height={704}
@@ -328,9 +332,9 @@ function SortableRow({
         </div>
       </div>
       <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-muted-foreground px-2 py-0.5 rounded-full border border-border">
-        {event.visibility === "all" ? "everyone" : event.visibility}
+        {t(event.visibility === "all" ? "everyone" : event.visibility === "day" ? "day" : "evening")}
       </span>
-      <Button variant="ghost" size="sm" onClick={onToggleVisible} title={event.is_visible ? "Hide from guests" : "Show to guests"}>
+      <Button variant="ghost" size="sm" onClick={onToggleVisible} title={event.is_visible ? t("Hide from guests") : t("Show to guests")}>
         {event.is_visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
       </Button>
       <Button variant="ghost" size="sm" onClick={onEdit}>
@@ -377,14 +381,15 @@ function EventDialog({
   );
   const [isVisible, setIsVisible] = useState(event?.is_visible ?? true);
   const [saving, setSaving] = useState(false);
+  const { t, tx } = useI18n();
 
   const save = async () => {
     if (!title.trim()) {
-      toast.error("Title is required.");
+      toast.error(t("Title is required."));
       return;
     }
     if (!/^\d{2}:\d{2}$/.test(time)) {
-      toast.error("Time must be HH:MM.");
+      toast.error(t("Time must be HH:MM."));
       return;
     }
     setSaving(true);
@@ -406,7 +411,7 @@ function EventDialog({
         .single();
       if (error) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -420,7 +425,7 @@ function EventDialog({
       const { error } = await supabase.from("timeline_events").update(payload).eq("id", event.id);
       if (error) {
         setSaving(false);
-        toast.error(error.message);
+        toast.error(tx(error.message));
         return;
       }
       void logAudit({
@@ -432,7 +437,7 @@ function EventDialog({
       });
     }
     setSaving(false);
-    toast.success(isNew ? "Event added." : "Event updated.");
+    toast.success(isNew ? t("Event added.") : t("Event updated."));
     onSaved();
   };
 
@@ -440,40 +445,40 @@ function EventDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{isNew ? "Add event" : "Edit event"}</DialogTitle>
+          <DialogTitle>{isNew ? t("Add event") : t("Edit event")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="tm">
-                <Clock className="w-3 h-3 inline mr-1" /> Time
+                <Clock className="w-3 h-3 inline mr-1" /> {t("Time")}
               </Label>
               <Input id="tm" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Category</Label>
+              <Label>{t("Category")}</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as TimelineCategory)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {TIMELINE_CATEGORIES.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    <SelectItem key={c.value} value={c.value}>{t(c.label)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="ti">Title</Label>
+            <Label htmlFor="ti">{t("Title")}</Label>
             <Input id="ti" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="lc">
-              <MapPin className="w-3 h-3 inline mr-1" /> Location (optional)
+              <MapPin className="w-3 h-3 inline mr-1" /> {t("Location (optional)")}
             </Label>
             <Input id="lc" value={location} onChange={(e) => setLocation(e.target.value)} maxLength={200} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="ds">Description (optional)</Label>
+            <Label htmlFor="ds">{t("Description (optional)")}</Label>
             <Textarea
               id="ds"
               value={description}
@@ -483,7 +488,7 @@ function EventDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Picture on the card</Label>
+            <Label>{t("Picture on the card")}</Label>
             <div className="grid grid-cols-4 gap-2">
               <button
                 type="button"
@@ -492,13 +497,13 @@ function EventDialog({
                   illustration === "auto" ? "border-primary ring-1 ring-primary" : "border-input"
                 }`}
               >
-                Automatic
+                {t("Automatic")}
               </button>
               {TIMELINE_PICTURES.map((p) => (
                 <button
                   key={p.value}
                   type="button"
-                  title={p.label}
+                  title={t(p.label)}
                   onClick={() => setIllustration(p.value)}
                   className={`flex h-16 items-center justify-center rounded-md border p-1 ${
                     illustration === p.value ? "border-primary ring-1 ring-primary" : "border-input"
@@ -506,7 +511,7 @@ function EventDialog({
                 >
                   <img
                     src={p.url}
-                    alt={p.alt}
+                    alt={t(p.alt)}
                     loading="lazy"
                     width={944}
                     height={704}
@@ -518,26 +523,26 @@ function EventDialog({
           </div>
           <div className="grid grid-cols-2 gap-3 items-end">
             <div className="space-y-1.5">
-              <Label>Audience</Label>
+              <Label>{t("Audience")}</Label>
               <Select value={visibility} onValueChange={(v) => setVisibility(v as Visibility)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Everyone</SelectItem>
-                  <SelectItem value="day">Day guests only</SelectItem>
-                  <SelectItem value="evening">Evening guests only</SelectItem>
+                  <SelectItem value="all">{t("Everyone")}</SelectItem>
+                  <SelectItem value="day">{t("Day guests only")}</SelectItem>
+                  <SelectItem value="evening">{t("Evening guests only")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <label className="flex items-center justify-between rounded-md border border-input px-3 py-2 h-9">
-              <span className="text-sm">Visible to guests</span>
+              <span className="text-sm">{t("Visible to guests")}</span>
               <Switch checked={isVisible} onCheckedChange={setIsVisible} />
             </label>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>{t("Cancel")}</Button>
           <Button onClick={save} disabled={saving} className="bg-primary hover:bg-primary/90">
-            {saving ? "Saving…" : isNew ? "Add" : "Save"}
+            {saving ? t("Saving…") : isNew ? t("Add") : t("Save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,6 +8,15 @@ import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
 import { signPhotoUrls } from "@/lib/photoUrl";
 
+import { useI18n, type MessageKey } from "@/i18n";
+
+const STATUS_LABEL: Record<"all" | "pending" | "approved" | "hidden", MessageKey> = {
+  all: "all",
+  pending: "pending",
+  approved: "approved",
+  hidden: "hidden",
+};
+
 export const Route = createFileRoute("/$slug/admin/photos")({
   component: AdminPhotos,
 });
@@ -28,6 +37,7 @@ function AdminPhotos() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const { t, tx } = useI18n();
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "hidden">("all");
 
   const load = async () => {
@@ -38,7 +48,7 @@ function AdminPhotos() {
       .select("id, uploader_name, storage_path, caption, status, created_at, size_bytes")
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     const list = (data ?? []) as Photo[];
     setPhotos(list);
     setUrls(await signPhotoUrls(list.map((p) => p.storage_path)));
@@ -58,7 +68,7 @@ function AdminPhotos() {
   const moderate = async (p: Photo, status: Photo["status"]) => {
     const { error } = await supabase.from("photos").update({ status }).eq("id", p.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -70,16 +80,16 @@ function AdminPhotos() {
         details: { uploader: p.uploader_name },
       });
     }
-    toast.success(status === "approved" ? "Approved" : "Hidden");
+    toast.success(status === "approved" ? t("Approved") : t("Hidden"));
     void load();
   };
 
   const remove = async (p: Photo) => {
-    if (!confirm("Delete this photo permanently?")) return;
+    if (!confirm(t("Delete this photo permanently?"))) return;
     await supabase.storage.from("wedding-photos").remove([p.storage_path]);
     const { error } = await supabase.from("photos").delete().eq("id", p.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -91,7 +101,7 @@ function AdminPhotos() {
         details: { uploader: p.uploader_name },
       });
     }
-    toast.success("Deleted.");
+    toast.success(t("Deleted."));
     void load();
   };
 
@@ -118,7 +128,7 @@ function AdminPhotos() {
                 : "border-border bg-background hover:border-primary/40"
             }`}
           >
-            {f} <span className="ml-1 opacity-60">({counts[f]})</span>
+            {t(STATUS_LABEL[f])} <span className="ml-1 opacity-60">({counts[f]})</span>
           </button>
         ))}
       </div>
@@ -130,7 +140,9 @@ function AdminPhotos() {
       ) : filtered.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
           <Camera className="w-6 h-6 mx-auto mb-2 opacity-40" />
-          No photos {filter === "all" ? "yet" : `with status "${filter}"`}.
+          {filter === "all"
+            ? t("No photos yet.")
+            : t('No photos with status "{status}".', { status: t(STATUS_LABEL[filter]) })}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -143,15 +155,15 @@ function AdminPhotos() {
             >
               <img
                 src={urls[p.storage_path] ?? ""}
-                alt={p.caption ?? `By ${p.uploader_name}`}
+                alt={p.caption ?? t("By {name}", { name: p.uploader_name })}
                 loading="lazy"
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-background/90 backdrop-blur text-foreground border border-border">
-                {p.status}
+                {t(STATUS_LABEL[p.status])}
               </div>
               <figcaption className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-white text-[11px]">
-                <p className="truncate">{p.caption ?? `By ${p.uploader_name}`}</p>
+                <p className="truncate">{p.caption ?? t("By {name}", { name: p.uploader_name })}</p>
                 <p className="opacity-70 text-[10px]">{formatBytes(p.size_bytes)}</p>
               </figcaption>
               <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -160,7 +172,7 @@ function AdminPhotos() {
                     type="button"
                     onClick={() => moderate(p, "approved")}
                     className="p-1.5 rounded-full bg-background/95 hover:bg-primary hover:text-primary-foreground"
-                    title="Approve"
+                    title={t("Approve")}
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   </button>
@@ -170,7 +182,7 @@ function AdminPhotos() {
                     type="button"
                     onClick={() => moderate(p, "hidden")}
                     className="p-1.5 rounded-full bg-background/95 hover:bg-foreground hover:text-background"
-                    title="Hide"
+                    title={t("Hide")}
                   >
                     <EyeOff className="w-3.5 h-3.5" />
                   </button>
@@ -179,7 +191,7 @@ function AdminPhotos() {
                     type="button"
                     onClick={() => moderate(p, "approved")}
                     className="p-1.5 rounded-full bg-background/95 hover:bg-primary hover:text-primary-foreground"
-                    title="Show"
+                    title={t("Show")}
                   >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
@@ -188,7 +200,7 @@ function AdminPhotos() {
                   type="button"
                   onClick={() => remove(p)}
                   className="p-1.5 rounded-full bg-background/95 hover:bg-destructive hover:text-destructive-foreground"
-                  title="Delete"
+                  title={t("Delete")}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { logAudit } from "@/wedding/audit";
+import { useT } from "@/i18n";
 
 interface WishlistItem {
   id: string;
@@ -50,6 +51,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
   const [draft, setDraft] = useState({ ...emptyDraft });
   const [saving, setSaving] = useState(false);
   const [togglingEnabled, setTogglingEnabled] = useState(false);
+  const t = useT();
 
   const load = async () => {
     setLoading(true);
@@ -60,7 +62,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
       .order("position", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) {
-      toast.error("Could not load wishlist.");
+      toast.error(t("Could not load wishlist."));
     } else {
       setItems((data ?? []) as WishlistItem[]);
     }
@@ -92,7 +94,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
 
   const save = async () => {
     if (!draft.title.trim()) {
-      toast.error("Please enter a title.");
+      toast.error(t("Please enter a title."));
       return;
     }
     setSaving(true);
@@ -111,7 +113,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
         .update(payload)
         .eq("id", editingId);
       if (error) {
-        toast.error("Could not save item.");
+        toast.error(t("Could not save item."));
         setSaving(false);
         return;
       }
@@ -129,7 +131,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
         .select("id")
         .single();
       if (error) {
-        toast.error("Could not add item.");
+        toast.error(t("Could not add item."));
         setSaving(false);
         return;
       }
@@ -143,15 +145,15 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
 
     setSaving(false);
     setDialogOpen(false);
-    toast.success("Saved.");
+    toast.success(t("Saved."));
     await load();
   };
 
   const remove = async (item: WishlistItem) => {
-    if (!confirm(`Delete "${item.title}"?`)) return;
+    if (!confirm(t('Delete "{title}"?', { title: item.title }))) return;
     const { error } = await supabase.from("wishlist_items").delete().eq("id", item.id);
     if (error) {
-      toast.error("Could not delete item.");
+      toast.error(t("Could not delete item."));
       return;
     }
     void logAudit({
@@ -160,7 +162,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
       targetType: "wishlist_item",
       targetId: item.id,
     });
-    toast.success("Deleted.");
+    toast.success(t("Deleted."));
     await load();
   };
 
@@ -188,7 +190,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
       .eq("id", weddingId);
     setTogglingEnabled(false);
     if (error) {
-      toast.error("Could not update wishlist visibility.");
+      toast.error(t("Could not update wishlist visibility."));
       return;
     }
     onEnabledChange(next);
@@ -199,7 +201,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
       targetId: weddingId,
       details: { field: "wishlist_enabled", value: next },
     });
-    toast.success(next ? "Wishlist shown to guests." : "Wishlist hidden from guests.");
+    toast.success(next ? t("Wishlist shown to guests.") : t("Wishlist hidden from guests."));
   };
 
   return (
@@ -207,11 +209,11 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Gift className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-xl">Wishlist / Gift registry</h2>
+          <h2 className="font-display text-xl">{t("Wishlist / Gift registry")}</h2>
         </div>
         <div className="flex items-center gap-3">
           <Label htmlFor="wishlist-enabled" className="text-sm text-muted-foreground">
-            Show to guests
+            {t("Show to guests")}
           </Label>
           <Switch
             id="wishlist-enabled"
@@ -222,14 +224,15 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
         </div>
       </div>
       <p className="mt-2 text-sm text-muted-foreground">
-        Add gift ideas, contributions or links. Guests see them on the invitation page when the
-        wishlist is enabled and contains at least one item.
+        {t(
+          "Add gift ideas, contributions or links. Guests see them on the invitation page when the wishlist is enabled and contains at least one item.",
+        )}
       </p>
 
       <div className="mt-5 flex justify-end">
         <Button onClick={openAdd} size="sm" className="rounded-full">
           <Plus className="w-4 h-4 mr-2" />
-          Add gift
+          {t("Add gift")}
         </Button>
       </div>
 
@@ -240,7 +243,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
           </div>
         ) : items.length === 0 ? (
           <div className="py-10 text-center text-sm text-muted-foreground border border-dashed rounded-xl">
-            No gift items yet. Add your first wish above.
+            {t("No gift items yet. Add your first wish above.")}
           </div>
         ) : (
           <ul className="space-y-3">
@@ -257,7 +260,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
                       className="p-0.5 disabled:opacity-30"
                       disabled={idx === 0}
                       onClick={() => void move(idx, -1)}
-                      aria-label="Move up"
+                      aria-label={t("Move up")}
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
@@ -266,7 +269,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
                       className="p-0.5 disabled:opacity-30"
                       disabled={idx === items.length - 1}
                       onClick={() => void move(idx, 1)}
-                      aria-label="Move down"
+                      aria-label={t("Move down")}
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
@@ -313,7 +316,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
                     variant="ghost"
                     size="icon"
                     onClick={() => openEdit(item)}
-                    aria-label="Edit"
+                    aria-label={t("Edit")}
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
@@ -322,7 +325,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
                     variant="ghost"
                     size="icon"
                     onClick={() => void remove(item)}
-                    aria-label="Delete"
+                    aria-label={t("Delete")}
                   >
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
@@ -336,30 +339,30 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingId ? "Edit gift" : "Add gift"}</DialogTitle>
+            <DialogTitle>{editingId ? t("Edit gift") : t("Add gift")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="w-title">Title *</Label>
+              <Label htmlFor="w-title">{t("Title *")}</Label>
               <Input
                 id="w-title"
                 value={draft.title}
                 onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                placeholder="Airfryer"
+                placeholder={t("Airfryer")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="w-desc">Description</Label>
+              <Label htmlFor="w-desc">{t("Description")}</Label>
               <Textarea
                 id="w-desc"
                 rows={3}
                 value={draft.description}
                 onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                placeholder="Help us upgrade our kitchen."
+                placeholder={t("Help us upgrade our kitchen.")}
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="w-image">Image URL</Label>
+              <Label htmlFor="w-image">{t("Image URL")}</Label>
               <Input
                 id="w-image"
                 value={draft.image_url}
@@ -369,16 +372,16 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="w-price">Price indication</Label>
+                <Label htmlFor="w-price">{t("Price indication")}</Label>
                 <Input
                   id="w-price"
                   value={draft.price_text}
                   onChange={(e) => setDraft({ ...draft, price_text: e.target.value })}
-                  placeholder="Approx. €120"
+                  placeholder={t("Approx. €120")}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="w-url">External link</Label>
+                <Label htmlFor="w-url">{t("External link")}</Label>
                 <Input
                   id="w-url"
                   value={draft.external_url}
@@ -390,7 +393,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDialogOpen(false)} disabled={saving}>
-              <X className="w-4 h-4 mr-2" /> Cancel
+              <X className="w-4 h-4 mr-2" /> {t("Cancel")}
             </Button>
             <Button onClick={() => void save()} disabled={saving}>
               {saving ? (
@@ -398,7 +401,7 @@ export function WishlistEditor({ weddingId, wishlistEnabled, onEnabledChange }: 
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              Save
+              {t("Save")}
             </Button>
           </DialogFooter>
         </DialogContent>

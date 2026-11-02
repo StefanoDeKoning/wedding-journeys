@@ -20,11 +20,14 @@ interface Message {
   created_at: string;
 }
 
+import { useI18n } from "@/i18n";
+
 function AdminGuestbook() {
   const { slug } = Route.useParams();
   const { wedding } = useWedding(slug);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, tx, locale } = useI18n();
 
   const load = async () => {
     if (!wedding) return;
@@ -34,7 +37,7 @@ function AdminGuestbook() {
       .select("id, guest_id, author_name, message, status, created_at")
       .eq("wedding_id", wedding.id)
       .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
+    if (error) toast.error(tx(error.message));
     setMessages((data ?? []) as Message[]);
     setLoading(false);
   };
@@ -49,7 +52,7 @@ function AdminGuestbook() {
     setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, status: next } : x)));
     const { error } = await supabase.from("guestbook_messages").update({ status: next }).eq("id", m.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       void load();
       return;
     }
@@ -64,10 +67,10 @@ function AdminGuestbook() {
   };
 
   const remove = async (m: Message) => {
-    if (!confirm(`Delete this message from ${m.author_name}?`)) return;
+    if (!confirm(t("Delete this message from {name}?", { name: m.author_name }))) return;
     const { error } = await supabase.from("guestbook_messages").delete().eq("id", m.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     if (wedding) {
@@ -79,7 +82,7 @@ function AdminGuestbook() {
         details: { author: m.author_name },
       });
     }
-    toast.success("Removed.");
+    toast.success(t("Removed."));
     void load();
   };
 
@@ -90,11 +93,13 @@ function AdminGuestbook() {
       <section className="rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-2">
           <MessageCircleHeart className="w-4 h-4 text-primary" />
-          <h2 className="font-display text-xl">Guestbook</h2>
+          <h2 className="font-display text-xl">{t("Guestbook")}</h2>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          {messages.length} message{messages.length === 1 ? "" : "s"} from your guests. Hide anything
-          you don't want shown on the public wall.
+          {messages.length === 1
+            ? t("1 message from your guests.")
+            : t("{count} messages from your guests.", { count: messages.length })}{" "}
+          {t("Hide anything you don't want shown on the public wall.")}
         </p>
       </section>
 
@@ -104,7 +109,7 @@ function AdminGuestbook() {
         </div>
       ) : messages.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground rounded-xl border border-dashed border-border">
-          No messages yet.
+          {t("No messages yet.")}
         </div>
       ) : (
         <ul className="rounded-xl border border-border bg-card divide-y divide-border overflow-hidden">
@@ -119,7 +124,7 @@ function AdminGuestbook() {
                 <p className="text-sm font-medium">{m.author_name}</p>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">{m.message}</p>
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  {new Date(m.created_at).toLocaleDateString(undefined, {
+                  {new Date(m.created_at).toLocaleDateString(locale, {
                     day: "numeric",
                     month: "short",
                     year: "numeric",
@@ -130,7 +135,7 @@ function AdminGuestbook() {
                 variant="ghost"
                 size="sm"
                 onClick={() => toggleStatus(m)}
-                title={m.status === "visible" ? "Hide from guests" : "Show to guests"}
+                title={m.status === "visible" ? t("Hide from guests") : t("Show to guests")}
               >
                 {m.status === "visible" ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
               </Button>

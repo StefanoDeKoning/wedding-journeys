@@ -13,6 +13,7 @@ import {
   renderInvitationText,
 } from "@/wedding/invitationTemplate";
 import { WishlistEditor } from "@/wedding/WishlistEditor";
+import { useT } from "@/i18n";
 
 export const Route = createFileRoute("/$slug/admin/invitation")({
   component: AdminInvitation,
@@ -25,13 +26,15 @@ function AdminInvitation() {
   const [text, setText] = useState("");
   const [initial, setInitial] = useState("");
   const [saving, setSaving] = useState(false);
+  const t = useT();
+  const defaultTemplate = t(DEFAULT_INVITATION_TEMPLATE);
 
   useEffect(() => {
     if (!wedding) return;
-    const t = wedding.invitation_text ?? DEFAULT_INVITATION_TEMPLATE;
-    setText(t);
-    setInitial(t);
-  }, [wedding]);
+    const initialText = wedding.invitation_text ?? defaultTemplate;
+    setText(initialText);
+    setInitial(initialText);
+  }, [wedding, defaultTemplate]);
 
   const dirty = useMemo(() => text !== initial, [text, initial]);
 
@@ -48,9 +51,9 @@ function AdminInvitation() {
   const coupleSignature =
     wedding.bride_name && wedding.groom_name
       ? `${wedding.bride_name} & ${wedding.groom_name}`
-      : (wedding.wedding_name ?? "The happy couple");
+      : (wedding.wedding_name ?? t("The happy couple"));
 
-  const resetToDefault = () => setText(DEFAULT_INVITATION_TEMPLATE);
+  const resetToDefault = () => setText(defaultTemplate);
 
   const handleSave = async () => {
     setSaving(true);
@@ -60,11 +63,11 @@ function AdminInvitation() {
       .eq("id", wedding.id);
     setSaving(false);
     if (error) {
-      toast.error("Could not save invitation.");
+      toast.error(t("Could not save invitation."));
       return;
     }
     setInitial(text);
-    toast.success("Invitation saved.");
+    toast.success(t("Invitation saved."));
     void logAudit({
       weddingId: wedding.id,
       action: "wedding.updated",
@@ -81,23 +84,24 @@ function AdminInvitation() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Mail className="w-4 h-4 text-primary" />
-            <h2 className="font-display text-xl">Invitation letter</h2>
+            <h2 className="font-display text-xl">{t("Invitation letter")}</h2>
           </div>
           <div className="flex items-center gap-2">
             <Button type="button" variant="ghost" size="sm" onClick={resetToDefault} className="rounded-full">
               <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
+              {t("Reset")}
             </Button>
             <Button onClick={handleSave} disabled={!dirty || saving} className="rounded-full">
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-              Save
+              {t("Save")}
             </Button>
           </div>
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          This is the letter guests see when they open the envelope on the invitation page.
-          Use <code className="px-1 py-0.5 rounded bg-muted text-xs">{`{FirstName}`}</code> and{" "}
-          <code className="px-1 py-0.5 rounded bg-muted text-xs">{`{LastName}`}</code> to personalize per guest.
+          {t("This is the letter guests see when they open the envelope on the invitation page.")}{" "}
+          {t("Use")} <code className="px-1 py-0.5 rounded bg-muted text-xs">{`{FirstName}`}</code> {t("and")}{" "}
+          <code className="px-1 py-0.5 rounded bg-muted text-xs">{`{LastName}`}</code>{" "}
+          {t("to personalize per guest.")}
         </p>
       </section>
 
@@ -108,15 +112,15 @@ function AdminInvitation() {
             onChange={(e) => setText(e.target.value)}
             rows={18}
             className="font-body text-base leading-relaxed"
-            placeholder={DEFAULT_INVITATION_TEMPLATE}
+            placeholder={defaultTemplate}
           />
         </section>
 
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="font-display text-lg">Live preview</h3>
+            <h3 className="font-display text-lg">{t("Live preview")}</h3>
             <span className="text-xs text-muted-foreground">
-              sample: {previewFirst} {previewLast}
+              {t("sample: {name}", { name: `${previewFirst} ${previewLast}` })}
             </span>
           </div>
           <EnvelopeLetter
@@ -126,10 +130,10 @@ function AdminInvitation() {
             coupleSignature={coupleSignature}
           />
           <p className="mt-3 text-xs text-muted-foreground text-center">
-            Rendered preview text:
+            {t("Rendered preview text:")}
           </p>
           <pre className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground border border-dashed border-border rounded-lg p-3 bg-muted/30">
-            {renderInvitationText(text, previewFirst, previewLast)}
+            {renderInvitationText(text, previewFirst, previewLast, defaultTemplate)}
           </pre>
         </section>
       </div>
