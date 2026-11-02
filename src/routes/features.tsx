@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import { SiteShell } from "@/components/SiteShell";
+import { tHead, useT, type MessageKey } from "@/i18n";
 import {
   Globe,
   Smartphone,
@@ -51,16 +52,17 @@ import {
 export const Route = createFileRoute("/features")({
   head: () => ({
     meta: [
-      { title: "Features — OurJourney" },
+      { title: tHead("Features — OurJourney") },
       {
         name: "description",
-        content:
+        content: tHead(
           "Every OurJourney feature in one place: wedding website, RSVP, guest management, budget, timeline, seating, gallery, playlist and more.",
+        ),
       },
-      { property: "og:title", content: "Features — OurJourney" },
+      { property: "og:title", content: tHead("Features — OurJourney") },
       {
         property: "og:description",
-        content: "The complete wedding platform — beautifully organised by category.",
+        content: tHead("The complete wedding platform — beautifully organised by category."),
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wedding-journeys.lovable.app/features" },
@@ -70,8 +72,8 @@ export const Route = createFileRoute("/features")({
   component: FeaturesPage,
 });
 
-type Feature = { icon: LucideIcon; t: string; d: string; soon?: boolean };
-type Category = { title: string; tagline: string; items: Feature[] };
+type Feature = { icon: LucideIcon; t: MessageKey; d: MessageKey; soon?: boolean };
+type Category = { title: MessageKey; tagline: MessageKey; items: Feature[] };
 
 const categories: Category[] = [
   {
@@ -179,17 +181,20 @@ const roles = [
   { t: "Platform Owner", d: "Oversees the platform — onboarding, billing, support." },
   { t: "Primary Admin", d: "The couple. Full control over their wedding." },
   { t: "Secondary Admin", d: "A trusted helper — planner, sibling, maid of honor." },
-];
+] as const;
 
 function FeaturesPage() {
+  const t = useT();
   return (
     <SiteShell>
       <PageCanvas density="regular">
         <Container width="prose">
           <Hero
             script="tout ce qu'il faut"
-            title="Every detail, lovingly handled."
-            subtitle="OurJourney is a complete wedding platform. One private home for everything from invitations to the after-party playlist."
+            title={t("Every detail, lovingly handled.")}
+            subtitle={t(
+              "OurJourney is a complete wedding platform. One private home for everything from invitations to the after-party playlist.",
+            )}
           />
         </Container>
 
@@ -199,8 +204,8 @@ function FeaturesPage() {
               <div className="flex items-end justify-between mb-block gap-4 flex-wrap">
                 <div>
                   <p className="type-label">{String(idx + 1).padStart(2, "0")}</p>
-                  <h2 className="type-section-title mt-1">{cat.title}</h2>
-                  <p className="type-body text-muted-foreground mt-1">{cat.tagline}</p>
+                  <h2 className="type-section-title mt-1">{t(cat.title)}</h2>
+                  <p className="type-body text-muted-foreground mt-1">{t(cat.tagline)}</p>
                 </div>
                 <div className="h-px flex-1 max-w-40 hidden md:block bg-linear-to-r from-primary/35 to-transparent" />
               </div>
@@ -211,12 +216,12 @@ function FeaturesPage() {
                     icon={<f.icon aria-hidden="true" className="w-5 h-5" />}
                     title={
                       <span className="flex items-center justify-between gap-2">
-                        {f.t}
-                        {f.soon && <Badge tone="gold">Soon</Badge>}
+                        {t(f.t)}
+                        {f.soon && <Badge tone="gold">{t("Soon")}</Badge>}
                       </span>
                     }
                   >
-                    {f.d}
+                    {t(f.d)}
                   </FeatureCard>
                 ))}
               </div>
@@ -226,22 +231,23 @@ function FeaturesPage() {
 
         <Section size="spacious" width="content">
           <ThemedCard variant="framed" ornament className="p-block md:p-section text-center">
-            <p className="type-script">three roles, perfectly cast</p>
-            <h2 className="type-section-title mt-3">Built for couples and their people.</h2>
+            <p className="type-script">{t("three roles, perfectly cast")}</p>
+            <h2 className="type-section-title mt-3">{t("Built for couples and their people.")}</h2>
             <div className="grid md:grid-cols-3 gap-gutter mt-block text-left">
               {roles.map((r) => (
                 <ThemedCard key={r.t} variant="veil">
-                  <h3 className="type-card-title">{r.t}</h3>
-                  <p className="type-body text-muted-foreground mt-1">{r.d}</p>
+                  <h3 className="type-card-title">{t(r.t)}</h3>
+                  <p className="type-body text-muted-foreground mt-1">{t(r.d)}</p>
                 </ThemedCard>
               ))}
             </div>
             <p className="type-body text-muted-foreground mt-block">
-              Guests don't need an account — they sign in with their name and invitation code, or open
-              their personal link.
+              {t(
+                "Guests don't need an account — they sign in with their name and invitation code, or open their personal link.",
+              )}
             </p>
             <ThemedButton asChild size="lg" className="mt-8">
-              <Link to="/create">Create your wedding</Link>
+              <Link to="/create">{t("Create your wedding")}</Link>
             </ThemedButton>
           </ThemedCard>
         </Section>

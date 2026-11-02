@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteShell } from "@/components/SiteShell";
+import { tHead, useT, type MessageKey } from "@/i18n";
 import {
   Accordion,
   AccordionContent,
@@ -7,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
+  type LucideIcon,
   Globe,
   MailCheck,
   Users,
@@ -44,17 +46,19 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "OurJourney — Plan, manage & celebrate your wedding" },
+      { title: tHead("OurJourney — Plan, manage & celebrate your wedding") },
       {
         name: "description",
-        content:
+        content: tHead(
           "OurJourney is the all-in-one wedding platform: invitation website, RSVP, guest management, timeline, budget, vendors, gallery, playlist and more.",
+        ),
       },
-      { property: "og:title", content: "OurJourney — Plan, manage & celebrate your wedding" },
+      { property: "og:title", content: tHead("OurJourney — Plan, manage & celebrate your wedding") },
       {
         property: "og:description",
-        content:
+        content: tHead(
           "Wedding website, RSVP, guest list, budget, timeline, gallery and playlist — all in one romantic home.",
+        ),
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://wedding-journeys.lovable.app/" },
@@ -67,7 +71,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const features = [
+const features: { icon: LucideIcon; t: MessageKey; d: MessageKey; soon?: boolean }[] = [
   { icon: Globe, t: "Invitation Website", d: "Your own private wedding site with countdown, story and location." },
   { icon: MailCheck, t: "RSVP Management", d: "Elegant RSVP with meal choices, dietary needs and deadlines." },
   { icon: Users, t: "Guest Management", d: "Groups, day/evening, plus-ones, unique invitation codes." },
@@ -87,7 +91,7 @@ const benefits = [
   { icon: Clock, t: "Less stress, more moments", d: "Automations, templates and reminders keep you ahead." },
   { icon: Users, t: "Guests always informed", d: "One private link with everything they need to know." },
   { icon: ShieldCheck, t: "Private & secure", d: "Per-wedding data isolation. Only your admins see the details." },
-];
+] as const;
 
 const steps = [
   { t: "Create your wedding", d: "Claim your private URL in under a minute." },
@@ -95,9 +99,9 @@ const steps = [
   { t: "Invite your guests", d: "Personal links & unique invitation codes." },
   { t: "Manage everything", d: "RSVPs, budget, vendors, seating — one dashboard." },
   { t: "Celebrate", d: "Live the day. Relive it in the gallery." },
-];
+] as const;
 
-const showcaseItems = ["Wedding website", "RSVP dashboard", "Budget planner", "Timeline editor"];
+const showcaseItems = ["Wedding website", "RSVP dashboard", "Budget planner", "Timeline editor"] as const;
 
 const testimonials = [
   {
@@ -115,7 +119,7 @@ const testimonials = [
     n: "Maya & Noah",
     r: "Married in Summer",
   },
-];
+] as const;
 
 const faqs = [
   {
@@ -138,40 +142,44 @@ const faqs = [
     q: "Do guests need an account?",
     a: "No. Guests sign in with their name and invitation code, or open their personal link.",
   },
-];
+] as const;
 
 function HomePage() {
+  const t = useT();
   return (
     <SiteShell>
       <PageCanvas density="lavish">
         <Container width="wide">
           <HeroSection
             align="split"
-            script="Once upon a forever"
+            script={t("Once upon a forever")}
             title={
               <>
-                Everything you need to <span className="italic text-primary">plan, manage</span> &
-                celebrate your wedding.
+                {t("Everything you need to")}{" "}
+                <span className="italic text-primary">{t("plan, manage")}</span>{" "}
+                {t("& celebrate your wedding.")}
               </>
             }
-            subtitle="OurJourney is your wedding website, RSVP platform, guest list, budget manager, timeline and gallery — all in one warm, romantic home."
+            subtitle={t(
+              "OurJourney is your wedding website, RSVP platform, guest list, budget manager, timeline and gallery — all in one warm, romantic home.",
+            )}
             extra={
               <div className="flex items-center gap-6 type-caption">
                 <span className="flex items-center gap-2">
-                  <Sparkles aria-hidden="true" className="w-4 h-4 text-primary" /> No design skills needed
+                  <Sparkles aria-hidden="true" className="w-4 h-4 text-primary" /> {t("No design skills needed")}
                 </span>
                 <span className="flex items-center gap-2">
-                  <ShieldCheck aria-hidden="true" className="w-4 h-4 text-primary" /> Private & secure
+                  <ShieldCheck aria-hidden="true" className="w-4 h-4 text-primary" /> {t("Private & secure")}
                 </span>
               </div>
             }
             actions={
               <>
                 <ThemedButton asChild size="lg">
-                  <Link to="/create">Create your wedding</Link>
+                  <Link to="/create">{t("Create your wedding")}</Link>
                 </ThemedButton>
                 <ThemedButton asChild variant="gilded" size="lg">
-                  <Link to="/demo">View demo</Link>
+                  <Link to="/demo">{t("View demo")}</Link>
                 </ThemedButton>
               </>
             }
@@ -180,7 +188,7 @@ function HomePage() {
                 <div className="overflow-hidden rounded-frame border-paper shadow-elev-4">
                   <img
                     src={hero}
-                    alt="Romantic wedding table setting"
+                    alt={t("Romantic wedding table setting")}
                     width={1600}
                     height={1200}
                     className="w-full h-auto"
@@ -201,9 +209,9 @@ function HomePage() {
         {/* Feature highlights */}
         <Section size="spacious" width="wide">
           <SectionHeader
-            eyebrow="one platform, every detail"
-            title="Far more than a wedding website."
-            description="From the first save-the-date to the last dance — OurJourney handles it all."
+            eyebrow={t("one platform, every detail")}
+            title={t("Far more than a wedding website.")}
+            description={t("From the first save-the-date to the last dance — OurJourney handles it all.")}
           />
           <div className="mt-block grid sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             {features.map((f) => (
@@ -212,12 +220,12 @@ function HomePage() {
                 icon={<f.icon aria-hidden="true" className="w-5 h-5" />}
                 title={
                   <span className="flex items-center gap-2">
-                    {f.t}
-                    {f.soon && <Badge tone="gold">Soon</Badge>}
+                    {t(f.t)}
+                    {f.soon && <Badge tone="gold">{t("Soon")}</Badge>}
                   </span>
                 }
               >
-                {f.d}
+                {t(f.d)}
               </FeatureCard>
             ))}
           </div>
@@ -228,11 +236,12 @@ function HomePage() {
           <ThemedCard variant="framed" ornament className="p-block md:p-section">
             <div className="grid lg:grid-cols-2 gap-block items-center">
               <div>
-                <p className="type-script">why OurJourney</p>
-                <h2 className="type-section-title mt-3">One home instead of ten spreadsheets.</h2>
+                <p className="type-script">{t("why OurJourney")}</p>
+                <h2 className="type-section-title mt-3">{t("One home instead of ten spreadsheets.")}</h2>
                 <p className="type-body-lg mt-5 text-muted-foreground">
-                  Excel files, WhatsApp groups, shared docs and sticky notes make wedding planning
-                  messier than it needs to be. OurJourney replaces all of it — beautifully.
+                  {t(
+                    "Excel files, WhatsApp groups, shared docs and sticky notes make wedding planning messier than it needs to be. OurJourney replaces all of it — beautifully.",
+                  )}
                 </p>
               </div>
               <ul className="flex flex-col gap-gutter">
@@ -243,8 +252,8 @@ function HomePage() {
                         <b.icon aria-hidden="true" className="w-5 h-5" />
                       </span>
                       <div>
-                        <h3 className="type-card-title">{b.t}</h3>
-                        <p className="type-body text-muted-foreground mt-1">{b.d}</p>
+                        <h3 className="type-card-title">{t(b.t)}</h3>
+                        <p className="type-body text-muted-foreground mt-1">{t(b.d)}</p>
                       </div>
                     </ThemedCard>
                   </li>
@@ -256,13 +265,13 @@ function HomePage() {
 
         {/* How it works */}
         <Section size="spacious" width="wide">
-          <SectionHeader eyebrow="how it works" title={'From "yes" to "I do", gracefully.'} />
+          <SectionHeader eyebrow={t("how it works")} title={t('From "yes" to "I do", gracefully.')} />
           <div className="mt-block grid md:grid-cols-5 gap-gutter">
             {steps.map((s, i) => (
               <ThemedCard key={s.t} className={i % 2 === 0 ? "animate-ds-reveal-left" : "animate-ds-reveal-right"}>
                 <div className="type-script text-3xl leading-none">0{i + 1}</div>
-                <h3 className="type-card-title mt-3">{s.t}</h3>
-                <p className="type-body text-muted-foreground mt-1">{s.d}</p>
+                <h3 className="type-card-title mt-3">{t(s.t)}</h3>
+                <p className="type-body text-muted-foreground mt-1">{t(s.d)}</p>
               </ThemedCard>
             ))}
           </div>
@@ -274,7 +283,7 @@ function HomePage() {
             <div className="overflow-hidden rounded-frame border-paper shadow-elev-3">
               <img
                 src={featureInvites}
-                alt="Wedding invitations mockup"
+                alt={t("Wedding invitations mockup")}
                 loading="lazy"
                 width={1024}
                 height={1024}
@@ -282,20 +291,20 @@ function HomePage() {
               />
             </div>
             <div className="flex flex-col gap-gutter">
-              <p className="type-script">a peek inside</p>
-              <h2 className="type-section-title">Beautiful on both sides of the invitation.</h2>
+              <p className="type-script">{t("a peek inside")}</p>
+              <h2 className="type-section-title">{t("Beautiful on both sides of the invitation.")}</h2>
               <p className="type-body-lg text-muted-foreground">
-                A romantic public site for your guests. A calm, powerful dashboard for you.
+                {t("A romantic public site for your guests. A calm, powerful dashboard for you.")}
               </p>
               <div className="grid grid-cols-2 gap-3 pt-2">
                 {showcaseItems.map((s) => (
                   <Tag key={s} className="justify-center py-2">
-                    {s}
+                    {t(s)}
                   </Tag>
                 ))}
               </div>
               <ThemedButton asChild size="lg" className="mt-2 self-start">
-                <Link to="/demo">Explore the demo</Link>
+                <Link to="/demo">{t("Explore the demo")}</Link>
               </ThemedButton>
             </div>
           </div>
@@ -303,14 +312,14 @@ function HomePage() {
 
         {/* Testimonials */}
         <Section size="spacious" width="wide">
-          <SectionHeader eyebrow="loved by couples" title="Real weddings, real relief." />
+          <SectionHeader eyebrow={t("loved by couples")} title={t("Real weddings, real relief.")} />
           <div className="mt-block grid md:grid-cols-3 gap-gutter">
-            {testimonials.map((t) => (
-              <ThemedCard key={t.n} variant="paper" interactive>
-                <blockquote className="type-body text-foreground/85 italic">"{t.q}"</blockquote>
+            {testimonials.map((tm) => (
+              <ThemedCard key={tm.n} variant="paper" interactive>
+                <blockquote className="type-body text-foreground/85 italic">"{t(tm.q)}"</blockquote>
                 <figcaption className="mt-5">
-                  <p className="type-script-sm">{t.n}</p>
-                  <p className="type-caption mt-1">{t.r}</p>
+                  <p className="type-script-sm">{tm.n}</p>
+                  <p className="type-caption mt-1">{t(tm.r)}</p>
                 </figcaption>
               </ThemedCard>
             ))}
@@ -319,13 +328,13 @@ function HomePage() {
 
         {/* FAQ */}
         <Section size="spacious" width="prose">
-          <SectionHeader eyebrow="faq" title="Everything you were wondering." />
+          <SectionHeader eyebrow={t("faq")} title={t("Everything you were wondering.")} />
           <ThemedCard variant="framed" className="mt-block">
             <Accordion type="single" collapsible>
               {faqs.map((f, i) => (
                 <AccordionItem key={i} value={`q-${i}`} className={i === faqs.length - 1 ? "border-b-0" : ""}>
-                  <AccordionTrigger className="type-body-lg text-left">{f.q}</AccordionTrigger>
-                  <AccordionContent className="type-body text-muted-foreground">{f.a}</AccordionContent>
+                  <AccordionTrigger className="type-body-lg text-left">{t(f.q)}</AccordionTrigger>
+                  <AccordionContent className="type-body text-muted-foreground">{t(f.a)}</AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -336,14 +345,14 @@ function HomePage() {
         <Section size="spacious" width="content">
           <div className="relative overflow-hidden rounded-frame bg-gradient-warm text-primary-foreground p-block md:p-section text-center shadow-elev-4">
             <p className="type-script opacity-90">à deux</p>
-            <h2 className="type-section-title mt-4 text-primary-foreground">Create your wedding today.</h2>
+            <h2 className="type-section-title mt-4 text-primary-foreground">{t("Create your wedding today.")}</h2>
             <p className="type-body-lg mt-4 text-primary-foreground/85 max-w-xl mx-auto">
-              Claim your private URL in under a minute. Free while you plan.
+              {t("Claim your private URL in under a minute. Free while you plan.")}
             </p>
             <Divider className="mx-auto max-w-xs opacity-70" />
             <div className="flex flex-wrap gap-3 justify-center">
               <ThemedButton asChild size="lg" className="!bg-card !text-foreground">
-                <Link to="/create">Create your wedding</Link>
+                <Link to="/create">{t("Create your wedding")}</Link>
               </ThemedButton>
               <ThemedButton
                 asChild
@@ -351,7 +360,7 @@ function HomePage() {
                 variant="gilded"
                 className="!border-primary-foreground/40 !text-primary-foreground hover:!bg-primary-foreground/10"
               >
-                <Link to="/demo">See the demo</Link>
+                <Link to="/demo">{t("See the demo")}</Link>
               </ThemedButton>
             </div>
           </div>

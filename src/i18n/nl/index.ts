@@ -6,9 +6,11 @@
  * error.
  */
 import core from "./core";
+import marketing from "./marketing";
 
 export const NL = {
   ...core,
+  ...marketing,
 };
 
 export type MessageKey = keyof typeof NL;

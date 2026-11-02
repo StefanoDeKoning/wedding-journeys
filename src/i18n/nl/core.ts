@@ -34,5 +34,18 @@ const nl = {
   "Sign in": "Inloggen",
   "Guest invitation": "Uitnodiging voor gasten",
   "Made with warmth.": "Met liefde gemaakt.",
+
+  // Section names used across the site
+  Invitation: "Uitnodiging",
+  Story: "Verhaal",
+  Timeline: "Tijdlijn",
+  Gallery: "Galerij",
+  Playlist: "Playlist",
+  Guestbook: "Gastenboek",
+  RSVP: "RSVP",
+  Budget: "Budget",
+  Seating: "Tafelschikking",
+  Wishlist: "Verlanglijst",
+  Storage: "Opslag",
 } satisfies Record<string, string>;
 export default nl;

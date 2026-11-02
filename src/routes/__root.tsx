@@ -49,9 +49,9 @@ export const Route = createRootRoute({
       },
       { name: "author", content: "OurJourney" },
       // Link previews (WhatsApp etc.) are fetched without JavaScript or a language
-      // preference, so Open Graph tags stay in the default language (Dutch).
-      { property: "og:title", content: "OurJourney — Jullie verhaal, prachtig gedeeld." },
-      { property: "og:description", content: "Een romantisch thuis voor elke bruiloft." },
+      // preference; the server renders head() in the default language (Dutch).
+      { property: "og:title", content: tHead("OurJourney — Your story. Beautifully shared.") },
+      { property: "og:description", content: tHead("A romantic home for every wedding.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
