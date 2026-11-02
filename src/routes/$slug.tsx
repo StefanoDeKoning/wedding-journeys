@@ -13,14 +13,15 @@ import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
 import { WaxSeal, initialsFromCouple } from "@/wedding/WaxSeal";
 import { PageCanvas, Section, FormPanel, ThemedButton, ThemedInput } from "@/design-system";
+import { tHead, useI18n, useT } from "@/i18n";
 
 export const Route = createFileRoute("/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug} — A wedding on OurJourney` },
+      { title: tHead("{slug} — A wedding on OurJourney", { slug: params.slug }) },
       {
         name: "description",
-        content: "A private wedding home for friends and family.",
+        content: tHead("A private wedding home for friends and family."),
       },
     ],
   }),
@@ -42,6 +43,7 @@ const guestSchema = z.object({
 function WeddingLayout() {
   const { slug } = Route.useParams();
   const { loading, wedding, guest, isAdmin, notAuthorized, refresh } = useWedding(slug);
+  const t = useT();
 
   if (loading) {
     return (
@@ -80,13 +82,14 @@ function WeddingLayout() {
         <PageCanvas density="quiet">
           <Section size="hero" width="prose">
             <div className="text-center">
-              <h1 className="type-hero">Coming soon</h1>
+              <h1 className="type-hero">{t("Coming soon")}</h1>
               <p className="type-body-lg mt-3 text-muted-foreground">
-                The couple is still finishing their site. You'll be able to view it once
-                they publish.
+                {t(
+                  "The couple is still finishing their site. You'll be able to view it once they publish.",
+                )}
               </p>
               <ThemedButton asChild variant="ghost" size="md" className="mt-6">
-                <Link to="/">Back to OurJourney</Link>
+                <Link to="/">{t("Back to OurJourney")}</Link>
               </ThemedButton>
             </div>
           </Section>
@@ -116,18 +119,19 @@ function WeddingLayout() {
 }
 
 function NotFoundForGuest({ slug }: { slug: string }) {
+  const t = useT();
   return (
     <SiteShell>
       <PageCanvas density="quiet">
         <Section size="hero" width="prose">
           <div className="text-center">
-            <h1 className="type-hero">We couldn't find that wedding</h1>
+            <h1 className="type-hero">{t("We couldn't find that wedding")}</h1>
             <p className="type-body-lg mt-3 text-muted-foreground">
-              The address <span className="font-mono">/{slug}</span> doesn't lead anywhere
-              yet. Double-check the link from your invitation.
+              {t("The address")} <span className="font-mono">/{slug}</span>{" "}
+              {t("doesn't lead anywhere yet. Double-check the link from your invitation.")}
             </p>
             <ThemedButton asChild variant="ghost" size="md" className="mt-6">
-              <Link to="/">Back to OurJourney</Link>
+              <Link to="/">{t("Back to OurJourney")}</Link>
             </ThemedButton>
           </div>
         </Section>
@@ -146,6 +150,7 @@ function GuestLoginGate({
   onSuccess: () => void;
 }) {
   const { refresh: refreshAuth } = useAuth();
+  const { t, tx } = useI18n();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -171,7 +176,7 @@ function GuestLoginGate({
         data: { ...parsed.data, weddingSlug: slug },
       });
       if (!result.ok || !result.session) {
-        toast.error(result.error ?? "Could not sign you in.");
+        toast.error(result.error ? tx(result.error) : t("Could not sign you in."));
         setSubmitting(false);
         return;
       }
@@ -180,15 +185,15 @@ function GuestLoginGate({
         refresh_token: result.session.refresh_token,
       });
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         setSubmitting(false);
         return;
       }
-      toast.success(`Welcome, ${result.guest?.first_name}!`);
+      toast.success(t("Welcome, {name}!", { name: result.guest?.first_name ?? "" }));
       await refreshAuth();
       onSuccess();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not sign you in.");
+      toast.error(err instanceof Error ? tx(err.message) : t("Could not sign you in."));
     } finally {
       setSubmitting(false);
     }
@@ -202,11 +207,10 @@ function GuestLoginGate({
             <div className="inline-block wax-pulse">
               <WaxSeal size={104} initials={initialsFromCouple(weddingTitle)} />
             </div>
-            <p className="type-script mt-4">welcome</p>
+            <p className="type-script mt-4">{t("welcome")}</p>
             <h1 className="type-hero mt-2">{weddingTitle}</h1>
             <p className="type-body mt-3 text-muted-foreground">
-              Enter your name and the invitation code from your envelope to open the
-              letter.
+              {t("Enter your name and the invitation code from your envelope to open the letter.")}
             </p>
           </div>
 
@@ -214,7 +218,7 @@ function GuestLoginGate({
             <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-gutter">
               <div className="grid grid-cols-2 gap-gutter">
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="firstName">First name</Label>
+                  <Label htmlFor="firstName">{t("First name")}</Label>
                   <ThemedInput
                     id="firstName"
                     name="firstName"
@@ -223,11 +227,11 @@ function GuestLoginGate({
                     aria-invalid={!!errors.firstName}
                   />
                   {errors.firstName && (
-                    <p className="type-caption text-destructive">{errors.firstName}</p>
+                    <p className="type-caption text-destructive">{tx(errors.firstName)}</p>
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label htmlFor="lastName">Last name</Label>
+                  <Label htmlFor="lastName">{t("Last name")}</Label>
                   <ThemedInput
                     id="lastName"
                     name="lastName"
@@ -236,13 +240,13 @@ function GuestLoginGate({
                     aria-invalid={!!errors.lastName}
                   />
                   {errors.lastName && (
-                    <p className="type-caption text-destructive">{errors.lastName}</p>
+                    <p className="type-caption text-destructive">{tx(errors.lastName)}</p>
                   )}
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="invitationCode">Invitation code</Label>
+                <Label htmlFor="invitationCode">{t("Invitation code")}</Label>
                 <ThemedInput
                   id="invitationCode"
                   name="invitationCode"
@@ -251,12 +255,12 @@ function GuestLoginGate({
                   aria-invalid={!!errors.invitationCode}
                 />
                 {errors.invitationCode && (
-                  <p className="type-caption text-destructive">{errors.invitationCode}</p>
+                  <p className="type-caption text-destructive">{tx(errors.invitationCode)}</p>
                 )}
               </div>
 
               <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
-                {submitting ? "Opening…" : "Open my invitation"}
+                {submitting ? t("Opening…") : t("Open my invitation")}
               </ThemedButton>
             </form>
           </FormPanel>

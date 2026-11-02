@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DecorMotifArt } from "./decor/Illustrations";
 import { useTheme } from "@/theme/ThemeProvider";
+import { useT } from "@/i18n";
 
 /* ------------------------------------------------------------------ */
 /* Buttons                                                             */
@@ -315,6 +316,7 @@ export function MediaCard({
   className?: string;
   ratio?: "square" | "portrait" | "landscape";
 }) {
+  const t = useT();
   const ratios = { square: "aspect-square", portrait: "aspect-[3/4]", landscape: "aspect-[4/3]" } as const;
   const revealClass =
     "opacity-100 can-hover:opacity-0 can-hover:group-hover:opacity-100 transition-opacity duration-[var(--ds-dur-fast)]";
@@ -334,7 +336,7 @@ export function MediaCard({
         <button
           type="button"
           onClick={onClick}
-          aria-label="View full photo"
+          aria-label={t("View full photo")}
           className="absolute inset-0 cursor-zoom-in focus-ring-elegant"
         />
       )}
@@ -618,8 +620,8 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = "Delete",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   destructive = true,
 }: {
@@ -632,6 +634,7 @@ export function ConfirmDialog({
   onConfirm: () => void;
   destructive?: boolean;
 }) {
+  const t = useT();
   return (
     <AlertDialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialogPrimitive.Portal>
@@ -646,7 +649,7 @@ export function ConfirmDialog({
           <div className="mt-stack flex justify-end gap-3">
             <AlertDialogPrimitive.Cancel asChild>
               <ThemedButton variant="ghost" size="sm">
-                {cancelLabel}
+                {cancelLabel ?? t("Cancel")}
               </ThemedButton>
             </AlertDialogPrimitive.Cancel>
             <AlertDialogPrimitive.Action asChild>
@@ -656,7 +659,7 @@ export function ConfirmDialog({
                 onClick={onConfirm}
                 className={destructive ? "bg-destructive text-destructive-foreground" : undefined}
               >
-                {confirmLabel}
+                {confirmLabel ?? t("Delete")}
               </ThemedButton>
             </AlertDialogPrimitive.Action>
           </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ThemedCard } from "@/design-system";
 import { cn } from "@/lib/utils";
+import { useT, type MessageKey } from "@/i18n";
 
 interface CountdownProps {
   /** ISO timestamp to count down to */
@@ -23,6 +24,7 @@ function diff(target: Date) {
 }
 
 export function Countdown({ target, label, compact, showSeconds = true }: CountdownProps) {
+  const tr = useT();
 
   const date = new Date(target);
   const valid = !Number.isNaN(date.getTime());
@@ -40,16 +42,16 @@ export function Countdown({ target, label, compact, showSeconds = true }: Countd
   if (t.done) {
     return (
       <ThemedCard variant="framed" ornament className="mx-auto max-w-sm animate-ds-scale text-center">
-        <p className="type-script">today is the day</p>
+        <p className="type-script">{tr("today is the day")}</p>
       </ThemedCard>
     );
   }
 
-  const items: { value: number; label: string }[] = [
+  const items: { value: number; label: MessageKey }[] = [
     { value: t.days, label: "days" },
     { value: t.hours, label: "hours" },
     { value: t.minutes, label: "minutes" },
-    ...(showSeconds ? [{ value: t.seconds, label: "seconds" }] : []),
+    ...(showSeconds ? [{ value: t.seconds, label: "seconds" as const }] : []),
   ];
 
   return (
@@ -76,11 +78,11 @@ export function Countdown({ target, label, compact, showSeconds = true }: Countd
                 "tabular-nums",
                 compact ? "type-section-title" : "type-card-title",
               )}
-              aria-label={`${i.value} ${i.label}`}
+              aria-label={`${i.value} ${tr(i.label)}`}
             >
               {String(i.value).padStart(2, "0")}
             </div>
-            <div className={cn("type-label", compact ? "mt-0" : "mt-1")}>{i.label}</div>
+            <div className={cn("type-label", compact ? "mt-0" : "mt-1")}>{tr(i.label)}</div>
           </div>
         ))}
       </div>

@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from "react";
 import { WaxSeal, initialsFromCouple, type WaxSealMotif } from "./WaxSeal";
 import { renderInvitationText } from "./invitationTemplate";
 import { cn } from "@/lib/utils";
+import { useT } from "@/i18n";
 
 interface EnvelopeLetterProps {
   recipientFirstName: string;
@@ -190,6 +191,7 @@ export function EnvelopeLetter({
   }, [stage]);
 
   const opened = stage === "open";
+  const t = useT();
 
   return (
     <div className="relative w-full">
@@ -197,12 +199,12 @@ export function EnvelopeLetter({
 
       {!opened && (
         <div className="flex flex-col items-center gap-6">
-          <p className="type-script-sm text-center">a letter awaits you</p>
+          <p className="type-script-sm text-center">{t("a letter awaits you")}</p>
 
           <button
             type="button"
             onClick={() => stage === "closed" && setStage("opening")}
-            aria-label={`Open invitation for ${recipientFirstName} ${recipientLastName}`}
+            aria-label={t("Open invitation for {name}", { name: `${recipientFirstName} ${recipientLastName}` })}
             className="group relative focus-ring-elegant"
           >
             {/* Envelope */}
@@ -254,7 +256,7 @@ export function EnvelopeLetter({
             </div>
 
             <span className="block mt-8 text-[22px] type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
-              tap to break the seal
+              {t("tap to break the seal")}
             </span>
           </button>
         </div>
@@ -272,9 +274,9 @@ export function EnvelopeLetter({
             {/* The ink */}
             <div className="letter-content" style={{ filter: `url(#${filterId}-ink)` }}>
               <header>
-                <p className="font-parchment-script text-[36px] md:text-[40px]">an invitation</p>
+                <p className="font-parchment-script text-[36px] md:text-[40px]">{t("an invitation")}</p>
                 <div className="letter-rule">
-                  <span className="type-label !text-current">Sealed with love</span>
+                  <span className="type-label !text-current">{t("Sealed with love")}</span>
                 </div>
               </header>
 

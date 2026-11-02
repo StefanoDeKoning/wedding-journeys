@@ -14,6 +14,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { ThemedButton } from "@/design-system";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "@/i18n/LanguageToggle";
+import { useT } from "@/i18n";
 
 const TAB_BASE =
   "type-nav flex min-h-11 items-center gap-2 rounded-full whitespace-nowrap px-4 py-2 border border-transparent " +
@@ -29,7 +30,7 @@ const tabs = [
   { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false, feature: "gallery" as const },
   { to: "/$slug/playlist" as const, label: "Playlist", icon: Music, exact: false, feature: "playlist" as const },
   { to: "/$slug/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false, feature: "guestbook" as const },
-];
+] as const;
 
 export interface EnabledFeatures {
   story: boolean;
@@ -52,6 +53,7 @@ export function WeddingHeader({
   features?: EnabledFeatures;
 }) {
   const { signOut } = useAuth();
+  const t = useT();
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-lg bg-background/75 border-b border-paper shadow-elev-1">
@@ -68,28 +70,28 @@ export function WeddingHeader({
             <LanguageToggle />
             {guestFirstName && (
               <span className="hidden sm:inline type-caption">
-                Hi, <span className="text-foreground font-medium">{guestFirstName}</span>
+                {t("Hi,")} <span className="text-foreground font-medium">{guestFirstName}</span>
               </span>
             )}
             {isAdmin && (
               <ThemedButton asChild variant="gilded" size="sm">
-                <Link to="/$slug/admin" params={{ slug }} aria-label="Admin">
+                <Link to="/$slug/admin" params={{ slug }} aria-label={t("Admin")}>
                   <Settings aria-hidden="true" className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Admin</span>
+                  <span className="hidden sm:inline">{t("Admin")}</span>
                 </Link>
               </ThemedButton>
             )}
             <ThemedButton
               variant="ghost"
               size="sm"
-              aria-label="Sign out"
+              aria-label={t("Sign out")}
               onClick={async () => {
                 await signOut();
                 window.location.href = `/${slug}`;
               }}
             >
               <LogOut aria-hidden="true" className="w-4 h-4" />
-              <span className="hidden sm:inline">Sign out</span>
+              <span className="hidden sm:inline">{t("Sign out")}</span>
             </ThemedButton>
           </div>
         </div>
@@ -97,20 +99,20 @@ export function WeddingHeader({
         {/* Tabs */}
         <nav className="flex gap-2 overflow-x-auto -mx-gutter px-gutter pb-4 scrollbar-thin">
           {tabs
-            .filter((t) => !t.feature || !features || features[t.feature])
-            .map((t) => {
-            const Icon = t.icon;
+            .filter((tab) => !tab.feature || !features || features[tab.feature])
+            .map((tab) => {
+            const Icon = tab.icon;
             return (
               <Link
-                key={t.to}
-                to={t.to}
+                key={tab.to}
+                to={tab.to}
                 params={{ slug }}
-                activeOptions={{ exact: t.exact }}
+                activeOptions={{ exact: tab.exact }}
                 className={cn(TAB_BASE, TAB_INACTIVE)}
                 activeProps={{ className: cn(TAB_BASE, TAB_ACTIVE) }}
               >
                 <Icon aria-hidden="true" className="w-3.5 h-3.5" />
-                {t.label}
+                {t(tab.label)}
               </Link>
             );
           })}
@@ -135,6 +137,7 @@ export function WeddingShell({
   features?: EnabledFeatures;
   children: ReactNode;
 }) {
+  const t = useT();
   return (
     <div className="min-h-screen flex flex-col bg-wash-page">
       <WeddingHeader
@@ -146,7 +149,7 @@ export function WeddingShell({
       />
       <main className="flex-1">{children}</main>
       <footer className="text-center type-caption py-block">
-        Made with love on{" "}
+        {t("Made with love on")}{" "}
         <Link to="/" className="text-primary hover-gild">
           OurJourney
         </Link>

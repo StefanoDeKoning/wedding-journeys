@@ -9,12 +9,14 @@ import core from "./core";
 import marketing from "./marketing";
 import auth from "./auth";
 import messages from "./messages";
+import guest from "./guest";
 
 export const NL = {
   ...core,
   ...marketing,
   ...auth,
   ...messages,
+  ...guest,
 };
 
 export type MessageKey = keyof typeof NL;
