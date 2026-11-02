@@ -15,7 +15,7 @@ const nl = {
   "Enter your name and the invitation code from your envelope to open the letter.":
     "Vul je naam en de uitnodigingscode uit je envelop in om de brief te openen.",
   "Opening…": "Openen…",
-  "Open my invitation": "Open mijn uitnodiging",
+  "Open my invitation": "Uitnodiging openen",
 
   // Header, tabs and footer
   "Hi,": "Hoi,",
