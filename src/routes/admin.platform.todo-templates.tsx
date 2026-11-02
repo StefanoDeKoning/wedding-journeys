@@ -22,8 +22,10 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
+import { tHead, useI18n, type MessageKey } from "@/i18n";
+
 export const Route = createFileRoute("/admin/platform/todo-templates")({
-  head: () => ({ meta: [{ title: "ToDo Templates" }] }),
+  head: () => ({ meta: [{ title: tHead("ToDo Templates") }] }),
   component: TemplateManager,
 });
 
@@ -57,6 +59,8 @@ const emptyDraft = (): Draft => ({
   position: "0",
 });
 
+const PRIORITY_LABEL: Record<Priority, MessageKey> = { low: "low", medium: "medium", high: "high" };
+
 function TemplateManager() {
   const auth = useAuth();
   const navigate = useNavigate();
@@ -65,6 +69,7 @@ function TemplateManager() {
   const [creating, setCreating] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const [saving, setSaving] = useState(false);
+  const { t, tx } = useI18n();
 
   useEffect(() => {
     if (auth.loading) return;
@@ -80,7 +85,7 @@ function TemplateManager() {
       .order("category", { ascending: true })
       .order("position", { ascending: true });
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     setTemplates((data ?? []) as Template[]);
@@ -88,6 +93,7 @@ function TemplateManager() {
 
   useEffect(() => {
     if (auth.isPlatformOwner) void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.isPlatformOwner]);
 
   const openCreate = () => {
@@ -117,7 +123,7 @@ function TemplateManager() {
 
   const save = async () => {
     if (!draft.title.trim()) {
-      toast.error("Title is required");
+      toast.error(t("Title is required"));
       return;
     }
     setSaving(true);
@@ -138,29 +144,29 @@ function TemplateManager() {
         .update(payload)
         .eq("id", editing.id);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         setSaving(false);
         return;
       }
     } else {
       const { error } = await supabase.from("todo_templates").insert(payload);
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         setSaving(false);
         return;
       }
     }
     setSaving(false);
     closeDialog();
-    toast.success(editing ? "Template updated" : "Template added");
+    toast.success(editing ? t("Template updated") : t("Template added"));
     void load();
   };
 
-  const remove = async (t: Template) => {
-    if (!confirm(`Delete template "${t.title}"?`)) return;
-    const { error } = await supabase.from("todo_templates").delete().eq("id", t.id);
+  const remove = async (tpl: Template) => {
+    if (!confirm(t('Delete template "{title}"?', { title: tpl.title }))) return;
+    const { error } = await supabase.from("todo_templates").delete().eq("id", tpl.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
     void load();
@@ -187,18 +193,18 @@ function TemplateManager() {
         to="/admin/platform"
         className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-4"
       >
-        <ArrowLeft className="w-3 h-3" /> Back to platform
+        <ArrowLeft className="w-3 h-3" /> {t("Back to platform")}
       </Link>
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-script text-2xl text-primary">global library</p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl">ToDo templates</h1>
+          <p className="font-script text-2xl text-primary">{t("global library")}</p>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl">{t("ToDo templates")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Tasks defined here are copied into every newly created wedding.
+            {t("Tasks defined here are copied into every newly created wedding.")}
           </p>
         </div>
         <Button onClick={openCreate}>
-          <Plus className="w-4 h-4" /> New template
+          <Plus className="w-4 h-4" /> {t("New template")}
         </Button>
       </header>
 
@@ -208,33 +214,33 @@ function TemplateManager() {
           <section key={category} className="mb-6">
             <h2 className="font-display text-xl mb-2">{category}</h2>
             <div className="rounded-2xl border border-border bg-card divide-y divide-border shadow-soft">
-              {list.map((t) => (
+              {list.map((tpl) => (
                 <div
-                  key={t.id}
+                  key={tpl.id}
                   className="flex items-start gap-3 px-4 py-3"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{t.title}</span>
+                      <span className="font-medium">{tpl.title}</span>
                       <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        {t.priority}
+                        {t(PRIORITY_LABEL[tpl.priority])}
                       </span>
-                      {t.relative_days_before != null && (
+                      {tpl.relative_days_before != null && (
                         <span className="text-xs text-muted-foreground">
-                          · {t.relative_days_before} days before
+                          · {t("{count} days before", { count: tpl.relative_days_before })}
                         </span>
                       )}
                     </div>
-                    {t.description && (
+                    {tpl.description && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        {t.description}
+                        {tpl.description}
                       </p>
                     )}
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => openEdit(t)}>
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(tpl)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => remove(t)}>
+                  <Button variant="ghost" size="icon" onClick={() => remove(tpl)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -250,17 +256,17 @@ function TemplateManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editing ? "Edit template" : "New template"}
+              {editing ? t("Edit template") : t("New template")}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <Input
-              placeholder="Title"
+              placeholder={t("Title")}
               value={draft.title}
               onChange={(e) => setDraft({ ...draft, title: e.target.value })}
             />
             <Textarea
-              placeholder="Description (optional)"
+              placeholder={t("Description (optional)")}
               value={draft.description}
               onChange={(e) =>
                 setDraft({ ...draft, description: e.target.value })
@@ -268,7 +274,7 @@ function TemplateManager() {
             />
             <div className="grid grid-cols-2 gap-3">
               <Input
-                placeholder="Category"
+                placeholder={t("Category")}
                 value={draft.category}
                 onChange={(e) =>
                   setDraft({ ...draft, category: e.target.value })
@@ -276,7 +282,7 @@ function TemplateManager() {
               />
               <Input
                 type="number"
-                placeholder="Days before wedding"
+                placeholder={t("Days before wedding")}
                 value={draft.relative_days_before}
                 onChange={(e) =>
                   setDraft({ ...draft, relative_days_before: e.target.value })
@@ -294,14 +300,14 @@ function TemplateManager() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low priority</SelectItem>
-                  <SelectItem value="medium">Medium priority</SelectItem>
-                  <SelectItem value="high">High priority</SelectItem>
+                  <SelectItem value="low">{t("Low priority")}</SelectItem>
+                  <SelectItem value="medium">{t("Medium priority")}</SelectItem>
+                  <SelectItem value="high">{t("High priority")}</SelectItem>
                 </SelectContent>
               </Select>
               <Input
                 type="number"
-                placeholder="Position"
+                placeholder={t("Position")}
                 value={draft.position}
                 onChange={(e) =>
                   setDraft({ ...draft, position: e.target.value })
@@ -311,11 +317,11 @@ function TemplateManager() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button onClick={save} disabled={saving}>
               {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-              Save
+              {t("Save")}
             </Button>
           </DialogFooter>
         </DialogContent>

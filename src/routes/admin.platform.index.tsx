@@ -4,13 +4,14 @@ import { Loader2, Crown, Users, Image as ImageIcon, HardDrive, CalendarHeart, Sc
 import { useAuth } from "@/auth/AuthProvider";
 import { getPlatformOverview, type PlatformOverview } from "@/auth/platform.functions";
 import { describeAction } from "@/wedding/audit";
+import { tHead, useI18n } from "@/i18n";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/platform/")({
   head: () => ({
     meta: [
-      { title: "Platform Owner Dashboard" },
-      { name: "description", content: "OurJourney platform-wide stats and audit." },
+      { title: tHead("Platform Owner Dashboard") },
+      { name: "description", content: tHead("OurJourney platform-wide stats and audit.") },
     ],
   }),
   component: PlatformDashboard,
@@ -28,6 +29,7 @@ function PlatformDashboard() {
   const navigate = useNavigate();
   const [data, setData] = useState<PlatformOverview | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t, tx, locale } = useI18n();
 
   useEffect(() => {
     if (auth.loading) return;
@@ -47,7 +49,7 @@ function PlatformDashboard() {
       })
       .catch((err: Error) => {
         console.error("getPlatformOverview failed", err);
-        toast.error(err?.message ?? "Could not load platform overview.");
+        toast.error(err?.message ? tx(err.message) : t("Could not load platform overview."));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -55,6 +57,8 @@ function PlatformDashboard() {
     return () => {
       cancelled = true;
     };
+    // Translators are read when the request fails; refetching on a language switch is unnecessary.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.loading, auth.user, auth.isPlatformOwner, navigate]);
 
   if (auth.loading || loading) {
@@ -68,7 +72,7 @@ function PlatformDashboard() {
   if (!data) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-12 text-center text-muted-foreground">
-        Could not load platform overview.
+        {t("Could not load platform overview.")}
       </div>
     );
   }
@@ -80,44 +84,49 @@ function PlatformDashboard() {
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="font-script text-2xl text-primary flex items-center gap-2">
-            <Crown className="w-5 h-5" /> platform owner
+            <Crown className="w-5 h-5" /> {t("platform owner")}
           </p>
-          <h1 className="mt-1 font-display text-3xl sm:text-4xl">OurJourney overview</h1>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl">{t("OurJourney overview")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Cross-wedding stats, storage, and audit history.
+            {t("Cross-wedding stats, storage, and audit history.")}
           </p>
         </div>
         <Link
           to="/admin/platform/todo-templates"
           className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted/60 transition-colors"
         >
-          ToDo templates <ArrowRight className="w-3.5 h-3.5" />
+          {t("ToDo templates")} <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
-        <StatCard label="Weddings" value={totals.weddings} sub={`${totals.published} published`} icon={CalendarHeart} />
-        <StatCard label="Total guests" value={totals.guests} icon={Users} />
-        <StatCard label="RSVP yes" value={totals.rsvp_yes} icon={Users} />
-        <StatCard label="Photos" value={totals.photos} icon={ImageIcon} />
-        <StatCard label="Storage used" value={formatBytes(totals.storage_bytes)} icon={HardDrive} />
-        <StatCard label="Audit events" value={recentAudit.length} icon={ScrollText} sub="latest 50" />
+        <StatCard
+          label={t("Weddings")}
+          value={totals.weddings}
+          sub={t("{count} published", { count: totals.published })}
+          icon={CalendarHeart}
+        />
+        <StatCard label={t("Total guests")} value={totals.guests} icon={Users} />
+        <StatCard label={t("RSVP yes")} value={totals.rsvp_yes} icon={Users} />
+        <StatCard label={t("Photos")} value={totals.photos} icon={ImageIcon} />
+        <StatCard label={t("Storage used")} value={formatBytes(totals.storage_bytes)} icon={HardDrive} />
+        <StatCard label={t("Audit events")} value={recentAudit.length} icon={ScrollText} sub={t("latest 50")} />
       </section>
 
       <section className="mb-10">
-        <h2 className="font-display text-xl mb-3">All weddings</h2>
+        <h2 className="font-display text-xl mb-3">{t("All weddings")}</h2>
         <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-soft">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="text-left px-4 py-3">Wedding</th>
-                  <th className="text-left px-4 py-3">Date</th>
-                  <th className="text-left px-4 py-3">Status</th>
-                  <th className="text-right px-4 py-3">Guests</th>
-                  <th className="text-right px-4 py-3">Yes</th>
-                  <th className="text-right px-4 py-3">Photos</th>
-                  <th className="text-right px-4 py-3">Storage</th>
+                  <th className="text-left px-4 py-3">{t("Wedding")}</th>
+                  <th className="text-left px-4 py-3">{t("Date")}</th>
+                  <th className="text-left px-4 py-3">{t("Status")}</th>
+                  <th className="text-right px-4 py-3">{t("Guests")}</th>
+                  <th className="text-right px-4 py-3">{t("Yes")}</th>
+                  <th className="text-right px-4 py-3">{t("Photos")}</th>
+                  <th className="text-right px-4 py-3">{t("Storage")}</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -125,7 +134,7 @@ function PlatformDashboard() {
                 {weddings.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
-                      No weddings yet.
+                      {t("No weddings yet.")}
                     </td>
                   </tr>
                 ) : (
@@ -141,7 +150,7 @@ function PlatformDashboard() {
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">
                           {w.wedding_date
-                            ? new Date(w.wedding_date).toLocaleDateString(undefined, {
+                            ? new Date(w.wedding_date).toLocaleDateString(locale, {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
@@ -156,7 +165,7 @@ function PlatformDashboard() {
                                 : "bg-muted text-muted-foreground"
                             }`}
                           >
-                            {w.status}
+                            {w.status === "published" ? t("Published") : t("Draft")}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">{w.guest_count}</td>
@@ -185,7 +194,7 @@ function PlatformDashboard() {
                             params={{ slug: w.slug }}
                             className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                           >
-                            Open <ArrowRight className="w-3 h-3" />
+                            {t("Open")} <ArrowRight className="w-3 h-3" />
                           </Link>
                         </td>
                       </tr>
@@ -199,19 +208,19 @@ function PlatformDashboard() {
       </section>
 
       <section>
-        <h2 className="font-display text-xl mb-3">Recent activity</h2>
+        <h2 className="font-display text-xl mb-3">{t("Recent activity")}</h2>
         <div className="rounded-2xl border border-border bg-card divide-y divide-border shadow-soft">
           {recentAudit.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              No audit events yet.
+              {t("No audit events yet.")}
             </div>
           ) : (
             recentAudit.map((a) => (
               <div key={a.id} className="px-4 py-3 flex items-start justify-between gap-4 text-sm">
                 <div className="min-w-0">
                   <p className="truncate">
-                    <span className="font-medium">{a.actor_label ?? "Someone"}</span>{" "}
-                    <span className="text-muted-foreground">{describeAction(a.action)}</span>
+                    <span className="font-medium">{a.actor_label ?? t("Someone")}</span>{" "}
+                    <span className="text-muted-foreground">{tx(describeAction(a.action))}</span>
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {a.wedding_slug ? (
@@ -223,12 +232,12 @@ function PlatformDashboard() {
                         {a.wedding_name ?? a.wedding_slug}
                       </Link>
                     ) : (
-                      <span>Unknown wedding</span>
+                      <span>{t("Unknown wedding")}</span>
                     )}
                   </p>
                 </div>
                 <time className="text-xs text-muted-foreground whitespace-nowrap shrink-0">
-                  {new Date(a.created_at).toLocaleString()}
+                  {new Date(a.created_at).toLocaleString(locale)}
                 </time>
               </div>
             ))

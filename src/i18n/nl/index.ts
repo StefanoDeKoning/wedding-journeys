@@ -17,6 +17,7 @@ import adminGuests from "./adminGuests";
 import adminPlanning from "./adminPlanning";
 import adminContent from "./adminContent";
 import adminSettings from "./adminSettings";
+import platform from "./platform";
 
 export const NL = {
   ...core,
@@ -31,6 +32,7 @@ export const NL = {
   ...adminPlanning,
   ...adminContent,
   ...adminSettings,
+  ...platform,
 };
 
 export type MessageKey = keyof typeof NL;
