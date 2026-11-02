@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   CalendarDays,
+  CalendarPlus,
   MapPin,
   Heart,
   ListChecks,
@@ -12,7 +13,8 @@ import {
   Mail,
 } from "lucide-react";
 import { useWeddingContext } from "@/wedding/WeddingContext";
-import { useFirstTimelineEventTime } from "@/wedding/useFirstTimelineEvent";
+import { useGuestTimelineWindow } from "@/wedding/useGuestTimelineWindow";
+import { buildIcs, downloadIcs, weddingMinutesToIso } from "@/wedding/calendarInvite";
 
 import { EnvelopeLetter } from "@/wedding/EnvelopeLetter";
 import { Countdown } from "@/wedding/Countdown";
@@ -67,13 +69,11 @@ function InvitationPage() {
 
 
   const isEvening = guest?.guest_type === "evening";
-  const firstEventTime = useFirstTimelineEventTime(
-    wedding.id,
-    guest?.guest_type ?? null,
-    wedding.wedding_date,
-  );
+  const guestWindow = useGuestTimelineWindow(wedding.id, guest?.guest_type ?? null);
   const target =
-    firstEventTime ??
+    (guestWindow && wedding.wedding_date
+      ? weddingMinutesToIso(wedding.wedding_date, guestWindow.start)
+      : null) ??
     (isEvening
       ? (wedding.reception_at ?? wedding.ceremony_at)
       : (wedding.ceremony_at ?? wedding.reception_at));
@@ -89,6 +89,19 @@ function InvitationPage() {
       : (wedding.wedding_name ?? t("The happy couple"));
 
   const mapsUrl = safeHttpUrl(wedding.maps_url);
+
+  const downloadCalendarEvent = () => {
+    if (!wedding.wedding_date) return;
+    const ics = buildIcs({
+      uid: `${wedding.id}-${guest?.guest_type ?? "full_day"}@our-journey`,
+      title: t("Wedding of {couple}", { couple: coupleSignature }),
+      location: [wedding.location_name, wedding.location_address].filter(Boolean).join(", "),
+      url: `${window.location.origin}/${slug}`,
+      date: wedding.wedding_date,
+      window: guestWindow,
+    });
+    downloadIcs(`${slug}.ics`, ics);
+  };
 
   return (
     <PageCanvas density="lavish">
@@ -189,7 +202,16 @@ function InvitationPage() {
                 />
               </div>
             )}
-
+            {wedding.wedding_date && (
+              <ThemedButton
+                variant="gilded"
+                size="sm"
+                className="mt-6"
+                onClick={downloadCalendarEvent}
+              >
+                <CalendarPlus aria-hidden="true" className="w-4 h-4" /> {t("Add to calendar")}
+              </ThemedButton>
+            )}
           </ThemedCard>
 
           <ThemedCard variant="framed" ornament className="animate-ds-reveal-right h-full">

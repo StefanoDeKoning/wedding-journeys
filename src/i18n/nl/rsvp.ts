@@ -18,6 +18,8 @@ const nl = {
   "You're invited to the evening celebration.": "Je bent uitgenodigd voor het avondfeest.",
   "until the evening celebration begins": "tot het avondfeest begint",
   "until the celebration begins": "tot het feest begint",
+  "Add to calendar": "Zet in je agenda",
+  "Wedding of {couple}": "Bruiloft van {couple}",
   Where: "Waar",
   "Venue to be announced": "Locatie volgt nog",
   "Open in Google Maps →": "Openen in Google Maps →",
