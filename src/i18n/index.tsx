@@ -29,9 +29,19 @@ export function translate(lang: Lang, en: MessageKey, vars?: Vars) {
   return interpolate(lang === "nl" ? DICT[en] : en, vars);
 }
 
+// zod's built-in messages embed numbers, so they are matched by pattern.
+const NL_PATTERNS: [RegExp, string][] = [
+  [/^String must contain at most (\d+) character\(s\)$/, "Maximaal $1 tekens"],
+  [/^String must contain at least (\d+) character\(s\)$/, "Minimaal $1 tekens"],
+  [/^Number must be greater than or equal to (-?[\d.]+)$/, "Moet minimaal $1 zijn"],
+  [/^Number must be less than or equal to (-?[\d.]+)$/, "Mag maximaal $1 zijn"],
+];
+
 /** Translate a string only known at runtime (e.g. a server error message). */
 export function translateDynamic(lang: Lang, en: string, vars?: Vars) {
   if (lang === "nl" && !(en in DICT)) {
+    const pattern = NL_PATTERNS.find(([re]) => re.test(en));
+    if (pattern) return en.replace(pattern[0], pattern[1]);
     if (import.meta.env.DEV) console.warn(`[i18n] Missing Dutch translation: "${en}"`);
     return interpolate(en, vars);
   }

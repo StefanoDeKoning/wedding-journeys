@@ -23,18 +23,20 @@ import {
   ThemedTextarea,
   SlugInput,
 } from "@/design-system";
+import { tHead, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/create")({
   head: () => ({
     meta: [
-      { title: "Create your wedding — OurJourney" },
+      { title: tHead("Create your wedding — OurJourney") },
       {
         name: "description",
-        content:
+        content: tHead(
           "Set up your private wedding website and admin dashboard in minutes. Pick your slug, add your details, invite your guests.",
+        ),
       },
-      { property: "og:title", content: "Create your wedding — OurJourney" },
-      { property: "og:description", content: "Begin your OurJourney." },
+      { property: "og:title", content: tHead("Create your wedding — OurJourney") },
+      { property: "og:description", content: tHead("Begin your OurJourney.") },
     ],
   }),
   component: CreatePage,
@@ -86,6 +88,7 @@ type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 function CreatePage() {
   const { user, refresh, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { t, tx } = useI18n();
 
   const [weddingName, setWeddingName] = useState("");
   const [brideName, setBrideName] = useState("");
@@ -147,8 +150,8 @@ function CreatePage() {
   }, [slug]);
 
   const placeholderName = useMemo(
-    () => (brideName && groomName ? `${brideName} & ${groomName}` : "Our wedding"),
-    [brideName, groomName],
+    () => (brideName && groomName ? `${brideName} & ${groomName}` : t("Our wedding")),
+    [brideName, groomName, t],
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -174,7 +177,7 @@ function CreatePage() {
       return;
     }
     if (slugStatus !== "available") {
-      setErrors({ slug: "Pick an available URL before continuing." });
+      setErrors({ slug: t("Pick an available URL before continuing.") });
       return;
     }
 
@@ -185,7 +188,7 @@ function CreatePage() {
       // requires fresh credentials so we always go through the same backend op.
       if (user) {
         toast.error(
-          "You're already signed in. Sign out first to create a new wedding from a fresh account.",
+          t("You're already signed in. Sign out first to create a new wedding from a fresh account."),
         );
         setSubmitting(false);
         return;
@@ -212,15 +215,15 @@ function CreatePage() {
           },
         });
       } catch (callErr) {
-        const message = callErr instanceof Error ? callErr.message : "Server error";
+        const message = callErr instanceof Error ? tx(callErr.message) : t("Server error");
         console.error("[create] createWeddingWithAccount threw:", callErr);
-        toast.error(`Could not create your wedding: ${message}`);
+        toast.error(t("Could not create your wedding: {message}", { message }));
         setSubmitting(false);
         return;
       }
 
       if (!result.ok || !result.wedding) {
-        const message = result.error ?? "Could not create your wedding.";
+        const message = tx(result.error ?? "Could not create your wedding.");
         console.error("[create] createWeddingWithAccount failed:", result);
         if (result.errorField) {
           setErrors({ [result.errorField]: message });
@@ -236,19 +239,19 @@ function CreatePage() {
         password: sParsed.data.password,
       });
       if (signInErr) {
-        toast.message("Wedding created. Please sign in to continue.", {
-          description: signInErr.message,
+        toast.message(t("Wedding created. Please sign in to continue."), {
+          description: tx(signInErr.message),
         });
         void navigate({ to: "/login" });
         return;
       }
 
-      toast.success("Your wedding home is ready.");
+      toast.success(t("Your wedding home is ready."));
       await refresh();
       void navigate({ to: result.wedding.adminUrl });
     } catch (err) {
       console.error("[create] unexpected:", err);
-      toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      toast.error(err instanceof Error ? tx(err.message) : t("Something went wrong."));
     } finally {
       setSubmitting(false);
     }
@@ -260,15 +263,17 @@ function CreatePage() {
         <PageCanvas density="quiet">
           <Section size="hero" width="prose">
             <FormPanel
-              title="You're already signed in"
-              description="Creating a wedding needs a fresh account for now. Sign out first, or head back if you meant to visit your dashboard."
+              title={t("You're already signed in")}
+              description={t(
+                "Creating a wedding needs a fresh account for now. Sign out first, or head back if you meant to visit your dashboard.",
+              )}
             >
               <div className="flex flex-wrap gap-3 justify-center">
                 <ThemedButton size="lg" onClick={() => void signOut()}>
-                  Sign out
+                  {t("Sign out")}
                 </ThemedButton>
                 <ThemedButton asChild variant="gilded" size="lg">
-                  <Link to="/">Back home</Link>
+                  <Link to="/">{t("Back home")}</Link>
                 </ThemedButton>
               </div>
             </FormPanel>
@@ -283,12 +288,13 @@ function CreatePage() {
       <PageCanvas density="regular">
         <Container width="prose">
           <Hero
-            script="begin"
-            title="Create your wedding home."
+            script={t("begin")}
+            title={t("Create your wedding home.")}
             subtitle={
               <>
-                Your site starts in <span className="font-medium text-foreground">draft mode</span> —
-                only you can see it until you're ready to share. Refine everything afterwards.
+                {t("Your site starts in")}{" "}
+                <span className="font-medium text-foreground">{t("draft mode")}</span>{" "}
+                {t("— only you can see it until you're ready to share. Refine everything afterwards.")}
               </>
             }
           />
@@ -299,10 +305,10 @@ function CreatePage() {
         <form onSubmit={handleSubmit} noValidate className="space-y-block">
           {/* Couple */}
           <fieldset className="space-y-5">
-            <legend className="type-card-title">The couple</legend>
+            <legend className="type-card-title">{t("The couple")}</legend>
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <Label htmlFor="brideName">Bride name</Label>
+                <Label htmlFor="brideName">{t("Bride name")}</Label>
                 <ThemedInput
                   id="brideName"
                   value={brideName}
@@ -310,10 +316,10 @@ function CreatePage() {
                   placeholder="Sophie"
                   aria-invalid={!!errors.brideName}
                 />
-                {errors.brideName && <p className="type-caption text-destructive">{errors.brideName}</p>}
+                {errors.brideName && <p className="type-caption text-destructive">{tx(errors.brideName)}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="groomName">Groom name</Label>
+                <Label htmlFor="groomName">{t("Groom name")}</Label>
                 <ThemedInput
                   id="groomName"
                   value={groomName}
@@ -321,11 +327,11 @@ function CreatePage() {
                   placeholder="Jan"
                   aria-invalid={!!errors.groomName}
                 />
-                {errors.groomName && <p className="type-caption text-destructive">{errors.groomName}</p>}
+                {errors.groomName && <p className="type-caption text-destructive">{tx(errors.groomName)}</p>}
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="weddingName">Wedding name</Label>
+              <Label htmlFor="weddingName">{t("Wedding name")}</Label>
               <ThemedInput
                 id="weddingName"
                 value={weddingName}
@@ -334,11 +340,11 @@ function CreatePage() {
                 aria-invalid={!!errors.weddingName}
               />
               {errors.weddingName && (
-                <p className="type-caption text-destructive">{errors.weddingName}</p>
+                <p className="type-caption text-destructive">{tx(errors.weddingName)}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="weddingDate">Wedding date</Label>
+              <Label htmlFor="weddingDate">{t("Wedding date")}</Label>
               <ThemedInput
                 id="weddingDate"
                 type="date"
@@ -347,16 +353,16 @@ function CreatePage() {
                 aria-invalid={!!errors.weddingDate}
               />
               {errors.weddingDate && (
-                <p className="type-caption text-destructive">{errors.weddingDate}</p>
+                <p className="type-caption text-destructive">{tx(errors.weddingDate)}</p>
               )}
             </div>
           </fieldset>
 
           {/* Location */}
           <fieldset className="space-y-5">
-            <legend className="type-card-title">The venue</legend>
+            <legend className="type-card-title">{t("The venue")}</legend>
             <div className="space-y-2">
-              <Label htmlFor="locationName">Location name</Label>
+              <Label htmlFor="locationName">{t("Location name")}</Label>
               <ThemedInput
                 id="locationName"
                 value={locationName}
@@ -365,7 +371,7 @@ function CreatePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="locationAddress">Address</Label>
+              <Label htmlFor="locationAddress">{t("Address")}</Label>
               <ThemedTextarea
                 id="locationAddress"
                 value={locationAddress}
@@ -375,7 +381,7 @@ function CreatePage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mapsUrl">Google Maps link</Label>
+              <Label htmlFor="mapsUrl">{t("Google Maps link")}</Label>
               <ThemedInput
                 id="mapsUrl"
                 type="url"
@@ -384,15 +390,15 @@ function CreatePage() {
                 placeholder="https://maps.app.goo.gl/…"
                 aria-invalid={!!errors.mapsUrl}
               />
-              {errors.mapsUrl && <p className="type-caption text-destructive">{errors.mapsUrl}</p>}
+              {errors.mapsUrl && <p className="type-caption text-destructive">{tx(errors.mapsUrl)}</p>}
             </div>
           </fieldset>
 
           {/* Slug */}
           <fieldset className="space-y-3">
-            <legend className="type-card-title">Your wedding URL</legend>
+            <legend className="type-card-title">{t("Your wedding URL")}</legend>
             <Label htmlFor="slug" className="sr-only">
-              Wedding slug
+              {t("Wedding slug")}
             </Label>
             <SlugInput
               id="slug"
@@ -428,23 +434,23 @@ function CreatePage() {
 
             <div id="slug-status">
               {slugStatus === "available" && (
-                <p className="type-caption text-primary">Available — this URL is yours.</p>
+                <p className="type-caption text-primary">{t("Available — this URL is yours.")}</p>
               )}
               {slugStatus === "invalid" && (
                 <p className="type-caption text-destructive">
-                  Use 3–60 lowercase letters, numbers and dashes. No spaces.
+                  {t("Use 3–60 lowercase letters, numbers and dashes. No spaces.")}
                 </p>
               )}
               {slugStatus === "taken" && (
                 <p className="type-caption text-destructive">
-                  <span className="font-medium">{slug}</span> is already taken.
+                  <span className="font-medium">{slug}</span> {t("is already taken.")}
                 </p>
               )}
             </div>
             {slugStatus === "taken" && suggestions.length > 0 && (
               <div>
                 <p className="type-caption flex items-center gap-1.5 mb-2">
-                  <Sparkles aria-hidden="true" className="h-3 w-3" /> Try one of these
+                  <Sparkles aria-hidden="true" className="h-3 w-3" /> {t("Try one of these")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {suggestions.map((s) => (
@@ -463,17 +469,17 @@ function CreatePage() {
                 </div>
               </div>
             )}
-            {errors.slug && <p className="type-caption text-destructive">{errors.slug}</p>}
+            {errors.slug && <p className="type-caption text-destructive">{tx(errors.slug)}</p>}
             <p className="type-caption">
-              Lowercase letters, numbers and dashes. You can change this later.
+              {t("Lowercase letters, numbers and dashes. You can change this later.")}
             </p>
           </fieldset>
 
           {/* RSVP */}
           <fieldset className="space-y-3">
-            <legend className="type-card-title">RSVP deadline</legend>
+            <legend className="type-card-title">{t("RSVP deadline")}</legend>
             <div className="space-y-2">
-              <Label htmlFor="rsvpDeadline">Last day guests can respond</Label>
+              <Label htmlFor="rsvpDeadline">{t("Last day guests can respond")}</Label>
               <ThemedInput
                 id="rsvpDeadline"
                 type="date"
@@ -481,7 +487,7 @@ function CreatePage() {
                 onChange={(e) => setRsvpDeadline(e.target.value)}
               />
               <p className="type-caption">
-                After this date, guests can't change their answer. Optional — you can set it later.
+                {t("After this date, guests can't change their answer. Optional — you can set it later.")}
               </p>
             </div>
           </fieldset>
@@ -489,41 +495,41 @@ function CreatePage() {
           {/* Account */}
           {!loading && !user && (
             <fieldset className="space-y-5 border-t border-paper pt-8">
-              <legend className="type-card-title">Your admin account</legend>
+              <legend className="type-card-title">{t("Your admin account")}</legend>
               <div className="grid sm:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("Email")}</Label>
                   <ThemedInput
                     id="email"
                     type="email"
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="hello@example.com"
+                    placeholder={t("hello@example.com")}
                     aria-invalid={!!errors.email}
                   />
-                  {errors.email && <p className="type-caption text-destructive">{errors.email}</p>}
+                  {errors.email && <p className="type-caption text-destructive">{tx(errors.email)}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t("Password")}</Label>
                   <ThemedInput
                     id="password"
                     type="password"
                     autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder={t("At least 8 characters")}
                     aria-invalid={!!errors.password}
                   />
                   {errors.password && (
-                    <p className="type-caption text-destructive">{errors.password}</p>
+                    <p className="type-caption text-destructive">{tx(errors.password)}</p>
                   )}
                 </div>
               </div>
               <p className="type-caption">
-                Already have an account?{" "}
+                {t("Already have an account?")}{" "}
                 <Link to="/login" className="text-primary hover-gild focus-ring-elegant">
-                  Sign in instead
+                  {t("Sign in instead")}
                 </Link>
                 .
               </p>
@@ -538,15 +544,19 @@ function CreatePage() {
               className="w-full"
             >
               {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
-              {submitting ? "Creating…" : slugStatus === "checking" ? "Checking your URL…" : "Reserve our journey"}
+              {submitting
+                ? t("Creating…")
+                : slugStatus === "checking"
+                  ? t("Checking your URL…")
+                  : t("Reserve our journey")}
             </ThemedButton>
             {slugStatus === "checking" && (
-              <p className="type-caption text-center">Just a moment while we confirm your URL is free.</p>
+              <p className="type-caption text-center">{t("Just a moment while we confirm your URL is free.")}</p>
             )}
           </div>
 
           <p className="type-caption text-center">
-            We'll set up your wedding website, admin dashboard and guest login in one go.
+            {t("We'll set up your wedding website, admin dashboard and guest login in one go.")}
           </p>
         </form>
         </FormPanel>

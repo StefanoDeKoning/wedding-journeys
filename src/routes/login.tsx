@@ -19,18 +19,20 @@ import {
   SlugInput,
 } from "@/design-system";
 import { cn } from "@/lib/utils";
+import { tHead, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Login — OurJourney" },
+      { title: tHead("Login — OurJourney") },
       {
         name: "description",
-        content:
+        content: tHead(
           "Sign in to your OurJourney admin dashboard, or join a wedding as a guest with your invitation code.",
+        ),
       },
-      { property: "og:title", content: "Login — OurJourney" },
-      { property: "og:description", content: "Sign in to OurJourney." },
+      { property: "og:title", content: tHead("Login — OurJourney") },
+      { property: "og:description", content: tHead("Sign in to OurJourney.") },
     ],
   }),
   component: LoginPage,
@@ -67,6 +69,7 @@ function LoginPage() {
   const [weddingSlug, setWeddingSlug] = useState("");
   const navigate = useNavigate();
   const { refresh } = useAuth();
+  const { t, tx } = useI18n();
 
   const handleAdmin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,7 +93,7 @@ function LoginPage() {
 
     if (error) {
       setSubmitting(false);
-      toast.error(error.message);
+      toast.error(tx(error.message));
       return;
     }
 
@@ -136,7 +139,7 @@ function LoginPage() {
     }
 
     setSubmitting(false);
-    toast.success("Welcome back");
+    toast.success(t("Welcome back"));
     await refresh();
     if (destination.params) {
       try {
@@ -173,7 +176,7 @@ function LoginPage() {
     try {
       const result = await guestLogin({ data: parsed.data });
       if (!result.ok || !result.session) {
-        toast.error(result.error ?? "Could not sign you in.");
+        toast.error(result.error ? tx(result.error) : t("Could not sign you in."));
         setSubmitting(false);
         return;
       }
@@ -182,16 +185,16 @@ function LoginPage() {
         refresh_token: result.session.refresh_token,
       });
       if (error) {
-        toast.error(error.message);
+        toast.error(tx(error.message));
         setSubmitting(false);
         return;
       }
-      toast.success(`Welcome, ${result.guest?.first_name}!`);
+      toast.success(t("Welcome, {name}!", { name: result.guest?.first_name ?? "" }));
       await refresh();
       const slug = result.guest?.wedding_slug ?? parsed.data.weddingSlug;
       void navigate({ to: "/$slug", params: { slug } });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not sign you in.");
+      toast.error(err instanceof Error ? tx(err.message) : t("Could not sign you in."));
     } finally {
       setSubmitting(false);
     }
@@ -204,12 +207,12 @@ function LoginPage() {
     <SiteShell>
       <PageCanvas density="quiet">
         <Container width="prose">
-          <Hero script="welcome back" title="Sign in" />
+          <Hero script={t("welcome back")} title={t("Sign in")} />
         </Container>
 
         <Section size="compact" width="prose">
           <FormPanel className="!max-w-md !p-0 overflow-hidden">
-            <div className="grid grid-cols-2" role="tablist" aria-label="Sign in as">
+            <div className="grid grid-cols-2" role="tablist" aria-label={t("Sign in as")}>
               <button
                 type="button"
                 role="tab"
@@ -227,7 +230,7 @@ function LoginPage() {
                     : "bg-muted/40 text-muted-foreground hover:text-foreground",
                 )}
               >
-                Couple / Admin
+                {t("Couple / Admin")}
               </button>
               <button
                 type="button"
@@ -246,7 +249,7 @@ function LoginPage() {
                     : "bg-muted/40 text-muted-foreground hover:text-foreground",
                 )}
               >
-                Guest
+                {t("Guest")}
               </button>
             </div>
 
@@ -260,24 +263,24 @@ function LoginPage() {
                 noValidate
               >
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("Email")}</Label>
                   <ThemedInput
                     id="email"
                     name="email"
                     type="email"
                     autoComplete="email"
-                    placeholder="hello@example.com"
+                    placeholder={t("hello@example.com")}
                     aria-invalid={!!errors.email}
                     aria-describedby={errors.email ? "email-error" : undefined}
                   />
                   {errors.email && (
                     <p id="email-error" role="alert" className="type-caption text-destructive">
-                      {errors.email}
+                      {tx(errors.email)}
                     </p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t("Password")}</Label>
                   <ThemedInput
                     id="password"
                     name="password"
@@ -289,19 +292,19 @@ function LoginPage() {
                   />
                   {errors.password && (
                     <p id="password-error" role="alert" className="type-caption text-destructive">
-                      {errors.password}
+                      {tx(errors.password)}
                     </p>
                   )}
                 </div>
 
                 <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
                   {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
-                  {submitting ? "Signing in…" : "Sign in"}
+                  {submitting ? t("Signing in…") : t("Sign in")}
                 </ThemedButton>
                 <p className="text-center type-caption">
-                  Platform Owner setup?{" "}
+                  {t("Platform Owner setup?")}{" "}
                   <Link to="/admin/platform/claim" className="text-primary hover-gild focus-ring-elegant">
-                    Bootstrap the first owner
+                    {t("Bootstrap the first owner")}
                   </Link>
                   .
                 </p>
@@ -316,7 +319,7 @@ function LoginPage() {
                 noValidate
               >
                 <div className="space-y-2">
-                  <Label htmlFor="weddingSlug">Wedding URL</Label>
+                  <Label htmlFor="weddingSlug">{t("Wedding URL")}</Label>
                   <SlugInput
                     id="weddingSlug"
                     name="weddingSlug"
@@ -331,13 +334,13 @@ function LoginPage() {
                   />
                   {errors.weddingSlug && (
                     <p id="slug-error" role="alert" className="type-caption text-destructive">
-                      {errors.weddingSlug}
+                      {tx(errors.weddingSlug)}
                     </p>
                   )}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First name</Label>
+                    <Label htmlFor="firstName">{t("First name")}</Label>
                     <ThemedInput
                       id="firstName"
                       name="firstName"
@@ -348,12 +351,12 @@ function LoginPage() {
                     />
                     {errors.firstName && (
                       <p id="firstName-error" role="alert" className="type-caption text-destructive">
-                        {errors.firstName}
+                        {tx(errors.firstName)}
                       </p>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last name</Label>
+                    <Label htmlFor="lastName">{t("Last name")}</Label>
                     <ThemedInput
                       id="lastName"
                       name="lastName"
@@ -364,13 +367,13 @@ function LoginPage() {
                     />
                     {errors.lastName && (
                       <p id="lastName-error" role="alert" className="type-caption text-destructive">
-                        {errors.lastName}
+                        {tx(errors.lastName)}
                       </p>
                     )}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="invitationCode">Invitation code</Label>
+                  <Label htmlFor="invitationCode">{t("Invitation code")}</Label>
                   <ThemedInput
                     id="invitationCode"
                     name="invitationCode"
@@ -381,26 +384,26 @@ function LoginPage() {
                   />
                   {errors.invitationCode && (
                     <p id="code-error" role="alert" className="type-caption text-destructive">
-                      {errors.invitationCode}
+                      {tx(errors.invitationCode)}
                     </p>
                   )}
                 </div>
                 <p className="type-caption">
-                  No account needed — just your name and the code from your invite.
+                  {t("No account needed — just your name and the code from your invite.")}
                 </p>
 
                 <ThemedButton type="submit" size="lg" disabled={submitting} className="w-full">
                   {submitting && <Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
-                  {submitting ? "Checking…" : "Enter wedding"}
+                  {submitting ? t("Checking…") : t("Enter wedding")}
                 </ThemedButton>
               </form>
             )}
           </FormPanel>
 
           <p className="text-center type-body text-muted-foreground mt-6">
-            New here?{" "}
+            {t("New here?")}{" "}
             <Link to="/create" className="text-primary hover-gild focus-ring-elegant">
-              Create your wedding
+              {t("Create your wedding")}
             </Link>
           </p>
         </Section>

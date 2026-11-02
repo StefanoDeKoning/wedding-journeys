@@ -7,10 +7,14 @@
  */
 import core from "./core";
 import marketing from "./marketing";
+import auth from "./auth";
+import messages from "./messages";
 
 export const NL = {
   ...core,
   ...marketing,
+  ...auth,
+  ...messages,
 };
 
 export type MessageKey = keyof typeof NL;

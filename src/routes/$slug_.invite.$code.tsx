@@ -9,18 +9,19 @@ import { useAuth } from "@/auth/AuthProvider";
 import { guestLoginByCode } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
 import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
+import { tHead, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/$slug_/invite/$code")({
   head: () => ({
     meta: [
-      { title: "Your personal invitation — OurJourney" },
+      { title: tHead("Your personal invitation — OurJourney") },
       {
         name: "description",
-        content: "Open your personal wedding invitation.",
+        content: tHead("Open your personal wedding invitation."),
       },
       { name: "robots", content: "noindex,nofollow" },
-      { property: "og:title", content: "Your personal invitation — OurJourney" },
-      { property: "og:description", content: "Open your personal wedding invitation." },
+      { property: "og:title", content: tHead("Your personal invitation — OurJourney") },
+      { property: "og:description", content: tHead("Open your personal wedding invitation.") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -33,6 +34,7 @@ function InvitePage() {
   const navigate = useNavigate();
   const loginByCode = useServerFn(guestLoginByCode);
   const { refresh } = useAuth();
+  const { t, tx } = useI18n();
   const [status, setStatus] = useState<"loading" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const ran = useRef(false);
@@ -47,7 +49,7 @@ function InvitePage() {
           data: { weddingSlug: slug, invitationCode: code },
         });
         if (!result.ok || !result.session) {
-          setErrorMsg(result.error ?? "We couldn't open your invitation.");
+          setErrorMsg(result.error ? tx(result.error) : t("We couldn't open your invitation."));
           setStatus("error");
           return;
         }
@@ -56,19 +58,19 @@ function InvitePage() {
           refresh_token: result.session.refresh_token,
         });
         if (error) {
-          setErrorMsg(error.message);
+          setErrorMsg(tx(error.message));
           setStatus("error");
           return;
         }
-        toast.success(`Welcome, ${result.guest?.first_name}!`);
+        toast.success(t("Welcome, {name}!", { name: result.guest?.first_name ?? "" }));
         await refresh();
         void navigate({ to: "/$slug", params: { slug: result.guest?.wedding_slug ?? slug }, replace: true });
       } catch (err) {
-        setErrorMsg(err instanceof Error ? err.message : "Could not open invitation.");
+        setErrorMsg(err instanceof Error ? tx(err.message) : t("Could not open invitation."));
         setStatus("error");
       }
     })();
-  }, [slug, code, navigate, refresh, loginByCode]);
+  }, [slug, code, navigate, refresh, loginByCode, t, tx]);
 
   return (
     <SiteShell>
@@ -79,18 +81,18 @@ function InvitePage() {
               <div className="wax-pulse">
                 <WaxSeal size={80} />
               </div>
-              <p className="type-script-sm">a moment, please</p>
-              <p className="type-body text-muted-foreground">Opening your invitation…</p>
+              <p className="type-script-sm">{t("a moment, please")}</p>
+              <p className="type-body text-muted-foreground">{t("Opening your invitation…")}</p>
             </div>
           ) : (
             <ThemedCard variant="framed" className="mx-auto max-w-sm text-center" ornament>
               <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-destructive/12 text-destructive">
                 <AlertTriangle aria-hidden="true" className="h-5 w-5" />
               </span>
-              <h1 className="type-card-title mt-4">This invitation link isn't working</h1>
+              <h1 className="type-card-title mt-4">{t("This invitation link isn't working")}</h1>
               <p className="type-body mt-2 text-muted-foreground">{errorMsg}</p>
               <ThemedButton onClick={() => navigate({ to: "/login" })} size="lg" className="mt-6">
-                Sign in manually
+                {t("Sign in manually")}
               </ThemedButton>
             </ThemedCard>
           )}
