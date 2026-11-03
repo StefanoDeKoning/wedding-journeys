@@ -12,7 +12,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
 import { WaxSeal, initialsFromCouple } from "@/wedding/WaxSeal";
-import { PageCanvas, Section, FormPanel, ThemedButton, ThemedInput } from "@/design-system";
+import {
+  PageCanvas,
+  Section,
+  FormPanel,
+  ThemedButton,
+  ThemedInput,
+  ThemeProvider,
+  themeFontLinks,
+  WEDDING_THEME_ID,
+} from "@/design-system";
 import { tHead, useI18n, useT } from "@/i18n";
 
 export const Route = createFileRoute("/$slug")({
@@ -24,9 +33,18 @@ export const Route = createFileRoute("/$slug")({
         content: tHead("A private wedding home for friends and family."),
       },
     ],
+    links: themeFontLinks(WEDDING_THEME_ID),
   }),
-  component: WeddingLayout,
+  component: ThemedWeddingLayout,
 });
+
+function ThemedWeddingLayout() {
+  return (
+    <ThemeProvider themeId={WEDDING_THEME_ID} asPageRoot>
+      <WeddingLayout />
+    </ThemeProvider>
+  );
+}
 
 const guestSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(80),

@@ -8,7 +8,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLoginByCode } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
-import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
+import {
+  PageCanvas,
+  Section,
+  ThemedCard,
+  ThemedButton,
+  ThemeProvider,
+  themeFontLinks,
+  WEDDING_THEME_ID,
+} from "@/design-system";
 import { tHead, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/$slug_/invite/$code")({
@@ -25,9 +33,18 @@ export const Route = createFileRoute("/$slug_/invite/$code")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: themeFontLinks(WEDDING_THEME_ID),
   }),
-  component: InvitePage,
+  component: ThemedInvitePage,
 });
+
+function ThemedInvitePage() {
+  return (
+    <ThemeProvider themeId={WEDDING_THEME_ID} asPageRoot>
+      <InvitePage />
+    </ThemeProvider>
+  );
+}
 
 function InvitePage() {
   const { slug, code } = Route.useParams();

@@ -16,7 +16,7 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "gilded";
 type ButtonSize = "sm" | "md" | "lg";
 
 const BUTTON_BASE =
-  "type-button inline-flex items-center justify-center gap-2 rounded-full uppercase " +
+  "type-button inline-flex items-center justify-center gap-2 rounded-[var(--ds-radius-button)] uppercase " +
   "transition-[transform,box-shadow,background-color,color,border-color] duration-[var(--ds-dur-fast)] " +
   "ease-[var(--ease-paper)] focus-ring-elegant disabled:pointer-events-none disabled:opacity-50 " +
   "hover:-translate-y-0.5 active:translate-y-0";
@@ -195,9 +195,9 @@ export function ThemedCard({
       )}
       {...props}
     >
-      {ornament && (
+      {ornament && theme.decor.corners.length > 0 && (
         <DecorMotifArt
-          motif={theme.decor.corners[0] ?? "rose"}
+          motif={theme.decor.corners[0]}
           size="sm"
           intensity={0.3}
           placement="corner-top-right"
@@ -563,10 +563,11 @@ export function DecorativeWrapper({
 }) {
   const theme = useTheme();
   const [a, b] = theme.decor.corners;
+  if (!a) return <div className={cn("relative", className)}>{children}</div>;
   return (
     <div className={cn("relative", className)}>
       <DecorMotifArt
-        motif={a ?? "rose"}
+        motif={a}
         size="md"
         intensity={intensity}
         placement="corner-top-left"
