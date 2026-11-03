@@ -12,7 +12,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLogin } from "@/auth/guest.functions";
 import { WaxSeal, initialsFromCouple } from "@/wedding/WaxSeal";
-import { PageCanvas, Section, FormPanel, ThemedButton, ThemedInput } from "@/design-system";
+import {
+  PageCanvas,
+  Section,
+  FormPanel,
+  ThemedButton,
+  ThemedInput,
+  ThemeProvider,
+  themeFontLinks,
+  useTheme,
+  Fireflies,
+  WEDDING_THEME_ID,
+} from "@/design-system";
 import { tHead, useI18n, useT } from "@/i18n";
 
 export const Route = createFileRoute("/$slug")({
@@ -24,9 +35,18 @@ export const Route = createFileRoute("/$slug")({
         content: tHead("A private wedding home for friends and family."),
       },
     ],
+    links: themeFontLinks(WEDDING_THEME_ID),
   }),
-  component: WeddingLayout,
+  component: ThemedWeddingLayout,
 });
+
+function ThemedWeddingLayout() {
+  return (
+    <ThemeProvider themeId={WEDDING_THEME_ID} asPageRoot>
+      <WeddingLayout />
+    </ThemeProvider>
+  );
+}
 
 const guestSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(80),
@@ -79,8 +99,8 @@ function WeddingLayout() {
   if (wedding.status === "draft" && !isAdmin) {
     return (
       <SiteShell>
-        <PageCanvas density="quiet">
-          <Section size="hero" width="prose">
+        <PageCanvas decor={false}>
+          <Section tone="night" size="hero" width="prose" className="min-h-[70vh]">
             <div className="text-center">
               <h1 className="type-hero">{t("Coming soon")}</h1>
               <p className="type-body-lg mt-3 text-muted-foreground">
@@ -105,6 +125,8 @@ function WeddingLayout() {
         title={wedding.wedding_name ?? slug}
         guestFirstName={guest?.first_name}
         isAdmin={isAdmin}
+        weddingDate={wedding.wedding_date}
+        locationName={wedding.location_name}
         features={{
           story: wedding.story_enabled !== false,
           gallery: wedding.gallery_enabled !== false,
@@ -122,8 +144,8 @@ function NotFoundForGuest({ slug }: { slug: string }) {
   const t = useT();
   return (
     <SiteShell>
-      <PageCanvas density="quiet">
-        <Section size="hero" width="prose">
+      <PageCanvas decor={false}>
+        <Section tone="night" size="hero" width="prose" className="min-h-[70vh]">
           <div className="text-center">
             <h1 className="type-hero">{t("We couldn't find that wedding")}</h1>
             <p className="type-body-lg mt-3 text-muted-foreground">
@@ -151,6 +173,7 @@ function GuestLoginGate({
 }) {
   const { refresh: refreshAuth } = useAuth();
   const { t, tx } = useI18n();
+  const theme = useTheme();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -200,9 +223,10 @@ function GuestLoginGate({
   };
 
   return (
-    <PageCanvas density="lavish">
-      <Section size="hero" width="prose">
-        <div className="mx-auto w-full max-w-md">
+    <PageCanvas decor={false}>
+      <Section tone="night" size="hero" width="prose" className="min-h-[85vh]">
+        {theme.decor.fireflies && <Fireflies />}
+        <div className="relative mx-auto w-full max-w-md">
           <div className="text-center mb-8">
             <div className="inline-block wax-pulse">
               <WaxSeal size={104} initials={initialsFromCouple(weddingTitle)} />
@@ -214,7 +238,8 @@ function GuestLoginGate({
             </p>
           </div>
 
-          <FormPanel>
+          {/* The form sits on a sheet of paper laid on the night-green table. */}
+          <FormPanel className="tone-paper !bg-card">
             <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-gutter">
               <div className="grid grid-cols-2 gap-gutter">
                 <div className="flex flex-col gap-2">

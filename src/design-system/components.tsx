@@ -5,6 +5,8 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DecorMotifArt } from "./decor/Illustrations";
+import { Fireflies } from "./decor/Stationery";
+import { Container, Section } from "./Layout";
 import { useTheme } from "@/theme/ThemeProvider";
 import { useT } from "@/i18n";
 
@@ -16,7 +18,7 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "gilded";
 type ButtonSize = "sm" | "md" | "lg";
 
 const BUTTON_BASE =
-  "type-button inline-flex items-center justify-center gap-2 rounded-full uppercase " +
+  "type-button inline-flex items-center justify-center gap-2 rounded-[var(--ds-radius-button)] uppercase " +
   "transition-[transform,box-shadow,background-color,color,border-color] duration-[var(--ds-dur-fast)] " +
   "ease-[var(--ease-paper)] focus-ring-elegant disabled:pointer-events-none disabled:opacity-50 " +
   "hover:-translate-y-0.5 active:translate-y-0";
@@ -195,9 +197,9 @@ export function ThemedCard({
       )}
       {...props}
     >
-      {ornament && (
+      {ornament && theme.decor.corners.length > 0 && (
         <DecorMotifArt
-          motif={theme.decor.corners[0] ?? "rose"}
+          motif={theme.decor.corners[0]}
           size="sm"
           intensity={0.3}
           placement="corner-top-right"
@@ -563,10 +565,11 @@ export function DecorativeWrapper({
 }) {
   const theme = useTheme();
   const [a, b] = theme.decor.corners;
+  if (!a) return <div className={cn("relative", className)}>{children}</div>;
   return (
     <div className={cn("relative", className)}>
       <DecorMotifArt
-        motif={a ?? "rose"}
+        motif={a}
         size="md"
         intensity={intensity}
         placement="corner-top-left"
@@ -672,6 +675,33 @@ export function ConfirmDialog({
 /* ------------------------------------------------------------------ */
 /* Hero                                                               */
 /* ------------------------------------------------------------------ */
+
+/**
+ * The opening of a guest page. Themes with `heroTone: "night"` set it on a
+ * night band (with fireflies when the theme has them) followed by a block of
+ * breathing room; other themes keep the plain centered hero.
+ */
+export function PageHero({
+  width = "prose",
+  ...hero
+}: Omit<React.ComponentProps<typeof Hero>, "compact" | "align" | "media"> & {
+  width?: "prose" | "wide";
+}) {
+  const theme = useTheme();
+  if (theme.decor.heroTone !== "night") {
+    return (
+      <Container width={width}>
+        <Hero {...hero} />
+      </Container>
+    );
+  }
+  return (
+    <Section tone="night" size="regular" width={width} className="mb-block overflow-hidden">
+      {theme.decor.fireflies && <Fireflies />}
+      <Hero {...hero} className={cn("relative !py-0", hero.className)} />
+    </Section>
+  );
+}
 
 export function Hero({
   script,

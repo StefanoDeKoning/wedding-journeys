@@ -6,6 +6,8 @@
  */
 
 export { PageCanvas, Container, Section } from "./Layout";
+export type { SectionTone } from "./Layout";
+export { DeckleEdge, ArchFrame, Fireflies, OakLeaf, LeafRule } from "./decor/Stationery";
 export { useParallax } from "./hooks";
 export {
   ThemedButton,
@@ -29,6 +31,7 @@ export {
   EmptyState,
   ConfirmDialog,
   Hero,
+  PageHero,
 } from "./components";
 export {
   DecorMotifArt,
@@ -40,7 +43,14 @@ export {
 export type { DecorProps, DecorSize } from "./decor/Illustrations";
 
 export { ThemeProvider, useTheme, themeFontLinks } from "@/theme/ThemeProvider";
-export { getTheme, availableThemes, romanticGarden, DEFAULT_THEME_ID } from "@/theme/themes";
+export {
+  getTheme,
+  availableThemes,
+  romanticGarden,
+  nightGarden,
+  DEFAULT_THEME_ID,
+  WEDDING_THEME_ID,
+} from "@/theme/themes";
 export type {
   ThemeDefinition,
   ThemeDecor,

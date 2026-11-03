@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import floralColumn from "@/assets/floral-column-gold.png.asset.json";
 import { useTheme } from "@/theme/ThemeProvider";
+import { DeckleEdge } from "./decor/Stationery";
 
 import {
   DecorParticles,
@@ -46,7 +47,7 @@ export function PageCanvas({
         className,
       )}
     >
-      {decor && (
+      {decor && theme.decor.canvas === "watercolor" && (
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
           {/* Painted floral columns hugging both margins — pinned to the
               viewport so the flowers keep the same scale on long pages.
@@ -122,13 +123,31 @@ export function Container({
   );
 }
 
-/** Vertical rhythm lives below each section so adjacent spacing never doubles. */
+export type SectionTone = "none" | "paper" | "paper-deep" | "night" | "night-deep";
+
+const TONE_CLASS: Record<SectionTone, string> = {
+  none: "",
+  paper: "tone-paper",
+  "paper-deep": "tone-paper-deep",
+  night: "tone-night",
+  "night-deep": "tone-night-deep",
+};
+
+/**
+ * Vertical rhythm lives below each section so adjacent spacing never doubles.
+ *
+ * A toned section is a full-width band of colour: it pads its own top too,
+ * because its background separates it from its neighbours. `edge` tears the
+ * band's top into a deckled paper edge that overlaps the band above.
+ */
 export function Section({
   children,
   className,
   containerClassName,
   width = "content",
   size = "regular",
+  tone = "none",
+  edge = false,
   as: Tag = "section",
   id,
 }: {
@@ -137,6 +156,8 @@ export function Section({
   containerClassName?: string;
   width?: "prose" | "content" | "wide" | "full";
   size?: "compact" | "regular" | "spacious" | "hero";
+  tone?: SectionTone;
+  edge?: boolean;
   as?: "section" | "div" | "article" | "header" | "footer";
   id?: string;
 }) {
@@ -146,8 +167,19 @@ export function Section({
     spacious: "pb-section",
     hero: "pb-section",
   } as const;
+  const padTop = {
+    compact: "pt-block",
+    regular: "pt-section",
+    spacious: "pt-section",
+    hero: "pt-section",
+  } as const;
+  const toned = tone !== "none";
   return (
-    <Tag id={id} className={cn("relative", pad[size], className, "pt-0")}>
+    <Tag
+      id={id}
+      className={cn("relative", TONE_CLASS[tone], pad[size], className, toned ? padTop[size] : "pt-0")}
+    >
+      {edge && toned && <DeckleEdge />}
       <Container width={width} className={containerClassName}>
         {children}
       </Container>

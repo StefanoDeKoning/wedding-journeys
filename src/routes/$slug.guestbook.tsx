@@ -7,14 +7,13 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PageCanvas,
-  Container,
   Section,
   SectionHeader,
   ThemedCard,
   ThemedButton,
   ThemedTextarea,
   FormPanel,
-  Hero,
+  PageHero,
   EmptyState,
   ConfirmDialog,
 } from "@/design-system";
@@ -108,13 +107,11 @@ function GuestbookPage() {
 
   return (
     <PageCanvas density="regular">
-      <Container width="prose">
-        <Hero
-          script={t("a wall of wishes")}
-          title={t("Guestbook")}
-          subtitle={t("Leave the couple a note, a memory, or your best wishes for the road ahead.")}
-        />
-      </Container>
+      <PageHero
+        script={t("a wall of wishes")}
+        title={t("Guestbook")}
+        subtitle={t("Leave the couple a note, a memory, or your best wishes for the road ahead.")}
+      />
 
       <Section size="compact" width="prose">
         {guest ? (

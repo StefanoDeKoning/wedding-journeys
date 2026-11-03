@@ -6,12 +6,11 @@ import { TabGate } from "@/wedding/TabGate";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PageCanvas,
-  Container,
   Section,
   ThemedCard,
   Divider,
   Badge,
-  Hero,
+  PageHero,
   EmptyState,
 } from "@/design-system";
 import { DecorMotifArt } from "@/design-system/decor/Illustrations";
@@ -83,13 +82,11 @@ function StoryPage() {
 
   return (
     <PageCanvas density="regular">
-      <Container width="prose">
-        <Hero
-          script={t("before happily ever after")}
-          title={t("Our story")}
-          subtitle={t("Every love story is beautiful, but ours is our favourite.")}
-        />
-      </Container>
+      <PageHero
+        script={t("before happily ever after")}
+        title={t("Our story")}
+        subtitle={t("Every love story is beautiful, but ours is our favourite.")}
+      />
 
       {loading ? (
         <Section size="compact">

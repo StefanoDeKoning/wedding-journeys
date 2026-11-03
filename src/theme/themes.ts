@@ -30,14 +30,54 @@ export const romanticGarden: ThemeDefinition = {
     paperTexture: true,
     vignette: true,
     envelope: "wax-seal",
+    canvas: "watercolor",
+    horizon: "none",
+    fireflies: false,
+    heroTone: "plain",
+  },
+};
+
+const NIGHT_GARDEN_FONTS = [
+  "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Jost:wght@400;500&family=Great+Vibes&display=swap",
+];
+
+export const nightGarden: ThemeDefinition = {
+  id: "night-garden",
+  name: "Night Garden",
+  description:
+    "A stationery suite on deep green velvet — paper cream, gold foil and a wax seal, with the castle courtyard drawn as the horizon.",
+  // Tokens live in the `[data-theme="night-garden"]` block in styles.css.
+  tokens: {},
+  fontHrefs: NIGHT_GARDEN_FONTS,
+  decor: {
+    // No painted corners: night-garden cards are framed by hairlines instead.
+    corners: [],
+    sides: [],
+    divider: "gold-leaf",
+    particles: "none",
+    particleCount: 0,
+    paperTexture: false,
+    vignette: false,
+    envelope: "wax-seal",
+    canvas: "plain",
+    horizon: "castle-courtyard",
+    fireflies: true,
+    heroTone: "night",
   },
 };
 
 export const themes: Partial<Record<ThemeId, ThemeDefinition>> = {
   "romantic-garden": romanticGarden,
+  "night-garden": nightGarden,
 };
 
 export const DEFAULT_THEME_ID: ThemeId = "romantic-garden";
+
+/**
+ * Theme for the guest-facing wedding pages (`/$slug`, invite links). Until
+ * weddings store their own theme column, every wedding uses this one.
+ */
+export const WEDDING_THEME_ID: ThemeId = "night-garden";
 
 export function getTheme(id?: ThemeId | string | null): ThemeDefinition {
   if (!id) return romanticGarden;

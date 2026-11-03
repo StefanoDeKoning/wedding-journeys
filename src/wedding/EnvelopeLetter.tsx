@@ -200,7 +200,9 @@ export function EnvelopeLetter({
 
       {!opened && (
         <div className="flex flex-col items-center gap-6">
-          <p className="type-script-sm text-center">{t("a letter awaits you")}</p>
+          <p className="font-script text-center text-[clamp(2rem,4vw,2.75rem)] leading-tight text-primary">
+            {t("a letter awaits you")}
+          </p>
 
           <button
             type="button"
@@ -209,7 +211,8 @@ export function EnvelopeLetter({
             className="group relative focus-ring-elegant"
           >
             {/* Envelope */}
-            <div className={cn("relative", stage === "closed" && "envelope-float gentle-breathe")}>
+            {/* Only the seal moves while the envelope waits: one calm focal point. */}
+            <div className="relative">
               {/* Ground shadow — grounds the envelope on the page */}
               <div
                 className="absolute -bottom-4 left-1/2 -translate-x-1/2 h-6 w-[70%] rounded-full blur-md"
@@ -227,7 +230,7 @@ export function EnvelopeLetter({
                   className="absolute inset-x-0 bottom-6 text-center px-6"
                   style={{ filter: `url(#${filterId}-ink)` }}
                 >
-                  <p className="type-script-sm text-[var(--ds-parchment-ink)]">
+                  <p className="font-script text-[clamp(1.4rem,2.6vw,1.9rem)] leading-tight text-[var(--ds-parchment-ink)]">
                     {recipientFirstName} {recipientLastName}
                   </p>
                 </div>
@@ -256,7 +259,7 @@ export function EnvelopeLetter({
               </div>
             </div>
 
-            <span className="block mt-8 text-[22px] type-caption group-hover:text-primary transition-colors duration-[var(--ds-dur-fast)]">
+            <span className="mt-8 block font-body text-[0.9375rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors duration-[var(--ds-dur-fast)] group-hover:text-primary">
               {t("tap to break the seal")}
             </span>
           </button>

@@ -8,6 +8,7 @@
 
 export type ThemeId =
   | "romantic-garden"
+  | "night-garden"
   // Reserved ids for future themes — add a ThemeDefinition to the registry
   // and they light up everywhere automatically.
   | "modern-minimal"
@@ -71,6 +72,17 @@ export interface ThemeDecor {
   vignette: boolean;
   /** Envelope + seal flavour used by the invitation experience. */
   envelope: "wax-seal" | "gold-band" | "ribbon" | "plain";
+  /**
+   * Page backdrop: "watercolor" paints the floral columns and washes in the
+   * margins; "plain" leaves the page as clean paper so tone bands carry the mood.
+   */
+  canvas: "watercolor" | "plain";
+  /** Line drawing used as the hero horizon on the invitation page. */
+  horizon: "none" | "castle-courtyard";
+  /** Ambient fireflies in night-toned heroes. */
+  fireflies: boolean;
+  /** Opening band of guest pages: a plain hero, or a hero on a night band. */
+  heroTone: "plain" | "night";
 }
 
 export interface ThemeDefinition {

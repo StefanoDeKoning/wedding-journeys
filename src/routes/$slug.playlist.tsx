@@ -17,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { safeHttpUrl } from "@/lib/safeUrl";
 import {
   PageCanvas,
-  Container,
   Section,
   SectionHeader,
   FormPanel,
@@ -25,7 +24,7 @@ import {
   ThemedButton,
   ThemedInput,
   Badge,
-  Hero,
+  PageHero,
   EmptyState,
   ConfirmDialog,
 } from "@/design-system";
@@ -198,18 +197,16 @@ function PlaylistPage() {
 
   return (
     <PageCanvas density="regular">
-      <Container width="prose">
-        <Hero
-          script={t("help us fill the floor")}
-          title={t("Song requests")}
-          subtitle={
-            <>
-              {t("You have")} <span className="text-foreground font-medium">{t("3 requests")}</span>{" "}
-              {t("in total — use them to suggest songs or to vote for songs other guests suggested.")}
-            </>
-          }
-        />
-      </Container>
+      <PageHero
+        script={t("help us fill the floor")}
+        title={t("Song requests")}
+        subtitle={
+          <>
+            {t("You have")} <span className="text-foreground font-medium">{t("3 requests")}</span>{" "}
+            {t("in total — use them to suggest songs or to vote for songs other guests suggested.")}
+          </>
+        }
+      />
 
       {guest && (
         <Section size="compact" width="prose">

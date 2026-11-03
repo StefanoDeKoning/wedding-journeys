@@ -13,7 +13,7 @@ import {
   ThemedCard,
   Badge,
   Divider,
-  Hero,
+  PageHero,
   EmptyState,
 } from "@/design-system";
 
@@ -114,13 +114,11 @@ function TimelinePage() {
   if (!timelineVisible) {
     return (
       <PageCanvas density="regular">
-        <Container width="prose">
-          <Hero
-            script={t("how the day unfolds")}
-            title={t("Coming soon")}
-            subtitle={t("The timeline will be shared soon. Come back a little later!")}
-          />
-        </Container>
+        <PageHero
+          script={t("how the day unfolds")}
+          title={t("Coming soon")}
+          subtitle={t("The timeline will be shared soon. Come back a little later!")}
+        />
         <Section size="compact">
           <EmptyState motif="olive-branch" title={t("Wedding timeline")} />
         </Section>
@@ -130,16 +128,14 @@ function TimelinePage() {
 
   return (
     <PageCanvas density="regular">
-      <Container width="prose">
-        <Hero
-          script={t("how the day unfolds")}
-          title={t("Wedding timeline")}
-          subtitle={
-            isEvening &&
-            t("You're invited from the evening onwards — but you're welcome to arrive a little earlier.")
-          }
-        />
-      </Container>
+      <PageHero
+        script={t("how the day unfolds")}
+        title={t("Wedding timeline")}
+        subtitle={
+          isEvening &&
+          t("You're invited from the evening onwards — but you're welcome to arrive a little earlier.")
+        }
+      />
 
       {isAdmin && wedding.timeline_available !== true && (
         <Container width="prose">

@@ -8,7 +8,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/auth/AuthProvider";
 import { guestLoginByCode } from "@/auth/guest.functions";
 import { WaxSeal } from "@/wedding/WaxSeal";
-import { PageCanvas, Section, ThemedCard, ThemedButton } from "@/design-system";
+import {
+  PageCanvas,
+  Section,
+  ThemedCard,
+  ThemedButton,
+  ThemeProvider,
+  themeFontLinks,
+  WEDDING_THEME_ID,
+} from "@/design-system";
 import { tHead, useI18n } from "@/i18n";
 
 export const Route = createFileRoute("/$slug_/invite/$code")({
@@ -25,9 +33,18 @@ export const Route = createFileRoute("/$slug_/invite/$code")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: themeFontLinks(WEDDING_THEME_ID),
   }),
-  component: InvitePage,
+  component: ThemedInvitePage,
 });
+
+function ThemedInvitePage() {
+  return (
+    <ThemeProvider themeId={WEDDING_THEME_ID} asPageRoot>
+      <InvitePage />
+    </ThemeProvider>
+  );
+}
 
 function InvitePage() {
   const { slug, code } = Route.useParams();
@@ -74,8 +91,8 @@ function InvitePage() {
 
   return (
     <SiteShell>
-      <PageCanvas density="quiet">
-        <Section size="hero" width="prose">
+      <PageCanvas decor={false}>
+        <Section tone="night" size="hero" width="prose" className="min-h-[70vh]">
           {status === "loading" ? (
             <div className="mx-auto flex max-w-sm flex-col items-center gap-4 text-center">
               <div className="wax-pulse">
@@ -85,7 +102,7 @@ function InvitePage() {
               <p className="type-body text-muted-foreground">{t("Opening your invitation…")}</p>
             </div>
           ) : (
-            <ThemedCard variant="framed" className="mx-auto max-w-sm text-center" ornament>
+            <ThemedCard variant="framed" className="tone-paper !bg-card mx-auto max-w-sm text-center" ornament>
               <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-destructive/12 text-destructive">
                 <AlertTriangle aria-hidden="true" className="h-5 w-5" />
               </span>

@@ -64,6 +64,11 @@
   --color-decor-soft: var(--ds-decor-soft);
   --color-decor-leaf: var(--ds-decor-leaf);
   --color-decor-gold: var(--ds-decor-gold);
+  --color-night: var(--ds-night);
+  --color-night-deep: var(--ds-night-deep);
+  --color-on-night: var(--ds-on-night);
+  --color-gold-ink: var(--ds-gold-ink);
+  --color-gold-hi: var(--ds-gold-hi);
 
   /* ---- Radius scale ---- */
   --radius-paper: var(--ds-radius-paper);
@@ -135,9 +140,16 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Each ThemeProvider root re-applies the body face and ink, so a nested
+   * theme switches typography and colour for its whole subtree. */
+  [data-theme] {
+    font-family: var(--ds-font-body);
+    color: var(--foreground);
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 500;
+    font-weight: var(--ds-weight-display);
     letter-spacing: -0.01em;
   }
 
@@ -406,6 +418,15 @@
   /* Darkened terracotta for small text sitting on a primary/N% tint (Badge,
    * tags) — --ds-terracotta alone fails AA at label size on a light tint. */
   --ds-primary-strong: color-mix(in oklab, var(--ds-terracotta) 78%, var(--ds-ink) 22%);
+  --ds-ink-soft: oklch(0.48 0.025 50);
+  --ds-line: oklch(0.9 0.016 70);
+  --ds-ring: var(--ds-terracotta);
+  /* Dark band colours used by `tone-night` sections. */
+  --ds-night: oklch(0.32 0.025 50);
+  --ds-night-deep: oklch(0.27 0.025 50);
+  --ds-on-night: oklch(0.97 0.01 75);
+  --ds-gold-ink: oklch(0.5 0.08 75);
+  --ds-gold-hi: oklch(0.88 0.07 85);
 
   /* Legacy brand tokens (pre-dating the --ds-* layer). Kept as real,
    * theme-scoped entries — rather than deleted — so the gradients, shadows,
@@ -447,11 +468,22 @@
   --ds-font-body: "Lora", serif;
   --ds-font-script: "Great Vibes", cursive;
   --ds-tracking-label: 0.22em;
+  /* Accent lines (`type-script`): the face, style and size factor used for
+   * the small flourish lines above titles. */
+  --ds-font-accent: "Great Vibes", cursive;
+  --ds-accent-style: normal;
+  --ds-accent-scale: 1;
+  --ds-weight-display: 500;
+  --ds-weight-hero: 500;
+  --ds-label-size: 0.6875rem;
+  --ds-body-size: 1rem;
+  --ds-button-tracking: 0.06em;
 
   /* Radius */
   --ds-radius-paper: 0.5rem;
   --ds-radius-card: 1.25rem;
   --ds-radius-frame: 2rem;
+  --ds-radius-button: 9999px;
 
   /* Elevation — soft, warm, never harsh */
   --ds-elev-1: 0 1px 2px color-mix(in oklab, var(--ds-ink) 6%, transparent);
@@ -461,7 +493,8 @@
 
   /* Borders — paper-like */
   --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-ink) 10%, transparent);
-  --ds-border-paper: 1px solid color-mix(in oklab, var(--ds-terracotta) 18%, transparent);
+  --ds-border-paper-color: color-mix(in oklab, var(--ds-terracotta) 18%, transparent);
+  --ds-border-paper: 1px solid var(--ds-border-paper-color);
   --ds-border-gilded: 1px solid color-mix(in oklab, var(--ds-gold) 55%, transparent);
 
   /* Motion */
@@ -501,15 +534,223 @@
   --secondary: var(--ds-dusty-rose);
   --secondary-foreground: var(--ds-ivory);
   --muted: var(--ds-mist);
-  --muted-foreground: oklch(0.48 0.025 50);
+  --muted-foreground: var(--ds-ink-soft);
   --accent: var(--ds-gold);
   --accent-foreground: var(--ds-ink);
   --destructive: oklch(0.55 0.2 25);
   --destructive-foreground: var(--ds-ivory);
-  --border: oklch(0.9 0.016 70);
+  --border: var(--ds-line);
   --input: oklch(0.92 0.015 70);
   --radius: var(--ds-radius-paper);
-  --ring: var(--ds-terracotta);
+  --ring: var(--ds-ring);
+}
+
+/* ---------------------------------------------------------------------
+ * THEME: Night Garden
+ * A stationery suite on deep green velvet: paper cream surfaces, gold
+ * foil hairlines, a wax-red accent. Night-green bands come from the
+ * `tone-night` utilities below.
+ *
+ * Every token that is *derived* from another one (color-mix, var()) is
+ * restated here: custom properties resolve where they are declared, so a
+ * value inherited from `:root` would still carry the romantic colours.
+ * ------------------------------------------------------------------- */
+[data-theme="night-garden"] {
+  /* Palette */
+  --ds-ivory: #fbf7ef;
+  --ds-cream: #f4ede1;
+  --ds-champagne: #ece2d0;
+  --ds-blush: #e6e7dc;
+  --ds-dusty-rose: #9db0a0;
+  --ds-sage: #9db0a0;
+  --ds-olive: #5f7466;
+  --ds-gold: #c9a15a;
+  --ds-terracotta: #8e2a22;
+  --ds-ink: #2b2622;
+  --ds-mist: #eae2d4;
+  --ds-primary-strong: #7a231c;
+  --ds-ink-soft: #5e5650;
+  --ds-line: #ddd3c2;
+  --ds-ring: #7a5b25;
+  --ds-night: #1f3a32;
+  --ds-night-deep: #162b25;
+  --ds-on-night: #f4ede1;
+  --ds-gold-ink: #7a5b25;
+  --ds-gold-hi: #e7cf92;
+
+  /* Legacy brand tokens */
+  --blush: var(--ds-blush);
+  --peach: #efe4d0;
+  --dusty-rose: var(--ds-dusty-rose);
+  --rose: #b35a4e;
+  --terracotta: var(--ds-terracotta);
+  --gold: var(--ds-gold);
+  --sage: var(--ds-sage);
+  --warm-cream: var(--ds-cream);
+  --cream: var(--ds-cream);
+  --ink: var(--ds-ink);
+  --transition-base: var(--ds-ease-paper);
+
+  /* Decorative artwork colors */
+  --ds-decor: var(--ds-gold);
+  --ds-decor-soft: var(--ds-blush);
+  --ds-decor-leaf: var(--ds-sage);
+  --ds-decor-gold: var(--ds-gold);
+
+  /* Typography */
+  --ds-font-display: "Fraunces", Georgia, serif;
+  --ds-font-body: "Jost", "Helvetica Neue", Arial, sans-serif;
+  --ds-font-script: "Great Vibes", cursive;
+  --ds-font-accent: "Fraunces", Georgia, serif;
+  --ds-accent-style: italic;
+  --ds-accent-scale: 0.62;
+  --ds-tracking-label: 0.2em;
+  --ds-weight-display: 400;
+  --ds-weight-hero: 300;
+  --ds-label-size: 0.8125rem;
+  --ds-body-size: 1.0625rem;
+  --ds-button-tracking: 0.14em;
+
+  /* Radius — cut paper, not pills */
+  --ds-radius-paper: 0.25rem;
+  --ds-radius-card: 0.25rem;
+  --ds-radius-frame: 0.375rem;
+  --ds-radius-button: 0.25rem;
+
+  /* Elevation */
+  --ds-elev-1: 0 1px 2px color-mix(in oklab, var(--ds-ink) 7%, transparent);
+  --ds-elev-2: 0 10px 26px -16px color-mix(in oklab, var(--ds-ink) 26%, transparent);
+  --ds-elev-3: 0 22px 46px -26px color-mix(in oklab, var(--ds-ink) 36%, transparent);
+  --ds-elev-4: 0 34px 70px -34px color-mix(in oklab, var(--ds-ink) 50%, transparent);
+
+  /* Borders */
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-ink) 12%, transparent);
+  --ds-border-paper-color: color-mix(in oklab, var(--ds-ink) 14%, transparent);
+  --ds-border-paper: 1px solid var(--ds-border-paper-color);
+  --ds-border-gilded: 1px solid color-mix(in oklab, var(--ds-gold) 70%, transparent);
+
+  /* Surfaces & atmosphere */
+  --ds-texture-opacity: 0;
+  --ds-vignette: none;
+  --ds-wash-page: linear-gradient(var(--ds-cream), var(--ds-cream));
+
+  /* Semantic remap */
+  --background: var(--ds-cream);
+  --foreground: var(--ds-ink);
+  --card: var(--ds-ivory);
+  --card-foreground: var(--ds-ink);
+  --popover: var(--ds-ivory);
+  --popover-foreground: var(--ds-ink);
+  --primary: var(--ds-terracotta);
+  --primary-foreground: var(--ds-ivory);
+  --secondary: var(--ds-night);
+  --secondary-foreground: var(--ds-on-night);
+  --muted: var(--ds-mist);
+  --muted-foreground: var(--ds-ink-soft);
+  --accent: var(--ds-gold);
+  --accent-foreground: var(--ds-night-deep);
+  --destructive: oklch(0.5 0.19 25);
+  --destructive-foreground: var(--ds-ivory);
+  --border: var(--ds-line);
+  --input: var(--ds-line);
+  --radius: var(--ds-radius-paper);
+  --ring: var(--ds-ring);
+}
+
+/* ---------------------------------------------------------------------
+ * Section tones — a band of colour that re-points the semantic tokens,
+ * so headers, buttons and links inside it adapt without extra props.
+ * `--section-bg` is also the fill of the band's DeckleEdge.
+ * ------------------------------------------------------------------- */
+@utility tone-paper {
+  --section-bg: var(--ds-cream);
+  --foreground: var(--ds-ink);
+  --card-foreground: var(--ds-ink);
+  --muted-foreground: var(--ds-ink-soft);
+  --primary: var(--ds-terracotta);
+  --primary-foreground: var(--ds-ivory);
+  --card: var(--ds-ivory);
+  --border: var(--ds-line);
+  --ring: var(--ds-ring);
+  --ds-border-paper: 1px solid var(--ds-border-paper-color);
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-ink) 12%, transparent);
+  background-color: var(--section-bg);
+  color: var(--foreground);
+}
+@utility tone-paper-deep {
+  --section-bg: var(--ds-champagne);
+  --foreground: var(--ds-ink);
+  --card-foreground: var(--ds-ink);
+  --muted-foreground: var(--ds-ink-soft);
+  --primary: var(--ds-terracotta);
+  --primary-foreground: var(--ds-ivory);
+  --card: var(--ds-ivory);
+  --border: var(--ds-line);
+  --ring: var(--ds-ring);
+  --ds-border-paper: 1px solid var(--ds-border-paper-color);
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-ink) 12%, transparent);
+  background-color: var(--section-bg);
+  color: var(--foreground);
+}
+@utility tone-night {
+  --section-bg: var(--ds-night);
+  --foreground: var(--ds-on-night);
+  --card-foreground: var(--ds-on-night);
+  --muted-foreground: color-mix(in oklab, var(--ds-on-night) 76%, transparent);
+  --primary: var(--ds-gold);
+  --primary-foreground: var(--ds-night-deep);
+  --card: color-mix(in oklab, var(--ds-night) 88%, white);
+  --border: color-mix(in oklab, var(--ds-gold) 30%, transparent);
+  --ring: var(--ds-gold);
+  --ds-border-paper: 1px solid color-mix(in oklab, var(--ds-gold) 30%, transparent);
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-on-night) 16%, transparent);
+  background-color: var(--section-bg);
+  color: var(--foreground);
+}
+@utility tone-night-deep {
+  --section-bg: var(--ds-night-deep);
+  --foreground: var(--ds-on-night);
+  --card-foreground: var(--ds-on-night);
+  --muted-foreground: color-mix(in oklab, var(--ds-on-night) 76%, transparent);
+  --primary: var(--ds-gold);
+  --primary-foreground: var(--ds-night-deep);
+  --card: color-mix(in oklab, var(--ds-night-deep) 88%, white);
+  --border: color-mix(in oklab, var(--ds-gold) 30%, transparent);
+  --ring: var(--ds-gold);
+  --ds-border-paper: 1px solid color-mix(in oklab, var(--ds-gold) 30%, transparent);
+  --ds-border-hairline: 1px solid color-mix(in oklab, var(--ds-on-night) 16%, transparent);
+  background-color: var(--section-bg);
+  color: var(--foreground);
+}
+
+/* Gold-foil text for a single word or glyph (the "&" between the names). */
+@utility text-foil {
+  background: linear-gradient(100deg, #b88a3e 10%, var(--ds-gold-hi) 45%, var(--ds-gold) 60%, #f1dfae 80%, #b88a3e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* A heavy sheet of stationery: ivory card with a gold rule set in from the edge. */
+@utility stationery-card {
+  background-color: var(--card);
+  border-radius: var(--ds-radius-card);
+  box-shadow:
+    inset 0 0 0 10px var(--card),
+    inset 0 0 0 11px color-mix(in oklab, var(--ds-gold) 70%, transparent),
+    var(--ds-elev-3);
+}
+
+/* One link look for every inline text link on guest pages. */
+@utility link-ink {
+  color: var(--primary);
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklab, var(--primary) 40%, transparent);
+  text-underline-offset: 5px;
+  transition: text-decoration-color var(--ds-dur-fast) var(--ds-ease-soft);
+  &:hover {
+    text-decoration-color: var(--primary);
+  }
 }
 
 /* ---------------------------------------------------------------------
@@ -517,7 +758,7 @@
  * ------------------------------------------------------------------- */
 @utility type-hero {
   font-family: var(--ds-font-display);
-  font-weight: 500;
+  font-weight: var(--ds-weight-hero);
   font-size: clamp(2.75rem, 7vw, 5.5rem);
   line-height: 1.02;
   letter-spacing: -0.02em;
@@ -526,7 +767,7 @@
 
 @utility type-section-title {
   font-family: var(--ds-font-display);
-  font-weight: 500;
+  font-weight: var(--ds-weight-display);
   font-size: clamp(1.875rem, 3.6vw, 3rem);
   line-height: 1.12;
   letter-spacing: -0.01em;
@@ -535,23 +776,25 @@
 
 @utility type-card-title {
   font-family: var(--ds-font-display);
-  font-weight: 500;
+  font-weight: var(--ds-weight-display);
   font-size: clamp(1.125rem, 1.6vw, 1.5rem);
   line-height: 1.25;
 }
 
 @utility type-script {
-  font-family: var(--ds-font-script);
+  font-family: var(--ds-font-accent);
+  font-style: var(--ds-accent-style);
   font-weight: 400;
-  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  font-size: calc(clamp(1.75rem, 3.2vw, 2.75rem) * var(--ds-accent-scale) + (1 - var(--ds-accent-scale)) * 0.75rem);
   line-height: 1.35;
   color: var(--primary);
 }
 
 @utility type-script-sm {
-  font-family: var(--ds-font-script);
+  font-family: var(--ds-font-accent);
+  font-style: var(--ds-accent-style);
   font-weight: 400;
-  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-size: calc(clamp(1.25rem, 2vw, 1.6rem) * var(--ds-accent-scale) + (1 - var(--ds-accent-scale)) * 0.6rem);
   line-height: 1.4;
   color: var(--primary);
 }
@@ -565,7 +808,7 @@
 
 @utility type-body {
   font-family: var(--ds-font-body);
-  font-size: 1rem;
+  font-size: var(--ds-body-size);
   line-height: 1.7;
   text-wrap: pretty;
 }
@@ -579,7 +822,7 @@
 
 @utility type-label {
   font-family: var(--ds-font-body);
-  font-size: 0.6875rem;
+  font-size: var(--ds-label-size);
   text-transform: uppercase;
   letter-spacing: var(--ds-tracking-label);
   /* 74% (not a lighter, more "delicate" mix) keeps this readable at 11px per
@@ -596,7 +839,7 @@
 @utility type-button {
   font-family: var(--ds-font-body);
   font-size: 0.875rem;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--ds-button-tracking);
 }
 
 /* ---------------------------------------------------------------------
@@ -711,6 +954,10 @@
   85% { opacity: 0.5; }
   100% { transform: translate3d(var(--ds-drift-x, 40px), 108vh, 0) rotate(220deg); opacity: 0; }
 }
+@keyframes ds-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.85; }
+}
 @keyframes ds-shimmer {
   0%, 100% { opacity: 0.25; transform: scale(0.9); }
   50% { opacity: 0.9; transform: scale(1.15); }
@@ -724,6 +971,7 @@
 @utility animate-ds-paper { animation: ds-paper-lift var(--ds-dur-slow) var(--ds-ease-paper) both; }
 @utility animate-ds-float { animation: ds-float var(--ds-dur-ambient) var(--ds-ease-soft) infinite; }
 @utility animate-ds-drift { animation: ds-drift linear infinite; }
+@utility animate-ds-twinkle { animation: ds-twinkle 5s var(--ds-ease-soft) infinite; }
 @utility animate-ds-shimmer { animation: ds-shimmer var(--ds-dur-shimmer) var(--ds-ease-soft) infinite; }
 
 @utility hover-lift {

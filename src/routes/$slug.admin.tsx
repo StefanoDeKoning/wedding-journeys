@@ -14,6 +14,8 @@ import {
   Settings as SettingsIcon,
 } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
+import { ThemeProvider } from "@/theme/ThemeProvider";
+import { DEFAULT_THEME_ID } from "@/theme/themes";
 import { Loader2 } from "lucide-react";
 
 import { tHead, useT } from "@/i18n";
@@ -39,7 +41,12 @@ const tabs = [
   { to: "/$slug/admin/invitation" as const, label: "Invitation", icon: Mail, exact: false },
   { to: "/$slug/admin/playlist" as const, label: "Playlist", icon: Music, exact: false },
   { to: "/$slug/admin/photos" as const, label: "Photos", icon: ImageIcon, exact: false },
-  { to: "/$slug/admin/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false },
+  {
+    to: "/$slug/admin/guestbook" as const,
+    label: "Guestbook",
+    icon: MessageCircleHeart,
+    exact: false,
+  },
   { to: "/$slug/admin/settings" as const, label: "Settings", icon: SettingsIcon, exact: false },
 ] as const;
 
@@ -62,40 +69,44 @@ function AdminLayout() {
     throw redirect({ to: "/$slug", params: { slug } });
   }
 
+  // The guest pages wear the wedding theme; the dashboard keeps the
+  // platform look so its dense tables and forms stay as designed.
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-10">
-      <header className="mb-6">
-        <p className="font-script text-2xl text-primary">{t("behind the scenes")}</p>
-        <h1 className="mt-1 font-display text-3xl sm:text-4xl">{t("Admin dashboard")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {t("Manage guests, seating, timeline and more for")}{" "}
-          <span className="text-foreground font-medium">{wedding.wedding_name ?? slug}</span>.
-        </p>
-      </header>
+    <ThemeProvider themeId={DEFAULT_THEME_ID}>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-10">
+        <header className="mb-6">
+          <p className="font-script text-2xl text-primary">{t("behind the scenes")}</p>
+          <h1 className="mt-1 font-display text-3xl sm:text-4xl">{t("Admin dashboard")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t("Manage guests, seating, timeline and more for")}{" "}
+            <span className="text-foreground font-medium">{wedding.wedding_name ?? slug}</span>.
+          </p>
+        </header>
 
-      <nav className="flex gap-1 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 mb-6 border-b border-border scrollbar-thin">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <Link
-              key={tab.to}
-              to={tab.to}
-              params={{ slug }}
-              activeOptions={{ exact: tab.exact }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-              activeProps={{
-                className:
-                  "flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap bg-primary text-primary-foreground hover:bg-primary/90",
-              }}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {t(tab.label)}
-            </Link>
-          );
-        })}
-      </nav>
+        <nav className="flex gap-1 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 mb-6 border-b border-border scrollbar-thin">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <Link
+                key={tab.to}
+                to={tab.to}
+                params={{ slug }}
+                activeOptions={{ exact: tab.exact }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                activeProps={{
+                  className:
+                    "flex items-center gap-1.5 px-3 py-2 rounded-full text-xs sm:text-sm whitespace-nowrap bg-primary text-primary-foreground hover:bg-primary/90",
+                }}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {t(tab.label)}
+              </Link>
+            );
+          })}
+        </nav>
 
-      <Outlet />
-    </div>
+        <Outlet />
+      </div>
+    </ThemeProvider>
   );
 }

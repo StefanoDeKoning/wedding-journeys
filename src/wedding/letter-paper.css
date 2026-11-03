@@ -211,6 +211,12 @@
   text-wrap: pretty;
 }
 
+/* Night Garden writes the letter in the display face, set light like ink on cotton. */
+[data-theme="night-garden"] .letter-body {
+  font-family: var(--ds-font-display);
+  font-weight: 300;
+}
+
 .letter-content header .letter-rule .type-label {
   font-size: 0.75rem;
   letter-spacing: calc(var(--ds-tracking-label, 0.08em) + 0.02em);
