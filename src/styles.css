@@ -731,6 +731,16 @@
   color: transparent;
 }
 
+/* A heavy sheet of stationery: ivory card with a gold rule set in from the edge. */
+@utility stationery-card {
+  background-color: var(--card);
+  border-radius: var(--ds-radius-card);
+  box-shadow:
+    inset 0 0 0 10px var(--card),
+    inset 0 0 0 11px color-mix(in oklab, var(--ds-gold) 70%, transparent),
+    var(--ds-elev-3);
+}
+
 /* One link look for every inline text link on guest pages. */
 @utility link-ink {
   color: var(--primary);
