@@ -8,6 +8,13 @@
       "when": 1792858211228,
       "tag": "0000_timeline_availability",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793737729859,
+      "tag": "0001_restrict_todo_templates_read",
+      "breakpoints": true
     }
   ]
 }
