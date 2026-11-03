@@ -17,13 +17,12 @@ import {
 } from "@/components/ui/dialog";
 import {
   PageCanvas,
-  Container,
   Section,
   SectionHeader,
   FormPanel,
   ThemedButton,
   ThemedInput,
-  Hero,
+  PageHero,
   EmptyState,
   ConfirmDialog,
 } from "@/design-system";
@@ -211,16 +210,14 @@ function GalleryPage() {
 
   return (
     <PageCanvas density="regular">
-      <Container width="prose">
-        <Hero
-          script={t("the day in pictures")}
-          title={t("Gallery")}
-          subtitle={t("Share your photos with us — every angle, every smile.")}
-          extra={
-            uploadWindow.label && <p className="type-caption text-center italic">{t(uploadWindow.label)}</p>
-          }
-        />
-      </Container>
+      <PageHero
+        script={t("the day in pictures")}
+        title={t("Gallery")}
+        subtitle={t("Share your photos with us — every angle, every smile.")}
+        extra={
+          uploadWindow.label && <p className="type-caption text-center italic">{t(uploadWindow.label)}</p>
+        }
+      />
 
       <Section size="compact" width="content">
         <FormPanel>

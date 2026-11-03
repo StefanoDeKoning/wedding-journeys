@@ -8,11 +8,10 @@ import { signPhotoUrls } from "@/lib/photoUrl";
 import { PhotoTile } from "@/wedding/PhotoTile";
 import {
   PageCanvas,
-  Container,
   Section,
   ThemedCard,
   ThemedButton,
-  Hero,
+  PageHero,
   EmptyState,
   ConfirmDialog,
 } from "@/design-system";
@@ -100,6 +99,13 @@ function MyPhotosPage() {
 
   return (
     <PageCanvas density="regular">
+      <PageHero
+        width="wide"
+        script={t("your moments")}
+        title={t("{name}'s photos", { name: guest.first_name })}
+        subtitle={t("Everything you've uploaded — visible only to you and the couple.")}
+      />
+
       <Section size="compact" width="wide">
         <Link
           to="/$slug/gallery"
@@ -109,14 +115,6 @@ function MyPhotosPage() {
           <ArrowLeft aria-hidden="true" className="w-3.5 h-3.5 mr-1" /> {t("Back to gallery")}
         </Link>
       </Section>
-
-      <Container width="wide">
-        <Hero
-          script={t("your moments")}
-          title={t("{name}'s photos", { name: guest.first_name })}
-          subtitle={t("Everything you've uploaded — visible only to you and the couple.")}
-        />
-      </Container>
 
       <Section size="spacious" width="wide">
         {loading ? (

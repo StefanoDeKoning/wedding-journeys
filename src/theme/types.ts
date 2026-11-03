@@ -81,6 +81,8 @@ export interface ThemeDecor {
   horizon: "none" | "castle-courtyard";
   /** Ambient fireflies in night-toned heroes. */
   fireflies: boolean;
+  /** Opening band of guest pages: a plain hero, or a hero on a night band. */
+  heroTone: "plain" | "night";
 }
 
 export interface ThemeDefinition {

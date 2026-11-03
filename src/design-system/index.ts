@@ -31,6 +31,7 @@ export {
   EmptyState,
   ConfirmDialog,
   Hero,
+  PageHero,
 } from "./components";
 export {
   DecorMotifArt,

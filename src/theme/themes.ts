@@ -33,6 +33,7 @@ export const romanticGarden: ThemeDefinition = {
     canvas: "watercolor",
     horizon: "none",
     fireflies: false,
+    heroTone: "plain",
   },
 };
 
@@ -61,6 +62,7 @@ export const nightGarden: ThemeDefinition = {
     canvas: "plain",
     horizon: "castle-courtyard",
     fireflies: true,
+    heroTone: "night",
   },
 };
 
