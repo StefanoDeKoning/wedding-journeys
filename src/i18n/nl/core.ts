@@ -5,6 +5,9 @@ const nl = {
   "A romantic wedding website platform. Each couple gets their own private home — from RSVPs to the last dance.":
     "Een romantisch platform voor trouwwebsites. Elk bruidspaar krijgt een eigen, besloten plek — van RSVP tot de laatste dans.",
 
+  // Language switch
+  Language: "Taal",
+
   // 404 and error screen
   "lost your way?": "de weg kwijt?",
   "The page you're looking for doesn't exist or has been moved.":

@@ -91,8 +91,8 @@ function InvitePage() {
 
   return (
     <SiteShell>
-      <PageCanvas density="quiet">
-        <Section size="hero" width="prose">
+      <PageCanvas decor={false}>
+        <Section tone="night" size="hero" width="prose" className="min-h-[70vh]">
           {status === "loading" ? (
             <div className="mx-auto flex max-w-sm flex-col items-center gap-4 text-center">
               <div className="wax-pulse">
@@ -102,7 +102,7 @@ function InvitePage() {
               <p className="type-body text-muted-foreground">{t("Opening your invitation…")}</p>
             </div>
           ) : (
-            <ThemedCard variant="framed" className="mx-auto max-w-sm text-center" ornament>
+            <ThemedCard variant="framed" className="tone-paper !bg-card mx-auto max-w-sm text-center" ornament>
               <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-destructive/12 text-destructive">
                 <AlertTriangle aria-hidden="true" className="h-5 w-5" />
               </span>

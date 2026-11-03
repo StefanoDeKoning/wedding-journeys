@@ -1,35 +1,33 @@
 import { Link } from "@tanstack/react-router";
-import {
-  Mail,
-  BookHeart,
-  CalendarHeart,
-  Image as ImageIcon,
-  Music,
-  MessageCircleHeart,
-  LogOut,
-  Settings,
-} from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import { useAuth } from "@/auth/AuthProvider";
-import { ThemedButton } from "@/design-system";
+import { Section, ThemedButton } from "@/design-system";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "@/i18n/LanguageToggle";
-import { useT } from "@/i18n";
+import { useI18n, useT } from "@/i18n";
+import { WaxSeal, initialsFromCouple } from "./WaxSeal";
+import { formatLongDate } from "./formatDate";
 
 const TAB_BASE =
-  "type-nav flex min-h-11 items-center gap-2 rounded-full whitespace-nowrap px-4 py-2 border border-transparent " +
-  "transition-[color,background-color,border-color,transform] duration-[var(--ds-dur-fast)] ease-[var(--ease-soft)] " +
-  "focus-ring-elegant";
-const TAB_INACTIVE = "text-muted-foreground hover:text-primary hover:bg-primary/8 hover:-translate-y-0.5";
-const TAB_ACTIVE = "text-primary bg-primary/10 border-gilded shadow-elev-1";
+  "relative flex min-h-11 shrink-0 items-center whitespace-nowrap font-body text-[0.8125rem] uppercase tracking-[0.18em] " +
+  "transition-colors duration-[var(--ds-dur-fast)] ease-[var(--ease-soft)] focus-ring-elegant";
+const TAB_INACTIVE = "text-muted-foreground hover:text-foreground";
+const TAB_ACTIVE =
+  "text-gold-hi after:absolute after:inset-x-0 after:bottom-2 after:h-px after:bg-gold after:content-['']";
 
 const tabs = [
-  { to: "/$slug" as const, label: "Invitation", icon: Mail, exact: true, feature: null },
-  { to: "/$slug/story" as const, label: "Story", icon: BookHeart, exact: false, feature: "story" as const },
-  { to: "/$slug/timeline" as const, label: "Timeline", icon: CalendarHeart, exact: false, feature: null },
-  { to: "/$slug/gallery" as const, label: "Gallery", icon: ImageIcon, exact: false, feature: "gallery" as const },
-  { to: "/$slug/playlist" as const, label: "Playlist", icon: Music, exact: false, feature: "playlist" as const },
-  { to: "/$slug/guestbook" as const, label: "Guestbook", icon: MessageCircleHeart, exact: false, feature: "guestbook" as const },
+  { to: "/$slug" as const, label: "Invitation", exact: true, feature: null },
+  { to: "/$slug/story" as const, label: "Story", exact: false, feature: "story" as const },
+  { to: "/$slug/timeline" as const, label: "Timeline", exact: false, feature: null },
+  { to: "/$slug/gallery" as const, label: "Gallery", exact: false, feature: "gallery" as const },
+  { to: "/$slug/playlist" as const, label: "Playlist", exact: false, feature: "playlist" as const },
+  {
+    to: "/$slug/guestbook" as const,
+    label: "Guestbook",
+    exact: false,
+    feature: "guestbook" as const,
+  },
 ] as const;
 
 export interface EnabledFeatures {
@@ -39,6 +37,10 @@ export interface EnabledFeatures {
   guestbook: boolean;
 }
 
+/**
+ * Night-green header. On phones only the top row (seal, language, sign out)
+ * sticks; the tab row scrolls away with the page so it doesn't eat the screen.
+ */
 export function WeddingHeader({
   slug,
   title,
@@ -56,69 +58,102 @@ export function WeddingHeader({
   const t = useT();
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-lg bg-background/75 border-b border-paper shadow-elev-1">
-      <div className="mx-auto max-w-6xl px-gutter">
-        <div className="h-20 flex items-center justify-between gap-6">
-          <Link
-            to="/$slug"
-            params={{ slug }}
-            className="flex items-baseline gap-2 min-w-0 hover-gild"
-          >
-            <span className="type-script-sm truncate">{title}</span>
-          </Link>
-          <div className="flex items-center gap-4 shrink-0">
-            <LanguageToggle />
-            {guestFirstName && (
-              <span className="hidden sm:inline type-caption">
-                {t("Hi,")} <span className="text-foreground font-medium">{guestFirstName}</span>
-              </span>
-            )}
-            {isAdmin && (
-              <ThemedButton asChild variant="gilded" size="sm">
-                <Link to="/$slug/admin" params={{ slug }} aria-label={t("Admin")}>
-                  <Settings aria-hidden="true" className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t("Admin")}</span>
-                </Link>
-              </ThemedButton>
-            )}
-            <ThemedButton
-              variant="ghost"
-              size="sm"
-              aria-label={t("Sign out")}
-              onClick={async () => {
-                await signOut();
-                window.location.href = `/${slug}`;
-              }}
-            >
-              <LogOut aria-hidden="true" className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("Sign out")}</span>
-            </ThemedButton>
-          </div>
-        </div>
+    <header className="tone-night max-sm:contents sm:sticky sm:top-0 sm:z-40 sm:border-b sm:border-[color-mix(in_oklab,var(--ds-gold)_25%,transparent)]">
+      <div className="tone-night grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-gutter max-sm:sticky max-sm:top-0 max-sm:z-40 max-sm:border-b max-sm:border-[color-mix(in_oklab,var(--ds-gold)_20%,transparent)] sm:h-[4.75rem] sm:grid-cols-[1fr_auto_1fr] sm:px-block">
+        {guestFirstName ? (
+          <span className="type-body hidden text-muted-foreground sm:block">
+            {t("Hi,")} <span className="font-medium text-foreground">{guestFirstName}</span>
+          </span>
+        ) : (
+          <span className="hidden sm:block" />
+        )}
 
-        {/* Tabs */}
-        <nav className="flex gap-2 overflow-x-auto -mx-gutter px-gutter pb-4 scrollbar-thin">
-          {tabs
-            .filter((tab) => !tab.feature || !features || features[tab.feature])
-            .map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <Link
-                key={tab.to}
-                to={tab.to}
-                params={{ slug }}
-                activeOptions={{ exact: tab.exact }}
-                className={cn(TAB_BASE, TAB_INACTIVE)}
-                activeProps={{ className: cn(TAB_BASE, TAB_ACTIVE) }}
-              >
-                <Icon aria-hidden="true" className="w-3.5 h-3.5" />
-                {t(tab.label)}
+        <Link
+          to="/$slug"
+          params={{ slug }}
+          aria-label={title}
+          className="flex min-w-0 items-center gap-2.5 focus-ring-elegant sm:justify-center"
+        >
+          <WaxSeal size={40} initials={initialsFromCouple(title)} />
+          <span className="truncate font-display text-[1.1875rem] italic sm:hidden">{title}</span>
+        </Link>
+
+        <div className="flex items-center justify-end gap-1.5 sm:gap-4">
+          <LanguageToggle />
+          {isAdmin && (
+            <ThemedButton asChild variant="gilded" size="sm">
+              <Link to="/$slug/admin" params={{ slug }} aria-label={t("Admin")}>
+                <Settings aria-hidden="true" className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{t("Admin")}</span>
               </Link>
-            );
-          })}
-        </nav>
+            </ThemedButton>
+          )}
+          <ThemedButton
+            variant="ghost"
+            size="sm"
+            aria-label={t("Sign out")}
+            className="h-11 w-11 px-0 sm:w-auto sm:px-2"
+            onClick={async () => {
+              await signOut();
+              window.location.href = `/${slug}`;
+            }}
+          >
+            <LogOut aria-hidden="true" className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("Sign out")}</span>
+          </ThemedButton>
+        </div>
       </div>
+
+      <nav
+        aria-label={t("Pages")}
+        className="tone-night scrollbar-thin flex h-12 items-center gap-7 overflow-x-auto px-gutter pr-12 max-sm:[mask-image:linear-gradient(90deg,#000_78%,transparent)] sm:justify-center sm:gap-9 sm:pr-gutter"
+      >
+        {tabs
+          .filter((tab) => !tab.feature || !features || features[tab.feature])
+          .map((tab) => (
+            <Link
+              key={tab.to}
+              to={tab.to}
+              params={{ slug }}
+              activeOptions={{ exact: tab.exact }}
+              className={cn(TAB_BASE, TAB_INACTIVE)}
+              activeProps={{ className: cn(TAB_BASE, TAB_ACTIVE) }}
+            >
+              {t(tab.label)}
+            </Link>
+          ))}
+      </nav>
     </header>
+  );
+}
+
+function WeddingFooter({
+  title,
+  weddingDate,
+  locationName,
+}: {
+  title: string;
+  weddingDate?: string | null;
+  locationName?: string | null;
+}) {
+  const { t, locale } = useI18n();
+  const meta = [formatLongDate(weddingDate, locale), locationName].filter(Boolean).join(" · ");
+  return (
+    <Section as="footer" tone="night" edge size="compact" width="prose">
+      <div className="flex flex-col items-center gap-3 pt-4 text-center">
+        <WaxSeal size={72} initials={initialsFromCouple(title)} />
+        <p className="mt-2 font-display text-[clamp(1.75rem,3vw,2.5rem)] font-light italic leading-tight">
+          {title}
+        </p>
+        {meta && <p className="type-label !text-primary">{meta}</p>}
+        <p className="type-caption mt-4">
+          {t("Made with love on")}{" "}
+          <Link to="/" className="link-ink !text-foreground">
+            OurJourney
+          </Link>
+        </p>
+      </div>
+    </Section>
   );
 }
 
@@ -128,6 +163,8 @@ export function WeddingShell({
   guestFirstName,
   isAdmin = false,
   features,
+  weddingDate,
+  locationName,
   children,
 }: {
   slug: string;
@@ -135,11 +172,12 @@ export function WeddingShell({
   guestFirstName?: string;
   isAdmin?: boolean;
   features?: EnabledFeatures;
+  weddingDate?: string | null;
+  locationName?: string | null;
   children: ReactNode;
 }) {
-  const t = useT();
   return (
-    <div className="min-h-screen flex flex-col bg-wash-page">
+    <div className="flex min-h-screen flex-col bg-wash-page">
       <WeddingHeader
         slug={slug}
         title={title}
@@ -148,12 +186,7 @@ export function WeddingShell({
         features={features}
       />
       <main className="flex-1">{children}</main>
-      <footer className="text-center type-caption py-block">
-        {t("Made with love on")}{" "}
-        <Link to="/" className="text-primary hover-gild">
-          OurJourney
-        </Link>
-      </footer>
+      <WeddingFooter title={title} weddingDate={weddingDate} locationName={locationName} />
     </div>
   );
 }

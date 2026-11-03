@@ -19,6 +19,7 @@ const nl = {
 
   // Header, tabs and footer
   "Hi,": "Hoi,",
+  Pages: "Pagina's",
   Admin: "Beheer",
   "Made with love on": "Met liefde gemaakt op",
 
