@@ -698,7 +698,7 @@ export function PageHero({
   return (
     <Section tone="night" size="regular" width={width} className="mb-block overflow-hidden">
       {theme.decor.fireflies && <Fireflies />}
-      <Hero {...hero} className={cn("relative py-0", hero.className)} />
+      <Hero {...hero} className={cn("relative !py-0", hero.className)} />
     </Section>
   );
 }
