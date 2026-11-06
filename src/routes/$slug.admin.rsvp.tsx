@@ -62,6 +62,7 @@ import { logAudit } from "@/wedding/audit";
 import { downloadCsv, toCsv } from "@/wedding/csv";
 import { dietaryLabel, DIETARY_OPTIONS, type DietaryValue } from "@/wedding/dietary";
 import { buildInvitationLink } from "@/wedding/invitationLink";
+import { matchesGuestFilters } from "@/wedding/guestFilters";
 import { Link as LinkIcon } from "lucide-react";
 import jsPDF from "jspdf";
 import { tHead, useI18n, useT, type MessageKey } from "@/i18n";
@@ -72,6 +73,10 @@ export const Route = createFileRoute("/$slug/admin/rsvp")({
     meta: [
       { title: tHead("Guests & RSVP") },
       { name: "description", content: tHead("Manage guests, groups and RSVP responses.") },
+      { property: "og:title", content: tHead("Guests & RSVP") },
+      { property: "og:description", content: tHead("Manage guests, groups and RSVP responses.") },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminRsvpOverview,
@@ -119,6 +124,8 @@ function AdminRsvpOverview() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterGroup, setFilterGroup] = useState<string>("all");
+  const [filterType, setFilterType] = useState("all");
+  const [filterResponse, setFilterResponse] = useState("all");
   const [editing, setEditing] = useState<Guest | null>(null);
   const [adding, setAdding] = useState(false);
   const { t, tx, locale } = useI18n();
@@ -228,7 +235,8 @@ function AdminRsvpOverview() {
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return rows.filter(({ g }) => {
+    return rows.filter(({ g, r }) => {
+      if (!matchesGuestFilters(g.guest_type, r !== null, filterType, filterResponse)) return false;
       if (filterGroup === "none" && g.guest_group_id) return false;
       if (filterGroup !== "all" && filterGroup !== "none" && g.guest_group_id !== filterGroup)
         return false;
@@ -240,7 +248,7 @@ function AdminRsvpOverview() {
         (g.email?.toLowerCase().includes(q) ?? false)
       );
     });
-  }, [rows, search, filterGroup]);
+  }, [rows, search, filterGroup, filterType, filterResponse]);
 
   const removeGuest = async (g: Guest) => {
     if (!confirm(t("Remove {name}?", { name: `${g.first_name} ${g.last_name}` }))) return;
@@ -536,8 +544,8 @@ function AdminRsvpOverview() {
               </Button>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="relative flex-1">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+            <div className="relative flex-1 sm:min-w-48">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 value={search}
@@ -558,6 +566,27 @@ function AdminRsvpOverview() {
                     {g.name}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-full sm:w-48" aria-label={t("Guest type")}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("All guest types")}</SelectItem>
+                <SelectItem value="day">{t("Day")}</SelectItem>
+                <SelectItem value="evening">{t("Evening")}</SelectItem>
+                <SelectItem value="full_day">{t("Both parts")}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={filterResponse} onValueChange={setFilterResponse}>
+              <SelectTrigger className="w-full sm:w-48" aria-label={t("Response status")}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("All responses")}</SelectItem>
+                <SelectItem value="responded">{t("Responded")}</SelectItem>
+                <SelectItem value="not_responded">{t("Not responded")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
