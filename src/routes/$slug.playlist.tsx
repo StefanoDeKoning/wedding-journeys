@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { safeHttpUrl } from "@/lib/safeUrl";
+import { validateSongRequest } from "@/wedding/songRequestValidation";
 import {
   PageCanvas,
   Section,
@@ -113,16 +114,13 @@ function PlaylistPage() {
       toast.error(t("Only guests can submit songs."));
       return;
     }
-    if (!title.trim() || !artist.trim()) {
-      toast.error(t("Song title and artist are required."));
+    const validationError = validateSongRequest(title, artist, spotify);
+    if (validationError) {
+      toast.error(t(validationError));
       return;
     }
     if (remaining <= 0) {
       toast.error(t("You've used all 3 of your song requests."));
-      return;
-    }
-    if (spotify.trim() && !/^https?:\/\/(open\.)?spotify\.com\//i.test(spotify.trim())) {
-      toast.error(t("Spotify link must start with https://open.spotify.com/"));
       return;
     }
     setSubmitting(true);
@@ -229,10 +227,11 @@ function PlaylistPage() {
                     placeholder="At Last"
                     disabled={remaining <= 0}
                     maxLength={200}
+                    required
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="artist">{t("Artist")}</Label>
+                  <Label htmlFor="artist">{t("Artist (optional)")}</Label>
                   <ThemedInput
                     id="artist"
                     value={artist}
@@ -299,7 +298,7 @@ function PlaylistPage() {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{s.title}</p>
                           <p className="type-caption truncate">
-                            {s.artist} · {t("suggested by {name}", { name: s.submitted_by_name })}
+                            {s.artist && `${s.artist} · `}{t("suggested by {name}", { name: s.submitted_by_name })}
                             {mine && ` · ${t("you")}`}
                           </p>
                         </div>

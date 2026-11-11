@@ -1,5 +1,7 @@
 # Architecture
 
+- Keep song request field validation in a shared pure function with rule tests so optional fields cannot block submission.
+
 - Keep guest type and response filtering in a shared pure predicate with rule tests; combine it with existing search and group filters without changing total statistics or exports.
 
 - Keep section spacing centralized in the design-system `Section` wrapper so adjacent sections cannot accumulate duplicate vertical gaps.
