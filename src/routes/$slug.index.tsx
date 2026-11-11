@@ -141,10 +141,6 @@ function InvitationPage() {
             </div>
           )}
 
-          <ThemedButton size="lg" className="mt-stack w-full max-w-sm sm:w-auto" onClick={openRsvp}>
-            {t("Reply with your wishes")}
-          </ThemedButton>
-
           {theme.decor.horizon === "castle-courtyard" && <CastleSkyline className="mt-block" />}
         </header>
       </Section>
