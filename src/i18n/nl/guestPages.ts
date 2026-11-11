@@ -110,6 +110,8 @@ const nl = {
   "Suggest or vote for a song for the dance floor.": "Stel een nummer voor of stem op een nummer voor de dansvloer.",
   "Only guests can submit songs.": "Alleen gasten kunnen nummers voorstellen.",
   "Song title and artist are required.": "Vul de titel en de artiest in.",
+  "Song title is required.": "Vul de titel in.",
+  "Artist (optional)": "Artiest (optioneel)",
   "You've used all 3 of your song requests.": "Je hebt al je 3 verzoeken gebruikt.",
   "Spotify link must start with https://open.spotify.com/":
     "Een Spotify-link moet beginnen met https://open.spotify.com/",
