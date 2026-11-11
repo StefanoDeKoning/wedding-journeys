@@ -297,10 +297,7 @@ function PlaylistPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{s.title}</p>
-                          <p className="type-caption truncate">
-                            {s.artist && `${s.artist} · `}{t("suggested by {name}", { name: s.submitted_by_name })}
-                            {mine && ` · ${t("you")}`}
-                          </p>
+                          {s.artist && <p className="type-caption truncate">{s.artist}</p>}
                         </div>
                         <Badge tone="primary">
                           {s.vote_count} {s.vote_count === 1 ? t("vote") : t("votes")}
