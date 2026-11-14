@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Save, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, Plus, Trash2, Save, Settings as SettingsIcon } from "lucide-react";
 import { useWedding } from "@/wedding/useWedding";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,18 @@ import { AdminsSection } from "@/wedding/admin/AdminsSection";
 import { StorageSection } from "@/wedding/admin/StorageSection";
 import { AuditSection } from "@/wedding/admin/AuditSection";
 
-import { useI18n, useT } from "@/i18n";
+import { emptyCeremonyMaster, getCeremonyMasters, normalizeCeremonyMasters, type CeremonyMaster } from "@/wedding/ceremonyMasters";
+import { tHead, useI18n, useT } from "@/i18n";
 
 export const Route = createFileRoute("/$slug/admin/settings")({
+  head: () => ({ meta: [
+    { title: tHead("Wedding settings") },
+    { name: "description", content: tHead("Manage your wedding configuration, admins, storage and activity history in one place.") },
+    { property: "og:title", content: tHead("Wedding settings") },
+    { property: "og:description", content: tHead("Manage your wedding configuration, admins, storage and activity history in one place.") },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: AdminSettings,
 });
 
@@ -86,10 +95,7 @@ function GeneralTab({
   const [locationName, setLocationName] = useState("");
   const [locationAddress, setLocationAddress] = useState("");
   const [mapsUrl, setMapsUrl] = useState("");
-  const [cmName, setCmName] = useState("");
-  const [cmRole, setCmRole] = useState("");
-  const [cmPhone, setCmPhone] = useState("");
-  const [cmEmail, setCmEmail] = useState("");
+  const [ceremonyMasters, setCeremonyMasters] = useState<CeremonyMaster[]>([emptyCeremonyMaster()]);
   const { t, tx } = useI18n();
   const [tabs, setTabs] = useState({
     story_enabled: true,
@@ -108,10 +114,8 @@ function GeneralTab({
     setLocationName(wedding.location_name ?? "");
     setLocationAddress(wedding.location_address ?? "");
     setMapsUrl(wedding.maps_url ?? "");
-    setCmName(wedding.ceremony_master_name ?? "");
-    setCmRole(wedding.ceremony_master_role ?? "");
-    setCmPhone(wedding.ceremony_master_phone ?? "");
-    setCmEmail(wedding.ceremony_master_email ?? "");
+    const contacts = getCeremonyMasters(wedding);
+    setCeremonyMasters(contacts.length ? contacts : [emptyCeremonyMaster()]);
     setTabs({
       story_enabled: wedding.story_enabled !== false,
       gallery_enabled: wedding.gallery_enabled !== false,
@@ -122,6 +126,8 @@ function GeneralTab({
 
   const save = async () => {
     setSaving(true);
+    const contacts = normalizeCeremonyMasters(ceremonyMasters);
+    const firstContact = contacts[0];
     const { error } = await supabase
       .from("weddings")
       .update({
@@ -133,10 +139,11 @@ function GeneralTab({
         location_name: locationName.trim() || null,
         location_address: locationAddress.trim() || null,
         maps_url: mapsUrl.trim() || null,
-        ceremony_master_name: cmName.trim() || null,
-        ceremony_master_role: cmRole.trim() || null,
-        ceremony_master_phone: cmPhone.trim() || null,
-        ceremony_master_email: cmEmail.trim() || null,
+        ceremony_masters: contacts.map(contact => ({ ...contact })),
+        ceremony_master_name: firstContact?.name || null,
+        ceremony_master_role: firstContact?.role || null,
+        ceremony_master_phone: firstContact?.phone || null,
+        ceremony_master_email: firstContact?.email || null,
         ...tabs,
       })
       .eq("id", wedding.id);
@@ -279,58 +286,39 @@ function GeneralTab({
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-5">
         <div>
-          <h3 className="font-display text-lg">{t("Ceremony master")}</h3>
+          <h3 className="font-display text-lg">{t("Ceremony masters")}</h3>
           <p className="text-sm text-muted-foreground">
             {t("The person guests can contact with questions. Shown on the invitation page.")}
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="cmn">{t("Name")}</Label>
-            <Input
-              id="cmn"
-              value={cmName}
-              onChange={(e) => setCmName(e.target.value)}
-              placeholder="Anna de Vries"
-              maxLength={120}
-              className="mt-1"
-            />
+        {ceremonyMasters.map((contact, index) => (
+          <div key={index} className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="font-medium text-sm">{t("Ceremony master {number}", { number: index + 1 })}</h4>
+              <Button type="button" variant="ghost" size="icon" title={t("Remove ceremony master {number}", { number: index + 1 })} aria-label={t("Remove ceremony master {number}", { number: index + 1 })} onClick={() => setCeremonyMasters(previous => previous.filter((_, i) => i !== index))}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {(["name", "role", "phone", "email"] as const).map(field => (
+                <div key={field}>
+                  <Label htmlFor={`cm-${index}-${field}`}>{t(field === "name" ? "Name" : field === "role" ? "Role (optional)" : field === "phone" ? "Phone" : "Email")}</Label>
+                  <Input
+                    id={`cm-${index}-${field}`}
+                    type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
+                    value={contact[field]}
+                    onChange={event => setCeremonyMasters(previous => previous.map((row, i) => i === index ? { ...row, [field]: event.target.value } : row))}
+                    maxLength={field === "email" ? 200 : field === "phone" ? 40 : 120}
+                    className="mt-1"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <div>
-            <Label htmlFor="cmr">{t("Role (optional)")}</Label>
-            <Input
-              id="cmr"
-              value={cmRole}
-              onChange={(e) => setCmRole(e.target.value)}
-              placeholder={t("Ceremony master")}
-              maxLength={120}
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor="cmp">{t("Phone")}</Label>
-            <Input
-              id="cmp"
-              value={cmPhone}
-              onChange={(e) => setCmPhone(e.target.value)}
-              placeholder="+31 6 12345678"
-              maxLength={40}
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor="cme">{t("Email")}</Label>
-            <Input
-              id="cme"
-              type="email"
-              value={cmEmail}
-              onChange={(e) => setCmEmail(e.target.value)}
-              placeholder="anna@example.com"
-              maxLength={200}
-              className="mt-1"
-            />
-          </div>
-        </div>
+        ))}
+        <Button type="button" variant="outline" onClick={() => setCeremonyMasters(previous => [...previous, emptyCeremonyMaster()])}>
+          <Plus className="h-4 w-4 mr-2" />{t("Add ceremony master")}
+        </Button>
       </section>
 
       <section className="rounded-2xl border border-border bg-card p-6 shadow-soft space-y-4">

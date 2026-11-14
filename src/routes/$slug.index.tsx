@@ -13,6 +13,7 @@ import { CastleSkyline } from "@/wedding/CastleSkyline";
 import { WaxSeal, initialsFromCouple } from "@/wedding/WaxSeal";
 import { RsvpDialog, type GuestType } from "@/wedding/RsvpForm";
 import { safeHttpUrl } from "@/lib/safeUrl";
+import { ceremonyMasterMode, getCeremonyMasters } from "@/wedding/ceremonyMasters";
 import { cn } from "@/lib/utils";
 import {
   PageCanvas,
@@ -31,6 +32,10 @@ export const Route = createFileRoute("/$slug/")({
     meta: [
       { title: tHead("Invitation — {slug}", { slug: params.slug }) },
       { name: "description", content: tHead("Your private digital wedding invitation.") },
+      { property: "og:title", content: tHead("Invitation — {slug}", { slug: params.slug }) },
+      { property: "og:description", content: tHead("Your private digital wedding invitation.") },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: InvitationPage,
@@ -69,11 +74,9 @@ function InvitationPage() {
 
   const mapsUrl = safeHttpUrl(wedding.maps_url);
   const longDate = formatLongDate(wedding.wedding_date, locale);
-  const hasCeremonyMaster = !!(
-    wedding.ceremony_master_name ||
-    wedding.ceremony_master_phone ||
-    wedding.ceremony_master_email
-  );
+  const ceremonyMasters = getCeremonyMasters(wedding);
+  const contactMode = ceremonyMasterMode(ceremonyMasters);
+  const hasCeremonyMaster = contactMode !== "none";
 
   const downloadCalendarEvent = () => {
     if (!wedding.wedding_date) return;
@@ -278,31 +281,27 @@ function InvitationPage() {
           {hasCeremonyMaster && (
             <div className="flex flex-col justify-center gap-2 rounded-card border-gilded p-stack sm:p-10">
               <p className="type-label !text-gold-ink">{t("Questions?")}</p>
-              <p className="type-card-title mt-1">
-                {wedding.ceremony_master_name || t("Our ceremony master")}
-              </p>
               <p className="type-body text-muted-foreground">
-                {wedding.ceremony_master_role || t("Ceremony master")}{" "}
-                {t("— happy to help with anything about the day.")}
+                {contactMode === "single"
+                  ? t("Ceremony master - if you want to do something during the wedding or have questions you don't want to burden the couple with, you can come to me.")
+                  : t("Ceremony masters - if you want to do something during the wedding or have questions you don't want to burden the couple with, you can come to us.")}
               </p>
-              <div className="mt-2 flex flex-col gap-1">
-                {wedding.ceremony_master_phone && (
-                  <a
-                    href={`tel:${wedding.ceremony_master_phone.replace(/\s+/g, "")}`}
-                    className="type-body link-ink self-start focus-ring-elegant"
-                  >
-                    {wedding.ceremony_master_phone}
-                  </a>
-                )}
-                {wedding.ceremony_master_email && (
-                  <a
-                    href={`mailto:${wedding.ceremony_master_email}`}
-                    className="type-body link-ink self-start break-all focus-ring-elegant"
-                  >
-                    {wedding.ceremony_master_email}
-                  </a>
-                )}
-              </div>
+              {ceremonyMasters.map((contact, index) => (
+                <div key={index} className="mt-2 flex min-w-0 flex-col gap-1">
+                  <p className="type-card-title mt-1 break-words">{contact.name || t("Our ceremony master")}</p>
+                  {contact.role && <p className="type-body text-muted-foreground">{contact.role}</p>}
+                  {contact.phone && (
+                    <a href={`tel:${contact.phone.replace(/\s+/g, "")}`} className="type-body link-ink self-start focus-ring-elegant">
+                      {contact.phone}
+                    </a>
+                  )}
+                  {contact.email && (
+                    <a href={`mailto:${contact.email}`} className="type-body link-ink self-start break-all focus-ring-elegant">
+                      {contact.email}
+                    </a>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
