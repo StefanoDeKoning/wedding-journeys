@@ -1,0 +1,3 @@
+ALTER TABLE public.weddings ADD COLUMN ceremony_masters jsonb NOT NULL DEFAULT '[]'::jsonb;
+UPDATE public.weddings SET ceremony_masters = jsonb_build_array(jsonb_build_object('name', coalesce(ceremony_master_name, ''), 'role', coalesce(ceremony_master_role, ''), 'phone', coalesce(ceremony_master_phone, ''), 'email', coalesce(ceremony_master_email, ''))) WHERE coalesce(ceremony_master_name, ceremony_master_phone, ceremony_master_email) IS NOT NULL;
+ALTER TABLE public.weddings ADD CONSTRAINT ceremony_masters_is_array CHECK (jsonb_typeof(ceremony_masters) = 'array');

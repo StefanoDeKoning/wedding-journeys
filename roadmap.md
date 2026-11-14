@@ -1,5 +1,10 @@
 # Timeline availability
 
+# Multiple ceremony masters
+
+- [ ] Allow admins to save multiple contacts, retaining existing contact details.
+- [ ] Display all contacts with singular/plural invitation text and verify saving and reading back.
+
 - [x] Add persistent availability and enforce timeline reads for guests.
 - [x] Add release/hide control to the admin overview and preserve admin preview.
 - [x] Show Coming soon until released, without changing the timeline design.

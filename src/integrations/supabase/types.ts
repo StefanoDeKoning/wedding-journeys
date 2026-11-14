@@ -827,6 +827,7 @@ export type Database = {
           ceremony_master_name: string | null
           ceremony_master_phone: string | null
           ceremony_master_role: string | null
+          ceremony_masters: Json
           couple_name_one: string | null
           couple_name_two: string | null
           created_at: string
@@ -865,6 +866,7 @@ export type Database = {
           ceremony_master_name?: string | null
           ceremony_master_phone?: string | null
           ceremony_master_role?: string | null
+          ceremony_masters?: Json
           couple_name_one?: string | null
           couple_name_two?: string | null
           created_at?: string
@@ -903,6 +905,7 @@ export type Database = {
           ceremony_master_name?: string | null
           ceremony_master_phone?: string | null
           ceremony_master_role?: string | null
+          ceremony_masters?: Json
           couple_name_one?: string | null
           couple_name_two?: string | null
           created_at?: string

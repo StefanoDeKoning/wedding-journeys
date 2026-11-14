@@ -1,5 +1,7 @@
 # Architecture
 
+- Store ceremony-master contacts as a wedding JSON array and normalize/count filled contacts in a shared pure helper; preserve the legacy first-contact fields for compatibility with published clients.
+
 - Keep song request field validation in a shared pure function with rule tests so optional fields cannot block submission.
 
 - Keep guest type and response filtering in a shared pure predicate with rule tests; combine it with existing search and group filters without changing total statistics or exports.
