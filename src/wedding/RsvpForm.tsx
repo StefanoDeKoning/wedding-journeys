@@ -421,7 +421,13 @@ export function RsvpDialog({
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-[2px] animate-ds-fade" />
         <DialogPrimitive.Content className="surface-paper animate-ds-scale fixed top-1/2 left-1/2 z-50 w-[min(40rem,94vw)] max-h-[90dvh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto p-6 sm:p-block shadow-elev-4">
           <DialogPrimitive.Title className="type-section-title text-center">
-            {t("Will you join us?")}
+            {guest?.guest_type === "day"
+              ? t("Will you join us as a day guest?")
+              : guest?.guest_type === "evening"
+                ? t("Will you join us as an evening guest?")
+                : guest?.guest_type === "full_day"
+                  ? t("Will you join us as a day/evening guest?")
+                  : t("Will you join us?")}
           </DialogPrimitive.Title>
           <DialogPrimitive.Description className="type-caption mt-1 text-center">
             {rsvpDeadline
