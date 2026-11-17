@@ -4,6 +4,7 @@ const nl = {
   "Remove {name}?": "{name} verwijderen?",
   "Guest removed.": "Gast verwijderd.",
   "Invitation link copied.": "Uitnodigingslink gekopieerd.",
+  "Hello, here is the invitation link for our wedding:": "Hallo, bij deze de uitnodigingslink voor onze bruiloft:",
   "Could not copy link.": "De link kon niet worden gekopieerd.",
 
   // Export columns and values

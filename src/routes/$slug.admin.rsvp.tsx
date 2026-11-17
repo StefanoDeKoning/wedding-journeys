@@ -310,7 +310,7 @@ function AdminRsvpOverview() {
     if (!wedding) return;
     const link = buildInvitationLink(wedding.slug, code);
     try {
-      await navigator.clipboard.writeText(link);
+      await navigator.clipboard.writeText(`${t("Hello, here is the invitation link for our wedding:")}\n\n${link}`);
       toast.success(t("Invitation link copied."));
     } catch {
       toast.error(t("Could not copy link."));
